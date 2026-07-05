@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Routine X1</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 20px 10px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            color: #0f172a;
+        }
+
+        /* Tabs Navigation */
+        .tabs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        @media (min-width: 600px) {
+            .tabs {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
+
+        .tab-btn {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 12px 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-light);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+        }
+
+        /* Workout Content */
+        .workout-day {
+            display: none;
+        }
+
+        .workout-day.active {
+            display: block;
+        }
+
+        .day-title {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: #0f172a;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 5px;
+        }
+
+        /* Exercise Cards */
+        .exercise-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.2s, opacity 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .exercise-card.completed {
+            opacity: 0.6;
+            background-color: #f1f5f9;
+        }
+
+        .exercise-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .checkbox-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .exercise-checkbox {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .exercise-details h3 {
+            font-size: 1.05rem;
+            margin-bottom: 4px;
+        }
+
+        .exercise-card.completed .exercise-details h3 {
+            text-decoration: line-through;
+            color: var(--text-light);
+        }
+
+        .meta-tags {
+            display: flex;
+            gap: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .tag-sets {
+            background-color: #dbeafe;
+            color: #1e40af;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .tag-reps {
+            background-color: #fee2e2;
+            color: #991b1b;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .video-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f1f5f9;
+            color: var(--text);
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
+            margin-left: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .video-link:hover {
+            background-color: #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🏋️ Workout Routine X1</h1>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchDay('monday')">Mon</button>
+        <button class="tab-btn" onclick="switchDay('tuesday')">Tue</button>
+        <button class="tab-btn" onclick="switchDay('wednesday')">Wed</button>
+        <button class="tab-btn" onclick="switchDay('thursday')">Thu</button>
+        <button class="tab-btn" onclick="switchDay('friday')">Fri</button>
+        <button class="tab-btn" onclick="switchDay('saturday')">Sat</button>
+    </div>
+
+    <div id="monday" class="workout-day active">
+        <h2 class="day-title">Monday - Push Day A</h2>
+        
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Decline Bench Press</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=LfyQBUKR8SE" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Incline Dumbbell Press</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=8iPEnn-ltC8" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Cable Crossover</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=Iwe6AmxVf7o" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Military Press</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=2yjwXTZQDDI" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Lateral Raises</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=3VcKaXpzqRo" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+    </div>
+
+    <div id="tuesday" class="workout-day">
+        <h2 class="day-title">Tuesday - Pull Day A</h2>
+        
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Lat Pulldown</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=CAwf7n6Luuc" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Close Grip Pulldown</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=GZbfZ03X9UM" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>T-Bar Row</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=j3Igk5nyZE4" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Barbell Shrugs</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=AsAVbj7puKo" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Dumbbell Curls</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=sAq_ocpRh_I" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Dumbbell Preacher Curls</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=WK5yZMlgMb4" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Close Grip Pull-ups</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=WK5yZMlgMb4" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+    </div>
+
+    <div id="wednesday" class="workout-day">
+        <h2 class="day-title">Wednesday - Leg Day A</h2>
+        
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Squats</h3>
+                    <div class="meta-tags"><span class="tag-sets">5 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=t2b8UdqmlFs" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Lunges</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=QF0BQS2W80k" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Leg Press</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=IZxyjWwAKcc" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Leg Extension</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=YyvSfVLYHQI" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Calf Raises</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=YMmgq8gD6Y0" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+    </div>
+
+    <div id="thursday" class="workout-day">
+        <h2 class="day-title">Thursday - Push Day B</h2>
+        
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Flat Bench Press</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=rT7DgCr-3pg" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Dumbbell Pullovers</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=tpLnfSQJ0gg" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Skull Crushers</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=d_KZxkY_0cM" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Kickbacks</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=6SS6K3lAwZ8" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Arnold Press</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=6Z15_WdxwBM" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+    </div>
+
+    <div id="friday" class="workout-day">
+        <h2 class="day-title">Friday - Pull Day B</h2>
+        
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Barbell Row</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=I0vbwZ7UXmE" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>One-Arm Dumbbell Row</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=dFzUjAs_XDY" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Deadlift</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=op9kVnCDozo" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Dumbbell Shrugs</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=g6q809GfC90" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Cable Preacher Curls</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=00VQMt4Xsys" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Hammer Curls</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=zC3nLlEvin4" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Chin-ups</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=bd_A0kDAyK4" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+    </div>
+
+    <div id="saturday" class="workout-day">
+        <h2 class="day-title">Saturday - Leg Day B</h2>
+        
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Front Squats</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=v-mQm_vVug0" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Dumbbell Step-ups</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=dQqApCGd5Ss" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Lying Leg Curl</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=1Tq3QdIUjEk" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-info">
+                <div class="checkbox-wrapper"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"></div>
+                <div class="exercise-details">
+                    <h3>Standing Calf Raises</h3>
+                    <div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div>
+                </div>
+            </div>
+            <a href="https://www.youtube.com/watch?v=YMmgq8gD6Y0" target="_blank" class="video-link">🎬 Demo</a>
+        </div>
+    </div>
+
+    <script>
+        function switchDay(dayId) {
+            // Hide all routines
+            const days = document.querySelectorAll('.workout-day');
+            days.forEach(day => day.classList.remove('active'));
+
+            // Deactivate all tab buttons
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Show selected routine & activate button
+            document.getElementById(dayId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        function toggleComplete(checkbox) {
+            const card = checkbox.closest('.exercise-card');
+            if (checkbox.checked) {
+                card.classList.add('completed');
+            } else {
+                card.classList.remove('completed');
+            }
+        }
+    </script>
+</body>
+</html>
