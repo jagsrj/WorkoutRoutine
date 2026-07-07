@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Workout & Nutrition Tracker</title>
+    <title>Workout, Nutrition & Cricket Tracker</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -23,6 +23,7 @@
             --border: #e2e8f0;
             --success: #10b981;
             --accent-purple: #7c3aed;
+            --cricket-gold: #eab308;
         }
         * {
             box-sizing: border-box;
@@ -50,11 +51,11 @@
             color: #0f172a;
         }
         
-        /* Main Navigation (Workouts vs Nutrition) */
+        /* Main Navigation (3 Items now) */
         .main-nav {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px;
             margin-bottom: 20px;
             background: #e2e8f0;
             padding: 4px;
@@ -63,13 +64,14 @@
         .nav-btn {
             background: none;
             border: none;
-            padding: 12px;
-            font-size: 1rem;
+            padding: 10px 4px;
+            font-size: 0.85rem;
             font-weight: 700;
             color: var(--text-light);
             cursor: pointer;
             border-radius: 9px;
             transition: all 0.2s;
+            text-align: center;
         }
         .nav-btn.active {
             background: var(--card-bg);
@@ -85,9 +87,7 @@
             text-align: center;
             margin-bottom: 20px;
             cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
         }
-        .timer-container:active { transform: scale(0.98); }
         .timer-container.running { background: var(--primary); }
         .timer-container.finished { background: var(--success); animation: pulse 1s infinite; }
         #timer-display { font-size: 1.4rem; font-weight: bold; }
@@ -110,14 +110,12 @@
             color: var(--text-light);
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.2s ease;
             text-align: center;
         }
         .tab-btn.active {
             background-color: var(--primary);
             color: white;
             border-color: var(--primary);
-            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
         }
         
         .page-view, .workout-day { display: none; }
@@ -139,7 +137,6 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
         .exercise-card.completed {
             opacity: 0.45;
@@ -148,7 +145,6 @@
         .exercise-info { display: flex; align-items: center; gap: 14px; flex: 1; cursor: pointer; }
         .exercise-checkbox { width: 26px; height: 26px; accent-color: var(--primary); border-radius: 6px; }
         .exercise-details h3 { font-size: 1.05rem; margin-bottom: 6px; color: #0f172a; }
-        .exercise-card.completed .exercise-details h3 { text-decoration: line-through; color: var(--text-light); }
         
         .meta-tags { display: flex; gap: 8px; font-size: 0.75rem; font-weight: 700; }
         .tag-sets { background-color: #dbeafe; color: #1e40af; padding: 3px 8px; border-radius: 6px; }
@@ -167,22 +163,13 @@
             border: 1px solid var(--border);
         }
 
-        /* Nutrition Panel Styling */
+        /* Nutrition & Media Component Design */
         .nutrition-section {
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 16px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.01);
-        }
-        .nutrition-section h2 {
-            font-size: 1.25rem;
-            color: #0f172a;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
         .macro-grid {
             display: grid;
@@ -196,11 +183,7 @@
             border-radius: 12px;
             padding: 12px;
             text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
         }
-        .macro-card:active { transform: scale(0.97); }
-        .macro-card h4 { font-size: 1rem; margin-bottom: 4px; }
         
         .responsive-img {
             width: 100%;
@@ -209,9 +192,33 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
+        /* Special Cricket Card Styling */
+        .cricket-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .cricket-grid {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 14px;
+            align-items: center;
+        }
+        @media (max-width: 500px) {
+            .cricket-grid { grid-template-columns: 1fr; }
+        }
+        .cricket-img-container img {
+            width: 100%;
+            border-radius: 8px;
+            object-fit: cover;
+            aspect-ratio: 1/1;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
         .controls { margin-top: 35px; text-align: center; padding-bottom: env(safe-area-inset-bottom); }
         .reset-btn { background-color: #ef4444; color: white; border: none; padding: 14px 28px; font-size: 0.95rem; font-weight: 600; border-radius: 10px; cursor: pointer; }
-
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
     </style>
 </head>
@@ -223,6 +230,7 @@
 
     <nav class="main-nav">
         <button class="nav-btn active" id="btn-workout" onclick="showPage('workout')">💪 Workouts</button>
+        <button class="nav-btn" id="btn-cricket" onclick="showPage('cricket')">🏏 Cricket</button>
         <button class="nav-btn" id="btn-nutrition" onclick="showPage('nutrition')">🥗 Nutrition</button>
     </nav>
 
@@ -289,8 +297,87 @@
     </div>
 
 
+    <div id="page-cricket" class="page-view">
+        <div class="nutrition-section" style="border-left: 4px solid var(--cricket-gold); background: #fffdf5;">
+            <h3 style="color:#854d0e; margin-bottom: 4px;">⚡ Kinetic Chain Principle</h3>
+            <p style="font-size: 0.85rem; font-style: italic; color: #a16207;">"Sixes don't start in the arms. They start in the ground, explode through the hips, and finish through the bat."</p>
+        </div>
+
+        <h2 class="day-title" style="border-color: var(--cricket-gold);">🏏 Power Hitting Mechanics</h2>
+
+        <div class="cricket-card">
+            <div class="cricket-grid">
+                <div class="cricket-img-container"><img src="image.png" alt="Rear-Foot Elevated Split Squat"></div>
+                <div>
+                    <h3 style="font-size:1.1rem; margin-bottom:4px;">Rear-Foot Elevated Split Squat</h3>
+                    <p style="font-size:0.85rem; color:var(--text-light); line-height:1.3;">Builds explosive single-leg drive to ground your base securely during maximum swings.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="cricket-card">
+            <div class="cricket-grid">
+                <div class="cricket-img-container"><img src="image.png" alt="Trap Bar Deadlift"></div>
+                <div>
+                    <h3 style="font-size:1.1rem; margin-bottom:4px;">Trap Bar Deadlift</h3>
+                    <p style="font-size:0.85rem; color:var(--text-light); line-height:1.3;">Teaches you to press dynamic ground force vertically, turning lower strength into high bat velocity.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="cricket-card">
+            <div class="cricket-grid">
+                <div class="cricket-img-container"><img src="image.png" alt="Med Ball Rotational Throw"></div>
+                <div>
+                    <h3 style="font-size:1.1rem; margin-bottom:4px;">Med Ball Rotational Throw</h3>
+                    <p style="font-size:0.85rem; color:var(--text-light); line-height:1.3;">Pure hip-to-torso uncoiling. Maximizes torque across your transverse plane.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="cricket-card">
+            <div class="cricket-grid">
+                <div class="cricket-img-container"><img src="image.png" alt="Landmine Rotation"></div>
+                <div>
+                    <h3 style="font-size:1.1rem; margin-bottom:4px;">Landmine Rotation</h3>
+                    <p style="font-size:0.85rem; color:var(--text-light); line-height:1.3;">Builds rigid core rotational breaking, stopping mechanical power leakage during high speed movements.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="cricket-card">
+            <div class="cricket-grid">
+                <div class="cricket-img-container"><img src="image.png" alt="Cable Wood Chop"></div>
+                <div>
+                    <h3 style="font-size:1.1rem; margin-bottom:4px;">Cable Wood Chop</h3>
+                    <p style="font-size:0.85rem; color:var(--text-light); line-height:1.3;">Diagonal line loading pattern that mimics tracking and driving high full-tosses over boundaries.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="cricket-card">
+            <div class="cricket-grid">
+                <div class="cricket-img-container"><img src="image.png" alt="Pallof Press"></div>
+                <div>
+                    <h3 style="font-size:1.1rem; margin-bottom:4px;">Pallof Press</h3>
+                    <p style="font-size:0.85rem; color:var(--text-light); line-height:1.3;">Teaches trunk resistance to twist under structural loads, locking in stability through heavy swings.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="cricket-card">
+            <div class="cricket-grid">
+                <div class="cricket-img-container"><img src="image.png" alt="Band Pull Apart"></div>
+                <div>
+                    <h3 style="font-size:1.1rem; margin-bottom:4px;">Band Pull Apart</h3>
+                    <p style="font-size:0.85rem; color:var(--text-light); line-height:1.3;">Rear delt and trap endurance builder to protect shoulder capsule layout through continuous high-velocity swings.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div id="page-nutrition" class="page-view">
-        
         <div class="nutrition-section">
             <h2>📅 Weekly Muscle Gain Schedule</h2>
             <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 10px;">High protein & clean energy rotation schedule:</p>
@@ -302,18 +389,10 @@
             <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 10px;">Select a core macro category to analyze high-quality food choices:</p>
             
             <div class="macro-grid">
-                <div class="macro-card" style="border-left: 4px solid #a855f7;" onclick="toggleMacroVisual('protein-view')">
-                    <h4>💪 Proteins</h4>
-                </div>
-                <div class="macro-card" style="border-left: 4px solid #3b82f6;" onclick="toggleMacroVisual('carbs-view')">
-                    <h4>⚡ Carbs</h4>
-                </div>
-                <div class="macro-card" style="border-left: 4px solid #eab308;" onclick="toggleMacroVisual('fats-view')">
-                    <h4>🧠 Fats</h4>
-                </div>
-                <div class="macro-card" style="border-left: 4px solid #10b981;" onclick="toggleMacroVisual('fiber-view')">
-                    <h4>🟢 Fiber</h4>
-                </div>
+                <div class="macro-card" style="border-left: 4px solid #a855f7;" onclick="toggleMacroVisual('protein-view')"><h4>💪 Proteins</h4></div>
+                <div class="macro-card" style="border-left: 4px solid #3b82f6;" onclick="toggleMacroVisual('carbs-view')"><h4>⚡ Carbs</h4></div>
+                <div class="macro-card" style="border-left: 4px solid #eab308;" onclick="toggleMacroVisual('fats-view')"><h4>🧠 Fats</h4></div>
+                <div class="macro-card" style="border-left: 4px solid #10b981;" onclick="toggleMacroVisual('fiber-view')"><h4>🟢 Fiber</h4></div>
             </div>
 
             <div id="protein-view" class="macro-target" style="display:none; margin-top:15px; text-align:center;">
@@ -335,20 +414,11 @@
         </div>
     </div>
 
-
     <script>
         const STORAGE_KEY = 'workout_tracker_progress';
         let timerInterval = null;
         let timeRemaining = 90;
 
-        // Register PWA service worker fallback logic
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('data:text/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdmaXRjaCcsIGU9PihlLnJlc3BvbmRXaXRoKGZldGNoKGUucmVxdWVzdCkuY2F0Y2goKCk9Pm5ldyBSZXNwb25zZSgiT2Zmb OfflineZSIpKSkpKTs=');
-            });
-        }
-
-        // Main Navigation Controls
         function showPage(pageId) {
             document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -357,18 +427,12 @@
             document.getElementById(`btn-${pageId}`).classList.add('active');
         }
 
-        // Expandable Macros Dashboard Engine
         function toggleMacroVisual(elementId) {
             const block = document.getElementById(elementId);
             const isCurrentlyOpen = block.style.display === 'block';
-            
-            // Close all first to keep layout clean
             document.querySelectorAll('.macro-target').forEach(t => t.style.display = 'none');
-            
-            // If it wasn't open, open it now
             if (!isCurrentlyOpen) {
                 block.style.display = 'block';
-                block.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
         }
 
@@ -457,7 +521,6 @@
                         timerBox.className = 'timer-container finished';
                         timerDisplay.innerText = '💪 Rest over! Next Set!';
                         timerHint.innerText = 'Tap to restart timer';
-                        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
                     }
                 }, 1000);
             }
