@@ -2,15 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Workout, Nutrition & Cricket Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>CricBuild Pro | Bodybuilding for Modern Cricketers</title>
     
+    <!-- PWA Mobile App Capabilities -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="FitTracker">
+    <meta name="apple-mobile-web-app-title" content="CricBuild">
     <meta name="mobile-web-app-capable" content="yes">
     
-    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Workout%20and%20Nutrition%22,%22short_name%22:%22FitTracker%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23f8fafc%22,%22theme_color%22:%22%230f172a%22}">
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22CricBuild%20Athletic%20Tracker%22,%22short_name%22:%22CricBuild%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23f8fafc%22,%22theme_color%22:%22%230f172a%22}">
 
     <style>
         :root {
@@ -38,17 +40,27 @@
             padding: 20px 14px;
             max-width: 800px;
             margin: 0 auto;
-            padding-bottom: 100px;
             user-select: none;
         }
+        
         header {
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             margin-top: calc(env(safe-area-inset-top) + 5px);
         }
         header h1 {
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             color: #0f172a;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        header p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: 600;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
         }
         
         /* Main Navigation (3 Items) */
@@ -64,7 +76,7 @@
         .nav-btn {
             background: none;
             border: none;
-            padding: 10px 4px;
+            padding: 12px 4px;
             font-size: 0.85rem;
             font-weight: 700;
             color: var(--text-light);
@@ -121,13 +133,26 @@
         .page-view, .workout-day { display: none; }
         .page-view.active, .workout-day.active { display: block; }
         
+        .day-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 6px;
+            margin-bottom: 15px;
+        }
         .day-title {
             font-size: 1.3rem;
-            margin-bottom: 15px;
             color: #0f172a;
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 5px;
         }
+        .badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+        
         .exercise-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
@@ -218,202 +243,261 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         }
 
-        .controls { margin-top: 35px; text-align: center; padding-bottom: env(safe-area-inset-bottom); }
+        .controls { margin-top: 35px; text-align: center; }
         .reset-btn { background-color: #ef4444; color: white; border: none; padding: 14px 28px; font-size: 0.95rem; font-weight: 600; border-radius: 10px; cursor: pointer; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+        
+        footer {
+            margin-top: 60px;
+            text-align: center;
+            padding: 24px 0;
+            border-top: 1px solid var(--border);
+            padding-bottom: calc(env(safe-area-inset-bottom) + 24px);
+        }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>🏋️ FitTracker Pro</h1>
+        <h1>🏏 CricBuild<span style="color: var(--primary);">Pro</span></h1>
+        <p>Bodybuilding for Modern Cricketers</p>
     </header>
 
+    <!-- Main Navigation Module -->
     <nav class="main-nav">
         <button class="nav-btn active" id="btn-workout" onclick="showPage('workout')">💪 Workouts</button>
         <button class="nav-btn" id="btn-cricket" onclick="showPage('cricket')">🏏 Cricket</button>
         <button class="nav-btn" id="btn-nutrition" onclick="showPage('nutrition')">🥗 Nutrition</button>
     </nav>
 
-    <div id="page-workout" class="page-view active">
-        <div class="timer-container" id="timer-box" onclick="toggleTimer()">
-            <div id="timer-display">⏱️ Start 90s Rest Timer</div>
-            <div class="timer-hint" id="timer-hint">Tap after your set</div>
+    <main>
+        <!-- WORKOUT VIEW PANEL -->
+        <div id="page-workout" class="page-view active">
+            <div class="timer-container" id="timer-box" onclick="toggleTimer()">
+                <div id="timer-display">⏱️ Start 90s Rest Timer</div>
+                <div class="timer-hint" id="timer-hint">Tap after your set</div>
+            </div>
+
+            <div class="tabs" id="tabs-nav">
+                <button class="tab-btn" data-day="monday" onclick="switchDay('monday')">Mon</button>
+                <button class="tab-btn" data-day="tuesday" onclick="switchDay('tuesday')">Tue</button>
+                <button class="tab-btn" data-day="wednesday" onclick="switchDay('wednesday')">Wed</button>
+                <button class="tab-btn" data-day="thursday" onclick="switchDay('thursday')">Thu</button>
+                <button class="tab-btn" data-day="friday" onclick="switchDay('friday')">Fri</button>
+                <button class="tab-btn" data-day="saturday" onclick="switchDay('saturday')">Sat</button>
+            </div>
+
+            <!-- Monday -->
+            <div id="monday" class="workout-day">
+                <div class="day-header">
+                    <h2 class="day-title">Monday - Push Day A</h2>
+                    <span class="badge" style="background: #e0e7ff; color: #3730a3;">Hypertrophy</span>
+                </div>
+                <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Decline Bench Press</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=LfyQBUKR8SE" target="_blank" class="video-link">🎬 Demo</a></div>
+                <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Incline Dumbbell Press</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=8iPEnn-ltC8" target="_blank" class="video-link">🎬 Demo</a></div>
+                <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Cable Crossover</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=Iwe6AmxVf7o" target="_blank" class="video-link">🎬 Demo</a></div>
+                <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Military Press</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=2yjwXTZQDDI" target="_blank" class="video-link">🎬 Demo</a></div>
+                <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Lateral Raises</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=3VcKaXpzqRo" target="_blank" class="video-link">🎬 Demo</a></div>
+            </div>
+
+            <!-- Tuesday -->
+            <div id="tuesday" class="workout-day">
+                <div class="day-header">
+                    <h2 class="day-title">Tuesday - Pull Day A</h2>
+                    <span class="badge" style="background: #e0e7ff; color: #3730a3;">Hypertrophy</span>
+                </div>
+                <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Lat Pulldown</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=CAwf7n6Luuc" target="_blank" class="video-link">🎬 Demo</a></div>
+                <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Close Grip Pulldown</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=GZbfZ03X9UM" target="_blank" class="video-link">🎬 Demo</a></div>
+                <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>T-Bar Row</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=j3Igk5nyZE4" target="_blank" class="video-link">🎬 Demo</a></div>
+                <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Barbell Shrugs</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=AsAVbj7puKo" target="_blank" class="video-link">🎬 Demo</a></div>
+                <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Dumbbell Curls</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=sAq_ocpRh_I" target="_blank" class="video-link">🎬 Demo</a></div>
+            </div>
+
+            <!-- Wednesday -->
+            <div id="wednesday" class="workout-day">
+                <div class="day-header">
+                    <h2 class="day-title">Wednesday - Leg Day A</h2>
+                    <span class="badge" style="background: #fef3c7; color: #92400e;">Power Base</span>
+                </div>
+                <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Squats</h3><div class="meta-tags"><span class="tag-sets">5 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=t2b8UdqmlFs" target="_blank" class="video-link">🎬 Demo</a></div>
+                <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Lunges</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=QF0BQS2W80k" target="_blank" class="video-link">🎬 Demo</a></div>
+                <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Leg Press</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=IZxyjWwAKcc" target="_blank" class="video-link">🎬 Demo</a></div>
+            </div>
+
+            <!-- Thursday -->
+            <div id="thursday" class="workout-day">
+                <div class="day-header">
+                    <h2 class="day-title">Thursday - Push Day B</h2>
+                    <span class="badge" style="background: #e0e7ff; color: #3730a3;">Hypertrophy</span>
+                </div>
+                <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Flat Bench Press</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=rT7DgCr-3pg" target="_blank" class="video-link">🎬 Demo</a></div>
+                <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Dumbbell Pullovers</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=tpLnfSQJ0gg" target="_blank" class="video-link">🎬 Demo</a></div>
+            </div>
+
+            <!-- Friday -->
+            <div id="friday" class="workout-day">
+                <div class="day-header">
+                    <h2 class="day-title">Friday - Pull Day B</h2>
+                    <span class="badge" style="background: #e0e7ff; color: #3730a3;">Hypertrophy</span>
+                </div>
+                <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Barbell Row</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=I0vbwZ7UXmE" target="_blank" class="video-link">🎬 Demo</a></div>
+                <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>One-Arm Dumbbell Row</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=dFzUjAs_XDY" target="_blank" class="video-link">🎬 Demo</a></div>
+            </div>
+
+            <!-- Saturday -->
+            <div id="saturday" class="workout-day">
+                <div class="day-header">
+                    <h2 class="day-title">Saturday - Leg Day B</h2>
+                    <span class="badge" style="background: #fef3c7; color: #92400e;">Power Base</span>
+                </div>
+                <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Front Squats</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=v-mQm_vVug0" target="_blank" class="video-link">🎬 Demo</a></div>
+            </div>
+
+            <div class="controls">
+                <button class="reset-btn" onclick="clearProgress()">🔄 Reset All Progress</button>
+            </div>
         </div>
 
-        <div class="tabs" id="tabs-nav">
-            <button class="tab-btn" data-day="monday" onclick="switchDay('monday')">Mon</button>
-            <button class="tab-btn" data-day="tuesday" onclick="switchDay('tuesday')">Tue</button>
-            <button class="tab-btn" data-day="wednesday" onclick="switchDay('wednesday')">Wed</button>
-            <button class="tab-btn" data-day="thursday" onclick="switchDay('thursday')">Thu</button>
-            <button class="tab-btn" data-day="friday" onclick="switchDay('friday')">Fri</button>
-            <button class="tab-btn" data-day="saturday" onclick="switchDay('saturday')">Sat</button>
-        </div>
 
-        <div id="monday" class="workout-day">
-            <h2 class="day-title">Monday - Push Day A</h2>
-            <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Decline Bench Press</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=LfyQBUKR8SE" target="_blank" class="video-link">🎬 Demo</a></div>
-            <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Incline Dumbbell Press</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=8iPEnn-ltC8" target="_blank" class="video-link">🎬 Demo</a></div>
-            <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Cable Crossover</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=Iwe6AmxVf7o" target="_blank" class="video-link">🎬 Demo</a></div>
-            <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Military Press</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=2yjwXTZQDDI" target="_blank" class="video-link">🎬 Demo</a></div>
-            <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Lateral Raises</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=3VcKaXpzqRo" target="_blank" class="video-link">🎬 Demo</a></div>
-        </div>
+        <!-- CRICKET POWER HITTING TAB -->
+        <div id="page-cricket" class="page-view">
+            <div class="nutrition-section" style="border-left: 4px solid var(--cricket-gold); background: #fffdf5;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+                    <h3 style="color:#854d0e;">⚡ Kinetic Chain Principle</h3>
+                    <span class="badge" style="background: #fef08a; color: #854d0e;">Explosive Phase</span>
+                </div>
+                <p style="font-size: 0.85rem; font-style: italic; color: #a16207;">"Sixes don't start in the arms. They start in the ground, explode through the hips, and finish through the bat."</p>
+            </div>
 
-        <div id="tuesday" class="workout-day">
-            <h2 class="day-title">Tuesday - Pull Day A</h2>
-            <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Lat Pulldown</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=CAwf7n6Luuc" target="_blank" class="video-link">🎬 Demo</a></div>
-            <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Close Grip Pulldown</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=GZbfZ03X9UM" target="_blank" class="video-link">🎬 Demo</a></div>
-            <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>T-Bar Row</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=j3Igk5nyZE4" target="_blank" class="video-link">🎬 Demo</a></div>
-            <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Barbell Shrugs</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=AsAVbj7puKo" target="_blank" class="video-link">🎬 Demo</a></div>
-            <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Dumbbell Curls</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=sAq_ocpRh_I" target="_blank" class="video-link">🎬 Demo</a></div>
-        </div>
+            <h2 class="day-title" style="border-color: var(--cricket-gold);">🏏 Power Hitting Mechanics</h2>
 
-        <div id="wednesday" class="workout-day">
-            <h2 class="day-title">Wednesday - Leg Day A</h2>
-            <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Squats</h3><div class="meta-tags"><span class="tag-sets">5 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=t2b8UdqmlFs" target="_blank" class="video-link">🎬 Demo</a></div>
-            <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Lunges</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=QF0BQS2W80k" target="_blank" class="video-link">🎬 Demo</a></div>
-            <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Leg Press</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=IZxyjWwAKcc" target="_blank" class="video-link">🎬 Demo</a></div>
-        </div>
+            <!-- 1. Med Ball Rotational Throw -->
+            <div class="cricket-card">
+                <div class="cricket-grid">
+                    <div class="cricket-img-container"><img src="IMG_2731.jpeg" alt="Med Ball Rotational Throw"></div>
+                    <div>
+                        <h3 style="font-size:1.1rem; margin-bottom:4px;">1. Med Ball Rotational Throw</h3>
+                        <p style="font-size:0.85rem; color:var(--text-light); line-height:1.3;">Pure hip-to-torso uncoiling. Maximizes torque across your transverse plane.</p>
+                    </div>
+                </div>
+            </div>
 
-        <div id="thursday" class="workout-day">
-            <h2 class="day-title">Thursday - Push Day B</h2>
-            <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Flat Bench Press</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=rT7DgCr-3pg" target="_blank" class="video-link">🎬 Demo</a></div>
-            <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Dumbbell Pullovers</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=tpLnfSQJ0gg" target="_blank" class="video-link">🎬 Demo</a></div>
-        </div>
+            <!-- 2. Landmine Rotation -->
+            <div class="cricket-card">
+                <div class="cricket-grid">
+                    <div class="cricket-img-container"><img src="IMG_2732.jpeg" alt="Landmine Rotation"></div>
+                    <div>
+                        <h3 style="font-size:1.1rem; margin-bottom:4px;">2. Landmine Rotation</h3>
+                        <p style="font-size:0.85rem; color:var(--text-light); line-height:1.3;">Builds rigid core rotational breaking, stopping mechanical power leakage during high speed movements.</p>
+                    </div>
+                </div>
+            </div>
 
-        <div id="friday" class="workout-day">
-            <h2 class="day-title">Friday - Pull Day B</h2>
-            <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Barbell Row</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=I0vbwZ7UXmE" target="_blank" class="video-link">🎬 Demo</a></div>
-            <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>One-Arm Dumbbell Row</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=dFzUjAs_XDY" target="_blank" class="video-link">🎬 Demo</a></div>
-        </div>
+            <!-- 3. Rear-Foot Elevated Split Squat -->
+            <div class="cricket-card">
+                <div class="cricket-grid">
+                    <div class="cricket-img-container"><img src="IMG_2733.jpeg" alt="Rear-Foot Elevated Split Squat"></div>
+                    <div>
+                        <h3 style="font-size:1.1rem; margin-bottom:4px;">3. Rear-Foot Elevated Split Squat</h3>
+                        <p style="font-size:0.85rem; color:var(--text-light); line-height:1.3;">Builds explosive single-leg drive to ground your base securely during maximum swings.</p>
+                    </div>
+                </div>
+            </div>
 
-        <div id="saturday" class="workout-day">
-            <h2 class="day-title">Saturday - Leg Day B</h2>
-            <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Front Squats</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=v-mQm_vVug0" target="_blank" class="video-link">🎬 Demo</a></div>
-        </div>
+            <!-- 4. Trap Bar Deadlift -->
+            <div class="cricket-card">
+                <div class="cricket-grid">
+                    <div class="cricket-img-container"><img src="IMG_2734.jpeg" alt="Trap Bar Deadlift"></div>
+                    <div>
+                        <h3 style="font-size:1.1rem; margin-bottom:4px;">4. Trap Bar Deadlift</h3>
+                        <p style="font-size:0.85rem; color:var(--text-light); line-height:1.3;">Teaches you to press dynamic ground force vertically, turning lower strength into high bat velocity.</p>
+                    </div>
+                </div>
+            </div>
 
-        <div class="controls">
-            <button class="reset-btn" onclick="clearProgress()">🔄 Reset All Progress</button>
-        </div>
-    </div>
+            <!-- 5. Cable Wood Chop -->
+            <div class="cricket-card">
+                <div class="cricket-grid">
+                    <div class="cricket-img-container"><img src="IMG_2735.jpeg" alt="Cable Wood Chop"></div>
+                    <div>
+                        <h3 style="font-size:1.1rem; margin-bottom:4px;">5. Cable Wood Chop</h3>
+                        <p style="font-size:0.85rem; color:var(--text-light); line-height:1.3;">Diagonal line loading pattern that mimics tracking and driving high full-tosses over boundaries.</p>
+                    </div>
+                </div>
+            </div>
 
+            <!-- 6. Band Pull Apart -->
+            <div class="cricket-card">
+                <div class="cricket-grid">
+                    <div class="cricket-img-container"><img src="IMG_2736.jpeg" alt="Band Pull Apart"></div>
+                    <div>
+                        <h3 style="font-size:1.1rem; margin-bottom:4px;">6. Band Pull Apart</h3>
+                        <p style="font-size:0.85rem; color:var(--text-light); line-height:1.3;">Rear delt and trap endurance builder to protect shoulder capsule layout through continuous high-velocity swings.</p>
+                    </div>
+                </div>
+            </div>
 
-    <div id="page-cricket" class="page-view">
-        <div class="nutrition-section" style="border-left: 4px solid var(--cricket-gold); background: #fffdf5;">
-            <h3 style="color:#854d0e; margin-bottom: 4px;">⚡ Kinetic Chain Principle</h3>
-            <p style="font-size: 0.85rem; font-style: italic; color: #a16207;">"Sixes don't start in the arms. They start in the ground, explode through the hips, and finish through the bat."</p>
-        </div>
-
-        <h2 class="day-title" style="border-color: var(--cricket-gold);">🏏 Power Hitting Mechanics</h2>
-
-        <div class="cricket-card">
-            <div class="cricket-grid">
-                <div class="cricket-img-container"><img src="IMG_2731.jpeg" alt="Med Ball Rotational Throw"></div>
-                <div>
-                    <h3 style="font-size:1.1rem; margin-bottom:4px;">1. Med Ball Rotational Throw</h3>
-                    <p style="font-size:0.85rem; color:var(--text-light); line-height:1.3;">Pure hip-to-torso uncoiling. Maximizes torque across your transverse plane.</p>
+            <!-- 7. Pallof Press -->
+            <div class="cricket-card">
+                <div class="cricket-grid">
+                    <div class="cricket-img-container"><img src="IMG_2737.jpeg" alt="Pallof Press"></div>
+                    <div>
+                        <h3 style="font-size:1.1rem; margin-bottom:4px;">7. Pallof Press</h3>
+                        <p style="font-size:0.85rem; color:var(--text-light); line-height:1.3;">Teaches trunk resistance to twist under structural loads, locking in stability through heavy swings.</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="cricket-card">
-            <div class="cricket-grid">
-                <div class="cricket-img-container"><img src="IMG_2732.jpeg" alt="Landmine Rotation"></div>
-                <div>
-                    <h3 style="font-size:1.1rem; margin-bottom:4px;">2. Landmine Rotation</h3>
-                    <p style="font-size:0.85rem; color:var(--text-light); line-height:1.3;">Builds rigid core rotational breaking, stopping mechanical power leakage during high speed movements.</p>
+
+        <!-- NUTRITION VIEW PANEL -->
+        <div id="page-nutrition" class="page-view">
+            <div class="nutrition-section">
+                <h2>📅 Weekly Muscle Gain Schedule</h2>
+                <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 10px;">High protein & clean energy rotation schedule:</p>
+                <img src="IMG_2725.jpeg" alt="Weekly Meal Plan" class="responsive-img">
+            </div>
+
+            <div class="nutrition-section">
+                <h2>🥩 Whole Foods Nutrient Guides</h2>
+                <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 10px;">Select a core macro category to analyze high-quality food choices:</p>
+                
+                <div class="macro-grid">
+                    <div class="macro-card" style="border-left: 4px solid #a855f7;" onclick="toggleMacroVisual('protein-view')"><h4>💪 Proteins</h4></div>
+                    <div class="macro-card" style="border-left: 4px solid #3b82f6;" onclick="toggleMacroVisual('carbs-view')"><h4>⚡ Carbs</h4></div>
+                    <div class="macro-card" style="border-left: 4px solid #eab308;" onclick="toggleMacroVisual('fats-view')"><h4>🧠 Fats</h4></div>
+                    <div class="macro-card" style="border-left: 4px solid #10b981;" onclick="toggleMacroVisual('fiber-view')"><h4>🟢 Fiber</h4></div>
+                </div>
+
+                <div id="protein-view" class="macro-target" style="display:none; margin-top:15px; text-align:center;">
+                    <strong style="color:var(--accent-purple)">Protein Reference:</strong>
+                    <img src="IMG_2721.jpeg" alt="Protein Sources" class="responsive-img">
+                </div>
+                <div id="carbs-view" class="macro-target" style="display:none; margin-top:15px; text-align:center;">
+                    <strong style="color:var(--primary)">Carbohydrate Reference:</strong>
+                    <img src="IMG_2722.jpeg" alt="Carb Sources" class="responsive-img">
+                </div>
+                <div id="fats-view" class="macro-target" style="display:none; margin-top:15px; text-align:center;">
+                    <strong style="color:#ca8a04">Healthy Fats Reference:</strong>
+                    <img src="IMG_2724.jpeg" alt="Fat Sources" class="responsive-img">
+                </div>
+                <div id="fiber-view" class="macro-target" style="display:none; margin-top:15px; text-align:center;">
+                    <strong style="color:var(--success)">Dietary Fiber Reference:</strong>
+                    <img src="IMG_2723.jpeg" alt="Fiber Sources" class="responsive-img">
                 </div>
             </div>
         </div>
+    </main>
 
-        <div class="cricket-card">
-            <div class="cricket-grid">
-                <div class="cricket-img-container"><img src="IMG_2733.jpeg" alt="Rear-Foot Elevated Split Squat"></div>
-                <div>
-                    <h3 style="font-size:1.1rem; margin-bottom:4px;">3. Rear-Foot Elevated Split Squat</h3>
-                    <p style="font-size:0.85rem; color:var(--text-light); line-height:1.3;">Builds explosive single-leg drive to ground your base securely during maximum swings.</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="cricket-card">
-            <div class="cricket-grid">
-                <div class="cricket-img-container"><img src="IMG_2734.jpeg" alt="Trap Bar Deadlift"></div>
-                <div>
-                    <h3 style="font-size:1.1rem; margin-bottom:4px;">4. Trap Bar Deadlift</h3>
-                    <p style="font-size:0.85rem; color:var(--text-light); line-height:1.3;">Teaches you to press dynamic ground force vertically, turning lower strength into high bat velocity.</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="cricket-card">
-            <div class="cricket-grid">
-                <div class="cricket-img-container"><img src="IMG_2735.jpeg" alt="Cable Wood Chop"></div>
-                <div>
-                    <h3 style="font-size:1.1rem; margin-bottom:4px;">5. Cable Wood Chop</h3>
-                    <p style="font-size:0.85rem; color:var(--text-light); line-height:1.3;">Diagonal line loading pattern that mimics tracking and driving high full-tosses over boundaries.</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="cricket-card">
-            <div class="cricket-grid">
-                <div class="cricket-img-container"><img src="IMG_2736.jpeg" alt="Band Pull Apart"></div>
-                <div>
-                    <h3 style="font-size:1.1rem; margin-bottom:4px;">6. Band Pull Apart</h3>
-                    <p style="font-size:0.85rem; color:var(--text-light); line-height:1.3;">Rear delt and trap endurance builder to protect shoulder capsule layout through continuous high-velocity swings.</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="cricket-card">
-            <div class="cricket-grid">
-                <div class="cricket-img-container"><img src="IMG_2737.jpeg" alt="Pallof Press"></div>
-                <div>
-                    <h3 style="font-size:1.1rem; margin-bottom:4px;">7. Pallof Press</h3>
-                    <p style="font-size:0.85rem; color:var(--text-light); line-height:1.3;">Teaches trunk resistance to twist under structural loads, locking in stability through heavy swings.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <div id="page-nutrition" class="page-view">
-        <div class="nutrition-section">
-            <h2>📅 Weekly Muscle Gain Schedule</h2>
-            <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 10px;">High protein & clean energy rotation schedule:</p>
-            <img src="IMG_2725.jpeg" alt="Weekly Meal Plan" class="responsive-img">
-        </div>
-
-        <div class="nutrition-section">
-            <h2>🥩 Whole Foods Nutrient Guides</h2>
-            <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 10px;">Select a core macro category to analyze high-quality food choices:</p>
-            
-            <div class="macro-grid">
-                <div class="macro-card" style="border-left: 4px solid #a855f7;" onclick="toggleMacroVisual('protein-view')"><h4>💪 Proteins</h4></div>
-                <div class="macro-card" style="border-left: 4px solid #3b82f6;" onclick="toggleMacroVisual('carbs-view')"><h4>⚡ Carbs</h4></div>
-                <div class="macro-card" style="border-left: 4px solid #eab308;" onclick="toggleMacroVisual('fats-view')"><h4>🧠 Fats</h4></div>
-                <div class="macro-card" style="border-left: 4px solid #10b981;" onclick="toggleMacroVisual('fiber-view')"><h4>🟢 Fiber</h4></div>
-            </div>
-
-            <div id="protein-view" class="macro-target" style="display:none; margin-top:15px; text-align:center;">
-                <strong style="color:var(--accent-purple)">Protein Reference:</strong>
-                <img src="IMG_2721.jpeg" alt="Protein Sources" class="responsive-img">
-            </div>
-            <div id="carbs-view" class="macro-target" style="display:none; margin-top:15px; text-align:center;">
-                <strong style="color:var(--primary)">Carbohydrate Reference:</strong>
-                <img src="IMG_2722.jpeg" alt="Carb Sources" class="responsive-img">
-            </div>
-            <div id="fats-view" class="macro-target" style="display:none; margin-top:15px; text-align:center;">
-                <strong style="color:#ca8a04">Healthy Fats Reference:</strong>
-                <img src="IMG_2724.jpeg" alt="Fat Sources" class="responsive-img">
-            </div>
-            <div id="fiber-view" class="macro-target" style="display:none; margin-top:15px; text-align:center;">
-                <strong style="color:var(--success)">Dietary Fiber Reference:</strong>
-                <img src="IMG_2723.jpeg" alt="Fiber Sources" class="responsive-img">
-            </div>
-        </div>
-    </div>
+    <!-- Professional App Footer Section -->
+    <footer>
+        <p style="font-size: 0.85rem; color: var(--text-light); font-weight: 700; letter-spacing: 0.3px;">
+            © 2026 CricBuild Pro. All Rights Reserved.
+        </p>
+        <p style="font-size: 0.75rem; color: var(--text-light); opacity: 0.75; margin-top: 4px;">
+            v2.5.0 • Optimized for Athlete Hypertrophy & Ballistic Power
+        </p>
+    </footer>
 
     <script>
         const STORAGE_KEY = 'workout_tracker_progress';
