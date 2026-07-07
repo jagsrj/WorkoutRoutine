@@ -162,14 +162,16 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 10px;
         }
         .exercise-card.completed {
             opacity: 0.45;
             background-color: #f1f5f9;
         }
-        .exercise-info { display: flex; align-items: center; gap: 14px; flex: 1; cursor: pointer; }
-        .exercise-checkbox { width: 26px; height: 26px; accent-color: var(--primary); border-radius: 6px; }
-        .exercise-details h3 { font-size: 1.05rem; margin-bottom: 6px; color: #0f172a; }
+        .exercise-info { display: flex; align-items: center; gap: 14px; flex: 1; cursor: pointer; min-width: 0; }
+        .exercise-checkbox { width: 26px; height: 26px; accent-color: var(--primary); border-radius: 6px; flex-shrink: 0; }
+        .exercise-details { min-width: 0; flex: 1; }
+        .exercise-details h3 { font-size: 1.05rem; margin-bottom: 6px; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
         .meta-tags { display: flex; gap: 8px; font-size: 0.75rem; font-weight: 700; flex-wrap: wrap; }
         .tag-sets { background-color: #dbeafe; color: #1e40af; padding: 3px 8px; border-radius: 6px; }
@@ -187,6 +189,7 @@
             font-weight: 600;
             border: 1px solid var(--border);
             white-space: nowrap;
+            flex-shrink: 0;
         }
 
         /* Nutrition & Media Component Design */
@@ -253,7 +256,7 @@
             text-align: center;
             padding: 24px 0;
             border-top: 1px solid var(--border);
-            padding-bottom: calc(env(safe-area-inset-bottom) + 24px);
+            padding-bottom: calc(env(safe-area-inset-top) + 24px);
         }
     </style>
 </head>
@@ -299,7 +302,7 @@
                 <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Cable Crossover</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=Iwe6AmxVf7o" target="_blank" class="video-link">🎬 Demo</a></div>
                 <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Military Press</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=2yjwXTZQDDI" target="_blank" class="video-link">🎬 Demo</a></div>
                 <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Lateral Raises</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=3VcKaXpzqRo" target="_blank" class="video-link">🎬 Demo</a></div>
-                <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Face Pulley</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div><p style="font-size:0.75rem; color:var(--text-light); margin-top:4px;">💡 Pull rope below face to safely hit rear delts</p></div></div></div><a href="https://www.youtube.com/watch?v=rep-qVOkqgk" target="_blank" class="video-link">🎬 Demo</a></div>
+                <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Face Pulley</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div><p style="font-size:0.75rem; color:var(--text-light); margin-top:4px;">💡 Pull rope below face to safely hit rear delts</p></div></div><a href="https://www.youtube.com/watch?v=rep-qVOkqgk" target="_blank" class="video-link">🎬 Demo</a></div>
                 <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Triceps Pull Downs</h3><div class="meta-tags"><span class="tag-sets">3 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=U0kBTdeLvDA" target="_blank" class="video-link">🎬 Demo</a></div>
                 <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Close Grip Bench Press</h3><div class="meta-tags"><span class="tag-sets">3 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=nEF0bv2FW94" target="_blank" class="video-link">🎬 Demo</a></div>
                 <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Weighted Parallel Bar Dips</h3><div class="meta-tags"><span class="tag-sets">3 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=sM6XUdt1rm4" target="_blank" class="video-link">🎬 Demo</a></div>
