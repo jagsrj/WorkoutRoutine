@@ -26,6 +26,7 @@
             --success: #10b981;
             --accent-purple: #7c3aed;
             --cricket-gold: #eab308;
+            --psychology-teal: #0d9488;
         }
         * {
             box-sizing: border-box;
@@ -63,11 +64,11 @@
             letter-spacing: 0.8px;
         }
         
-        /* Main Navigation (3 Items) */
+        /* Navigation (Updated to 4 items layout) */
         .main-nav {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 6px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
             margin-bottom: 20px;
             background: #e2e8f0;
             padding: 4px;
@@ -76,8 +77,8 @@
         .nav-btn {
             background: none;
             border: none;
-            padding: 12px 4px;
-            font-size: 0.85rem;
+            padding: 12px 2px;
+            font-size: 0.8rem;
             font-weight: 700;
             color: var(--text-light);
             cursor: pointer;
@@ -176,6 +177,7 @@
         .meta-tags { display: flex; gap: 8px; font-size: 0.75rem; font-weight: 700; flex-wrap: wrap; }
         .tag-sets { background-color: #dbeafe; color: #1e40af; padding: 3px 8px; border-radius: 6px; }
         .tag-reps { background-color: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 6px; }
+        .tag-psych { background-color: #ccfbf1; color: #115e59; padding: 3px 8px; border-radius: 6px; }
         
         .video-link {
             display: inline-flex;
@@ -222,7 +224,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
-        /* Special Cricket Card Styling */
+        /* Cricket Card Styling */
         .cricket-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
@@ -267,11 +269,12 @@
         <p>Bodybuilding for Modern Cricketers</p>
     </header>
 
-    <!-- Main Navigation Module -->
+    <!-- Main Navigation Module (Updated to 4 Buttons) -->
     <nav class="main-nav">
         <button class="nav-btn active" id="btn-workout" onclick="showPage('workout')">💪 Workouts</button>
         <button class="nav-btn" id="btn-cricket" onclick="showPage('cricket')">🏏 Cricket</button>
         <button class="nav-btn" id="btn-nutrition" onclick="showPage('nutrition')">🥗 Nutrition</button>
+        <button class="nav-btn" id="btn-psychology" onclick="showPage('psychology')">🧠 Mindset</button>
     </nav>
 
     <main>
@@ -397,7 +400,6 @@
 
             <h2 class="day-title" style="border-color: var(--cricket-gold);">🏏 Power Hitting Mechanics</h2>
 
-            <!-- 1. Med Ball Rotational Throw -->
             <div class="cricket-card">
                 <div class="cricket-grid">
                     <div class="cricket-img-container"><img src="IMG_2731.jpeg" alt="Med Ball Rotational Throw"></div>
@@ -407,8 +409,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- 2. Landmine Rotation -->
             <div class="cricket-card">
                 <div class="cricket-grid">
                     <div class="cricket-img-container"><img src="IMG_2732.jpeg" alt="Landmine Rotation"></div>
@@ -418,8 +418,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- 3. Rear-Foot Elevated Split Squat -->
             <div class="cricket-card">
                 <div class="cricket-grid">
                     <div class="cricket-img-container"><img src="IMG_2733.jpeg" alt="Rear-Foot Elevated Split Squat"></div>
@@ -429,8 +427,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- 4. Trap Bar Deadlift -->
             <div class="cricket-card">
                 <div class="cricket-grid">
                     <div class="cricket-img-container"><img src="IMG_2734.jpeg" alt="Trap Bar Deadlift"></div>
@@ -440,8 +436,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- 5. Cable Wood Chop -->
             <div class="cricket-card">
                 <div class="cricket-grid">
                     <div class="cricket-img-container"><img src="IMG_2735.jpeg" alt="Cable Wood Chop"></div>
@@ -451,8 +445,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- 6. Band Pull Apart -->
             <div class="cricket-card">
                 <div class="cricket-grid">
                     <div class="cricket-img-container"><img src="IMG_2736.jpeg" alt="Band Pull Apart"></div>
@@ -462,8 +454,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- 7. Pallof Press -->
             <div class="cricket-card">
                 <div class="cricket-grid">
                     <div class="cricket-img-container"><img src="IMG_2737.jpeg" alt="Pallof Press"></div>
@@ -501,11 +491,11 @@
                 </div>
                 <div id="carbs-view" class="macro-target" style="display:none; margin-top:15px; text-align:center;">
                     <strong style="color:var(--primary)">Carbohydrate Reference:</strong>
-                    <img src="IMG_2722.jpeg" alt="Carb Sources" class="responsive-img">
+                    <img src="IMG_2724.jpeg" alt="Carb Sources" class="responsive-img">
                 </div>
                 <div id="fats-view" class="macro-target" style="display:none; margin-top:15px; text-align:center;">
                     <strong style="color:#ca8a04">Healthy Fats Reference:</strong>
-                    <img src="IMG_2724.jpeg" alt="Fat Sources" class="responsive-img">
+                    <img src="IMG_2722.jpeg" alt="Fat Sources" class="responsive-img">
                 </div>
                 <div id="fiber-view" class="macro-target" style="display:none; margin-top:15px; text-align:center;">
                     <strong style="color:var(--success)">Dietary Fiber Reference:</strong>
@@ -513,9 +503,87 @@
                 </div>
             </div>
         </div>
+
+
+        <!-- NEW: SPORTS PSYCHOLOGY VIEW PANEL -->
+        <div id="page-psychology" class="page-view">
+            <div class="nutrition-section" style="border-left: 4px solid var(--psychology-teal); background: #f0fdfa;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+                    <h3 style="color:#115e59;">🧘‍♂️ The Mental Edge</h3>
+                    <span class="badge" style="background: #99f6e4; color: #115e59;">Clutch Mindset</span>
+                </div>
+                <p style="font-size: 0.85rem; font-style: italic; color: #134e4a;">"Anxiety happens when you feel a high demand but perceive low personal control. Shift your focus strictly to execution mechanics."</p>
+            </div>
+
+            <h2 class="day-title" style="border-color: var(--psychology-teal); margin-bottom: 15px;">🧠 Top 5 Sports Psychology Strategies</h2>
+
+            <!-- Topic 1: Diaphragmatic Box Breathing -->
+            <div class="exercise-card">
+                <div class="exercise-info" onclick="handleCardClick(this)">
+                    <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
+                    <div class="exercise-details">
+                        <h3>1. Box Breathing for Vagus Nerve Stimulation</h3>
+                        <div class="meta-tags"><span class="tag-psych">Anxiety Reduction</span></div>
+                        <p style="font-size:0.75rem; color:var(--text-light); margin-top:4px;">💡 Inhale 4s, hold 4s, exhale 4s, hold 4s. Instantly drops heart rate between overs.</p>
+                    </div>
+                </div>
+                <a href="https://www.youtube.com/watch?v=FJJazamW4gA" target="_blank" class="video-link">🎬 Video</a>
+            </div>
+
+            <!-- Topic 2: Pre-Performance Routines -->
+            <div class="exercise-card">
+                <div class="exercise-info" onclick="handleCardClick(this)">
+                    <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
+                    <div class="exercise-details">
+                        <h3>2. Fixed Pre-Performance Routines</h3>
+                        <div class="meta-tags"><span class="tag-psych">Focus & Comfort</span></div>
+                        <p style="font-size:0.75rem; color:var(--text-light); margin-top:4px;">💡 Build a hyper-specific sequence (e.g., tap crease twice, adjust gloves) to signal safety to your brain.</p>
+                    </div>
+                </div>
+                <a href="https://www.youtube.com/watch?v=yG6eT_kS3Is" target="_blank" class="video-link">🎬 Video</a>
+            </div>
+
+            <!-- Topic 3: Vivid Script Visualization -->
+            <div class="exercise-card">
+                <div class="exercise-info" onclick="handleCardClick(this)">
+                    <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
+                    <div class="exercise-details">
+                        <h3>3. Internal Imagery & Video Visualization</h3>
+                        <div class="meta-tags"><span class="tag-psych">Neural Priming</span></div>
+                        <p style="font-size:0.75rem; color:var(--text-light); margin-top:4px;">💡 Close eyes and visualize the perfect strike or ball release using all 5 senses before stepping onto the pitch.</p>
+                    </div>
+                </div>
+                <a href="https://www.youtube.com/watch?v=48coMKvshN8" target="_blank" class="video-link">🎬 Video</a>
+            </div>
+
+            <!-- Topic 4: Cognitive Restructuring -->
+            <div class="exercise-card">
+                <div class="exercise-info" onclick="handleCardClick(this)">
+                    <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
+                    <div class="exercise-details">
+                        <h3>4. Reframe: Threats into Challenges</h3>
+                        <div class="meta-tags"><span class="tag-psych">Stress Reframe</span></div>
+                        <p style="font-size:0.75rem; color:var(--text-light); margin-top:4px;">💡 Interpret butterflies not as fear, but as adrenaline preparing your body for maximum ballistic power.</p>
+                    </div>
+                </div>
+                <a href="https://www.youtube.com/watch?v=778F3Vf8wJw" target="_blank" class="video-link">🎬 Video</a>
+            </div>
+
+            <!-- Topic 5: Process over Outcome Goal Setting -->
+            <div class="exercise-card">
+                <div class="exercise-info" onclick="handleCardClick(this)">
+                    <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
+                    <div class="exercise-details">
+                        <h3>5. Process Control vs Outcome Thinking</h3>
+                        <div class="meta-tags"><span class="tag-psych">In-Game Presence</span></div>
+                        <p style="font-size:0.75rem; color:var(--text-light); margin-top:4px;">💡 Forget the match scoreboard. Focus exclusively on the immediate ball coming down your line.</p>
+                    </div>
+                </div>
+                <a href="https://www.youtube.com/watch?v=D1s0zclgCio" target="_blank" class="video-link">🎬 Video</a>
+            </div>
+        </div>
     </main>
 
-    <!-- Professional App Footer Section -->
     <footer>
         <p style="font-size: 0.85rem; color: var(--text-light); font-weight: 700; letter-spacing: 0.3px;">
             © 2026 CricBuild Pro. All Rights Reserved.
