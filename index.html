@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>CricBuild Pro | Bodybuilding for Modern Cricketers</title>
     
-    <!-- PWA Mobile App Capabilities -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="CricBuild">
     <meta name="mobile-web-app-capable" content="yes">
     
-    <!-- Web App Manifest -->
     <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22CricBuild%20Athletic%20Tracker%22,%22short_name%22:%22CricBuild%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23f8fafc%22,%22theme_color%22:%22%230f172a%22}">
 
     <style>
@@ -27,6 +25,7 @@
             --accent-purple: #7c3aed;
             --cricket-gold: #eab308;
             --psychology-teal: #0d9488;
+            --ironax-orange: #f97316;
         }
         * {
             box-sizing: border-box;
@@ -64,21 +63,26 @@
             letter-spacing: 0.8px;
         }
         
-        /* Navigation (Updated to 4 items layout) */
+        /* Navigation (Updated to 6 items layout for PWA compatibility) */
         .main-nav {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 4px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
             margin-bottom: 20px;
             background: #e2e8f0;
             padding: 4px;
             border-radius: 12px;
         }
+        @media (min-width: 600px) {
+            .main-nav {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
         .nav-btn {
             background: none;
             border: none;
-            padding: 12px 2px;
-            font-size: 0.8rem;
+            padding: 10px 2px;
+            font-size: 0.75rem;
             font-weight: 700;
             color: var(--text-light);
             cursor: pointer;
@@ -130,9 +134,33 @@
             color: white;
             border-color: var(--primary);
         }
+
+        /* Sub-navigation style for Ironax Sub-tabs */
+        .ironax-tabs {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+            margin-bottom: 22px;
+        }
+        .ironax-tab-btn {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 12px 4px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-light);
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .ironax-tab-btn.active {
+            background-color: var(--ironax-orange);
+            color: white;
+            border-color: var(--ironax-orange);
+        }
         
-        .page-view, .workout-day { display: none; }
-        .page-view.active, .workout-day.active { display: block; }
+        .page-view, .workout-day, .ironax-day { display: none; }
+        .page-view.active, .workout-day.active, .ironax-day.active { display: block; }
         
         .day-header {
             display: flex;
@@ -178,6 +206,7 @@
         .tag-sets { background-color: #dbeafe; color: #1e40af; padding: 3px 8px; border-radius: 6px; }
         .tag-reps { background-color: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 6px; }
         .tag-psych { background-color: #ccfbf1; color: #115e59; padding: 3px 8px; border-radius: 6px; }
+        .tag-ironax { background-color: #ffedd5; color: #ea580c; padding: 3px 8px; border-radius: 6px; }
         
         .video-link {
             display: inline-flex;
@@ -249,6 +278,35 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         }
 
+        /* Timeline and Growth Components styling */
+        .timeline-container {
+            position: relative;
+            padding-left: 24px;
+            margin-top: 15px;
+            border-left: 2px solid var(--border);
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 24px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -31px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            border: 2px solid var(--card-bg);
+        }
+        .timeline-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
         .controls { margin-top: 35px; text-align: center; }
         .reset-btn { background-color: #ef4444; color: white; border: none; padding: 14px 28px; font-size: 0.95rem; font-weight: 600; border-radius: 10px; cursor: pointer; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
@@ -269,16 +327,16 @@
         <p>Bodybuilding for Modern Cricketers</p>
     </header>
 
-    <!-- Main Navigation Module (Updated to 4 Buttons) -->
     <nav class="main-nav">
         <button class="nav-btn active" id="btn-workout" onclick="showPage('workout')">💪 Workouts</button>
+        <button class="nav-btn" id="btn-ironax" onclick="showPage('ironax')">⚙️ Ironax</button>
+        <button class="nav-btn" id="btn-growth" onclick="showPage('growth')">📈 Growth</button>
         <button class="nav-btn" id="btn-cricket" onclick="showPage('cricket')">🏏 Cricket</button>
         <button class="nav-btn" id="btn-nutrition" onclick="showPage('nutrition')">🥗 Nutrition</button>
         <button class="nav-btn" id="btn-psychology" onclick="showPage('psychology')">🧠 Mindset</button>
     </nav>
 
     <main>
-        <!-- WORKOUT VIEW PANEL -->
         <div id="page-workout" class="page-view active">
             <div class="timer-container" id="timer-box" onclick="toggleTimer()">
                 <div id="timer-display">⏱️ Start 90s Rest Timer</div>
@@ -294,7 +352,6 @@
                 <button class="tab-btn" data-day="saturday" onclick="switchDay('saturday')">Sat</button>
             </div>
 
-            <!-- Monday - Push Day A -->
             <div id="monday" class="workout-day">
                 <div class="day-header">
                     <h2 class="day-title">Monday - Push Day A</h2>
@@ -311,7 +368,6 @@
                 <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Weighted Parallel Bar Dips</h3><div class="meta-tags"><span class="tag-sets">3 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=sM6XUdt1rm4" target="_blank" class="video-link">🎬 Demo</a></div>
             </div>
 
-            <!-- Tuesday - Pull Day A -->
             <div id="tuesday" class="workout-day">
                 <div class="day-header">
                     <h2 class="day-title">Tuesday - Pull Day A</h2>
@@ -326,7 +382,6 @@
                 <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Close Grip Pull Ups</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=WK5yZMlgMb4" target="_blank" class="video-link">🎬 Demo</a></div>
             </div>
 
-            <!-- Wednesday - Leg Day A -->
             <div id="wednesday" class="workout-day">
                 <div class="day-header">
                     <h2 class="day-title">Wednesday - Leg Day A</h2>
@@ -339,7 +394,6 @@
                 <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Calf Raises</h3><div class="meta-tags"><span class="tag-sets">10 Sets</span><span class="tag-reps">15-20 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=ORT4oJ_R8Qs" target="_blank" class="video-link">🎬 Demo</a></div>
             </div>
 
-            <!-- Thursday - Push Day B -->
             <div id="thursday" class="workout-day">
                 <div class="day-header">
                     <h2 class="day-title">Thursday - Push Day B</h2>
@@ -354,7 +408,6 @@
                 <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Rear Delt Flyes</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=ttvfGg9d76c" target="_blank" class="video-link">🎬 Demo</a></div>
             </div>
 
-            <!-- Friday - Pull Day B -->
             <div id="friday" class="workout-day">
                 <div class="day-header">
                     <h2 class="day-title">Friday - Pull Day B</h2>
@@ -369,7 +422,6 @@
                 <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Chin Ups</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=bd_A0kDAyK4" target="_blank" class="video-link">🎬 Demo</a></div>
             </div>
 
-            <!-- Saturday - Leg Day B -->
             <div id="saturday" class="workout-day">
                 <div class="day-header">
                     <h2 class="day-title">Saturday - Leg Day B</h2>
@@ -388,7 +440,234 @@
         </div>
 
 
-        <!-- CRICKET POWER HITTING TAB -->
+        <div id="page-ironax" class="page-view">
+            <div class="nutrition-section" style="border-left: 4px solid var(--ironax-orange); background: #fff7ed;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+                    <h3 style="color:#ea580c;">⚙️ Ironax All-In-One Workout Split</h3>
+                    <span class="badge" style="background: #ffedd5; color: #ea580c;">PPL Matrix</span>
+                </div>
+                <p style="font-size: 0.85rem; font-style: italic; color: #c2410c;">"Maximize mechanical advantage by capitalizing on smooth cable paths and Smith machine safety rails."</p>
+            </div>
+
+            <div class="ironax-tabs" id="ironax-tabs-nav">
+                <button class="ironax-tab-btn active" id="ironax-btn-push" onclick="switchIronaxDay('push')">Push Day</button>
+                <button class="ironax-tab-btn" id="ironax-btn-pull" onclick="switchIronaxDay('pull')">Pull Day</button>
+                <button class="ironax-tab-btn" id="ironax-btn-legs" onclick="switchIronaxDay('legs')">Leg Day</button>
+            </div>
+
+            <div id="ironax-push" class="ironax-day active">
+                <div class="day-header">
+                    <h2 class="day-title" style="color: var(--ironax-orange)">Mon / Thu - Push</h2>
+                    <span class="badge" style="background: #ffedd5; color: #ea580c;">Smith & Cable Focus</span>
+                </div>
+                <div class="exercise-card">
+                    <div class="exercise-info" onclick="handleCardClick(this)">
+                        <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
+                        <div class="exercise-details">
+                            <h3>Smith Machine Bench Press</h3>
+                            <div class="meta-tags"><span class="tag-ironax">Smith Machine</span><span class="tag-sets">3-4 Sets</span><span class="tag-reps">8-12 Reps</span></div>
+                        </div>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=7FyJdsXeta8" target="_blank" class="video-link">🎬 Demo</a>
+                </div>
+                <div class="exercise-card">
+                    <div class="exercise-info" onclick="handleCardClick(this)">
+                        <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
+                        <div class="exercise-details">
+                            <h3>Cable Crossover Fly</h3>
+                            <div class="meta-tags"><span class="tag-ironax">Dual Cables</span><span class="tag-sets">3 Sets</span><span class="tag-reps">10-15 Reps</span></div>
+                        </div>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=Iwe6AmxVf7o" target="_blank" class="video-link">🎬 Demo</a>
+                </div>
+                <div class="exercise-card">
+                    <div class="exercise-info" onclick="handleCardClick(this)">
+                        <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
+                        <div class="exercise-details">
+                            <h3>Cable Lateral Raise</h3>
+                            <div class="meta-tags"><span class="tag-ironax">Lower Cable</span><span class="tag-sets">3-4 Sets</span><span class="tag-reps">12-15 Reps</span></div>
+                        </div>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=zpbm-xRHB6k" target="_blank" class="video-link">🎬 Demo</a>
+                </div>
+                <div class="exercise-card">
+                    <div class="exercise-info" onclick="handleCardClick(this)">
+                        <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
+                        <div class="exercise-details">
+                            <h3>Overhead Rope Extension</h3>
+                            <div class="meta-tags"><span class="tag-ironax">High Cable</span><span class="tag-sets">3 Sets</span><span class="tag-reps">10-12 Reps</span></div>
+                        </div>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=jhDJNF_WlTc" target="_blank" class="video-link">🎬 Demo</a>
+                </div>
+            </div>
+
+            <div id="ironax-pull" class="ironax-day">
+                <div class="day-header">
+                    <h2 class="day-title" style="color: var(--ironax-orange)">Tue / Fri - Pull</h2>
+                    <span class="badge" style="background: #ffedd5; color: #ea580c;">Upper Back & Biceps</span>
+                </div>
+                <div class="exercise-card">
+                    <div class="exercise-info" onclick="handleCardClick(this)">
+                        <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
+                        <div class="exercise-details">
+                            <h3>Lat Pulldown</h3>
+                            <div class="meta-tags"><span class="tag-ironax">High Cable</span><span class="tag-sets">3-4 Sets</span><span class="tag-reps">8-12 Reps</span></div>
+                        </div>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=Z_3xHwuO8Tk" target="_blank" class="video-link">🎬 Demo</a>
+                </div>
+                <div class="exercise-card">
+                    <div class="exercise-info" onclick="handleCardClick(this)">
+                        <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
+                        <div class="exercise-details">
+                            <h3>Seated Cable Row</h3>
+                            <div class="meta-tags"><span class="tag-ironax">Mid Pulley</span><span class="tag-sets">3 Sets</span><span class="tag-reps">10-12 Reps</span></div>
+                        </div>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=q4boNkB4uaM" target="_blank" class="video-link">🎬 Demo</a>
+                </div>
+                <div class="exercise-card">
+                    <div class="exercise-info" onclick="handleCardClick(this)">
+                        <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
+                        <div class="exercise-details">
+                            <h3>Cable Face Pulls</h3>
+                            <div class="meta-tags"><span class="tag-ironax">High Cable</span><span class="tag-sets">3 Sets</span><span class="tag-reps">12-15 Reps</span></div>
+                        </div>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=DvjmJdEswQ4" target="_blank" class="video-link">🎬 Demo</a>
+                </div>
+                <div class="exercise-card">
+                    <div class="exercise-info" onclick="handleCardClick(this)">
+                        <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
+                        <div class="exercise-details">
+                            <h3>Standing Cable Bicep Curl</h3>
+                            <div class="meta-tags"><span class="tag-ironax">Low Cable</span><span class="tag-sets">3 Sets</span><span class="tag-reps">10-15 Reps</span></div>
+                        </div>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=cikXJydntCk" target="_blank" class="video-link">🎬 Demo</a>
+                </div>
+            </div>
+
+            <div id="ironax-legs" class="ironax-day">
+                <div class="day-header">
+                    <h2 class="day-title" style="color: var(--ironax-orange)">Wed / Sat - Legs</h2>
+                    <span class="badge" style="background: #ffedd5; color: #ea580c;">Structural Base</span>
+                </div>
+                <div class="exercise-card">
+                    <div class="exercise-info" onclick="handleCardClick(this)">
+                        <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
+                        <div class="exercise-details">
+                            <h3>Smith Machine Squat</h3>
+                            <div class="meta-tags"><span class="tag-ironax">Smith Machine</span><span class="tag-sets">3-4 Sets</span><span class="tag-reps">8-12 Reps</span></div>
+                        </div>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=iAcRGCsG_PY" target="_blank" class="video-link">🎬 Demo</a>
+                </div>
+                <div class="exercise-card">
+                    <div class="exercise-info" onclick="handleCardClick(this)">
+                        <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
+                        <div class="exercise-details">
+                            <h3>Smith Machine RDL</h3>
+                            <div class="meta-tags"><span class="tag-ironax">Smith Machine</span><span class="tag-sets">3 Sets</span><span class="tag-reps">8-12 Reps</span></div>
+                        </div>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=ICb49JhYASI" target="_blank" class="video-link">🎬 Demo</a>
+                </div>
+                <div class="exercise-card">
+                    <div class="exercise-info" onclick="handleCardClick(this)">
+                        <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
+                        <div class="exercise-details">
+                            <h3>Smith Machine Reverse Lunge</h3>
+                            <div class="meta-tags"><span class="tag-ironax">Smith Machine</span><span class="tag-sets">3 Sets</span><span class="tag-reps">10-12 Reps</span></div>
+                        </div>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=QF0BQS2W80k" target="_blank" class="video-link">🎬 Demo</a>
+                </div>
+                <div class="exercise-card">
+                    <div class="exercise-info" onclick="handleCardClick(this)">
+                        <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
+                        <div class="exercise-details">
+                            <h3>Smith Machine Calf Raise</h3>
+                            <div class="meta-tags"><span class="tag-ironax">Smith Machine</span><span class="tag-sets">4 Sets</span><span class="tag-reps">15-20 Reps</span></div>
+                        </div>
+                    </div>
+                    <a href="https://www.youtube.com/watch?v=ORT4oJ_R8Qs" target="_blank" class="video-link">🎬 Demo</a>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="page-growth" class="page-view">
+            <div class="nutrition-section" style="border-left: 4px solid var(--primary); background: #eff6ff;">
+                <h3 style="color:var(--primary); margin-bottom: 4px;">📈 Muscle Synthesis Mechanics</h3>
+                <p style="font-size: 0.85rem; color: #1e40af; line-height: 1.4;">Muscle tissue isn't built in the gym; it is broken down in the gym and rebuilt stronger during recovery. True structural growth requires strict devotion to the three foundational pillars.</p>
+            </div>
+
+            <div class="nutrition-section">
+                <h2>⏱️ The Hypertrophy Timeline</h2>
+                <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 10px;">What happens biologically as you train consistently:</p>
+                
+                <div class="timeline-container">
+                    <div class="timeline-item">
+                        <div class="timeline-title">Weeks 1-4: Neural Adaptation Phase</div>
+                        <p style="font-size:0.8rem; color: var(--text-light);">No significant muscle tissue is built yet. Your brain and nervous system are learning how to recruit muscle fibers more efficiently, creating rapid initial strength jumps.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-title">Weeks 6-8: Initial Micro-Hypertrophy</div>
+                        <p style="font-size:0.8rem; color: var(--text-light);">With consistent protein delivery and rest, protein synthesis surpasses breakdown. Subtle structural changes begin to display as muscles look fuller.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-title">Months 3-6: Real Visible Growth</div>
+                        <p style="font-size:0.8rem; color: var(--text-light);">Continuous progressive overload triggers permanent satellite-cell integration. True myofibrillar muscle hypertrophy is now fully visible in the mirror.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nutrition-section">
+                <h2>🔑 The 3 Pillars of Muscle Growth</h2>
+                <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 12px;">Select a pillar below to analyze its core growth protocols:</p>
+                
+                <div class="macro-grid">
+                    <div class="macro-card" style="border-left: 4px solid var(--ironax-orange);" onclick="toggleGrowthDetail('growth-overload')"><h4>🔄 1. Overload</h4></div>
+                    <div class="macro-card" style="border-left: 4px solid var(--accent-purple);" onclick="toggleGrowthDetail('growth-protein')"><h4>🥩 2. Protein</h4></div>
+                    <div class="macro-card" style="border-left: 4px solid var(--success);" onclick="toggleGrowthDetail('growth-recovery')"><h4>💤 3. Recovery</h4></div>
+                    <div class="macro-card" style="border-left: 4px solid var(--primary);" onclick="toggleGrowthDetail('growth-rates')"><h4>📈 Gain Rates</h4></div>
+                </div>
+
+                <div id="growth-overload" class="macro-target" style="display:none; margin-top:15px; background: #f8fafc; padding: 12px; border-radius: 10px; text-align: left;">
+                    <strong style="color:var(--ironax-orange); font-size: 0.95rem;">🔄 Progressive Overload Strategy:</strong>
+                    <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 6px; line-height: 1.4;">You must constantly demand more of your muscles to force adaptation. Over time, strive to:<br>
+                    • Increase resistance (weight on the bar)<br>
+                    • Perform more total repetitions with the same weight<br>
+                    • Improve execution form and slow down the eccentric (lowering) phase</p>
+                </div>
+                <div id="growth-protein" class="macro-target" style="display:none; margin-top:15px; background: #f8fafc; padding: 12px; border-radius: 10px; text-align: left;">
+                    <strong style="color:var(--accent-purple); font-size: 0.95rem;">🥩 Protein Synthesis Target:</strong>
+                    <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 6px; line-height: 1.4;">Muscle fibers are made of amino acids. To build tissue, aim to satisfy:<br>
+                    • Daily target: <strong>0.8 to 1.0 grams of protein per pound</strong> of body weight<br>
+                    • Focus on high-quality complete proteins (chicken, turkey, fish, eggs, whey)<br>
+                    • Space out intake across 3 to 5 meals to maintain continuous protein synthesis</p>
+                </div>
+                <div id="growth-recovery" class="macro-target" style="display:none; margin-top:15px; background: #f8fafc; padding: 12px; border-radius: 10px; text-align: left;">
+                    <strong style="color:var(--success); font-size: 0.95rem;">💤 Deep Recovery Rules:</strong>
+                    <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 6px; line-height: 1.4;">Muscle repair occurs in deep states of rest. Prioritize:<br>
+                    • **7 to 8 hours** of quality sleep per night for optimal natural growth hormone release<br>
+                    • Proper hydration: Muscle is roughly 75% water<br>
+                    • Resting fully on dedicated non-training recovery days</p>
+                </div>
+                <div id="growth-rates" class="macro-target" style="display:none; margin-top:15px; background: #f8fafc; padding: 12px; border-radius: 10px; text-align: left;">
+                    <strong style="color:var(--primary); font-size: 0.95rem;">📈 Realistic Muscle Gain Expectations:</strong>
+                    <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 6px; line-height: 1.4;">The speed of muscle building decreases as you gain experience:<br>
+                    • <strong>Beginner:</strong> 1.0 to 1.5 lbs of muscle per month<br>
+                    • <strong>Intermediate:</strong> 0.5 to 1.0 lbs of muscle per month<br>
+                    • <strong>Advanced:</strong> 0.25 to 0.5 lbs of muscle per month<br>
+                    <em>*Note: Weight on scale can sometimes stay flat due to simultaneous fat loss (recomposition).</em></p>
+                </div>
+            </div>
+        </div>
+
+
         <div id="page-cricket" class="page-view">
             <div class="nutrition-section" style="border-left: 4px solid var(--cricket-gold); background: #fffdf5;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
@@ -466,7 +745,6 @@
         </div>
 
 
-        <!-- NUTRITION VIEW PANEL -->
         <div id="page-nutrition" class="page-view">
             <div class="nutrition-section">
                 <h2>📅 Weekly Muscle Gain Schedule</h2>
@@ -505,7 +783,6 @@
         </div>
 
 
-        <!-- NEW: SPORTS PSYCHOLOGY VIEW PANEL -->
         <div id="page-psychology" class="page-view">
             <div class="nutrition-section" style="border-left: 4px solid var(--psychology-teal); background: #f0fdfa;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
@@ -517,7 +794,6 @@
 
             <h2 class="day-title" style="border-color: var(--psychology-teal); margin-bottom: 15px;">🧠 Top 5 Sports Psychology Strategies</h2>
 
-            <!-- Topic 1: Diaphragmatic Box Breathing -->
             <div class="exercise-card">
                 <div class="exercise-info" onclick="handleCardClick(this)">
                     <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
@@ -530,7 +806,6 @@
                 <a href="https://www.youtu.be.com/watch?v=FJJazamW4gA" target="_blank" class="video-link">🎬 Video</a>
             </div>
 
-            <!-- Topic 2: Pre-Performance Routines -->
             <div class="exercise-card">
                 <div class="exercise-info" onclick="handleCardClick(this)">
                     <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
@@ -543,7 +818,6 @@
                 <a href="https://www.youtu.be.com/watch?v=yG6eT_kS3Is" target="_blank" class="video-link">🎬 Video</a>
             </div>
 
-            <!-- Topic 3: Vivid Script Visualization -->
             <div class="exercise-card">
                 <div class="exercise-info" onclick="handleCardClick(this)">
                     <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
@@ -556,7 +830,6 @@
                 <a href="https://www.youtu.be.com/watch?v=48coMKvshN8" target="_blank" class="video-link">🎬 Video</a>
             </div>
 
-            <!-- Topic 4: Cognitive Restructuring -->
             <div class="exercise-card">
                 <div class="exercise-info" onclick="handleCardClick(this)">
                     <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
@@ -569,7 +842,6 @@
                 <a href="https://www.youtu.be.com/watch?v=778F3Vf8wJw" target="_blank" class="video-link">🎬 Video</a>
             </div>
 
-            <!-- Topic 5: Process over Outcome Goal Setting -->
             <div class="exercise-card">
                 <div class="exercise-info" onclick="handleCardClick(this)">
                     <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
@@ -589,7 +861,7 @@
             © 2026 CricBuild Pro. All Rights Reserved.
         </p>
         <p style="font-size: 0.75rem; color: var(--text-light); opacity: 0.75; margin-top: 4px;">
-            v2.5.0 • Optimized for Athlete Hypertrophy & Ballistic Power
+            v2.6.0 • Optimized for Athlete Hypertrophy & Ballistic Power
         </p>
     </footer>
 
@@ -615,6 +887,16 @@
             }
         }
 
+        // Handle Muscle Growth Detail Toggles
+        function toggleGrowthDetail(elementId) {
+            const block = document.getElementById(elementId);
+            const isCurrentlyOpen = block.style.display === 'block';
+            document.querySelectorAll('#page-growth .macro-target').forEach(t => t.style.display = 'none');
+            if (!isCurrentlyOpen) {
+                block.style.display = 'block';
+            }
+        }
+
         function switchDay(dayId) {
             document.querySelectorAll('.workout-day').forEach(day => day.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -624,6 +906,15 @@
                 const activeBtn = document.querySelector(`[data-day="${dayId}"]`);
                 if(activeBtn) activeBtn.classList.add('active');
             }
+        }
+
+        // Sub tab navigation for Ironax split
+        function switchIronaxDay(dayKey) {
+            document.querySelectorAll('.ironax-day').forEach(d => d.classList.remove('active'));
+            document.querySelectorAll('.ironax-tab-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(`ironax-${dayKey}`).classList.add('active');
+            document.getElementById(`ironax-btn-${dayKey}`).classList.add('active');
         }
 
         function setAutomaticDay() {
