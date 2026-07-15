@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CricBuild Pro | Bodybuilding for Modern Cricketers</title>
+    <title>CricBuild Pro | Bodybuilding & Martial Arts</title>
     
+    <!-- PWA Mobile App Capabilities -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="CricBuild">
     <meta name="mobile-web-app-capable" content="yes">
     
+    <!-- Web App Manifest -->
     <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22CricBuild%20Athletic%20Tracker%22,%22short_name%22:%22CricBuild%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23f8fafc%22,%22theme_color%22:%22%230f172a%22}">
 
     <style>
@@ -26,6 +28,7 @@
             --cricket-gold: #eab308;
             --psychology-teal: #0d9488;
             --ironax-orange: #f97316;
+            --karate-red: #dc2626;
         }
         * {
             box-sizing: border-box;
@@ -63,10 +66,10 @@
             letter-spacing: 0.8px;
         }
         
-        /* Navigation (Updated to 6 items layout for PWA compatibility) */
+        /* Navigation (Updated for PWA compatibility and support for 7 items) */
         .main-nav {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 6px;
             margin-bottom: 20px;
             background: #e2e8f0;
@@ -75,14 +78,14 @@
         }
         @media (min-width: 600px) {
             .main-nav {
-                grid-template-columns: repeat(6, 1fr);
+                grid-template-columns: repeat(7, 1fr);
             }
         }
         .nav-btn {
             background: none;
             border: none;
             padding: 10px 2px;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             font-weight: 700;
             color: var(--text-light);
             cursor: pointer;
@@ -207,6 +210,7 @@
         .tag-reps { background-color: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 6px; }
         .tag-psych { background-color: #ccfbf1; color: #115e59; padding: 3px 8px; border-radius: 6px; }
         .tag-ironax { background-color: #ffedd5; color: #ea580c; padding: 3px 8px; border-radius: 6px; }
+        .tag-karate { background-color: #fee2e2; color: #b91c1c; padding: 3px 8px; border-radius: 6px; }
         
         .video-link {
             display: inline-flex;
@@ -327,6 +331,7 @@
         <p>Bodybuilding for Modern Cricketers</p>
     </header>
 
+    <!-- Main Navigation Module (Updated to 7 Buttons for Karate Integration) -->
     <nav class="main-nav">
         <button class="nav-btn active" id="btn-workout" onclick="showPage('workout')">💪 Workouts</button>
         <button class="nav-btn" id="btn-ironax" onclick="showPage('ironax')">⚙️ Ironax</button>
@@ -334,9 +339,11 @@
         <button class="nav-btn" id="btn-cricket" onclick="showPage('cricket')">🏏 Cricket</button>
         <button class="nav-btn" id="btn-nutrition" onclick="showPage('nutrition')">🥗 Nutrition</button>
         <button class="nav-btn" id="btn-psychology" onclick="showPage('psychology')">🧠 Mindset</button>
+        <button class="nav-btn" id="btn-karate" onclick="showPage('karate')">🥋 Karate</button>
     </nav>
 
     <main>
+        <!-- WORKOUT VIEW PANEL -->
         <div id="page-workout" class="page-view active">
             <div class="timer-container" id="timer-box" onclick="toggleTimer()">
                 <div id="timer-display">⏱️ Start 90s Rest Timer</div>
@@ -352,6 +359,7 @@
                 <button class="tab-btn" data-day="saturday" onclick="switchDay('saturday')">Sat</button>
             </div>
 
+            <!-- Monday - Push Day A -->
             <div id="monday" class="workout-day">
                 <div class="day-header">
                     <h2 class="day-title">Monday - Push Day A</h2>
@@ -368,6 +376,7 @@
                 <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Weighted Parallel Bar Dips</h3><div class="meta-tags"><span class="tag-sets">3 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=sM6XUdt1rm4" target="_blank" class="video-link">🎬 Demo</a></div>
             </div>
 
+            <!-- Tuesday - Pull Day A -->
             <div id="tuesday" class="workout-day">
                 <div class="day-header">
                     <h2 class="day-title">Tuesday - Pull Day A</h2>
@@ -382,6 +391,7 @@
                 <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Close Grip Pull Ups</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=WK5yZMlgMb4" target="_blank" class="video-link">🎬 Demo</a></div>
             </div>
 
+            <!-- Wednesday - Leg Day A -->
             <div id="wednesday" class="workout-day">
                 <div class="day-header">
                     <h2 class="day-title">Wednesday - Leg Day A</h2>
@@ -394,6 +404,7 @@
                 <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Calf Raises</h3><div class="meta-tags"><span class="tag-sets">10 Sets</span><span class="tag-reps">15-20 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=ORT4oJ_R8Qs" target="_blank" class="video-link">🎬 Demo</a></div>
             </div>
 
+            <!-- Thursday - Push Day B -->
             <div id="thursday" class="workout-day">
                 <div class="day-header">
                     <h2 class="day-title">Thursday - Push Day B</h2>
@@ -408,6 +419,7 @@
                 <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Rear Delt Flyes</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=ttvfGg9d76c" target="_blank" class="video-link">🎬 Demo</a></div>
             </div>
 
+            <!-- Friday - Pull Day B -->
             <div id="friday" class="workout-day">
                 <div class="day-header">
                     <h2 class="day-title">Friday - Pull Day B</h2>
@@ -422,6 +434,7 @@
                 <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Chin Ups</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=bd_A0kDAyK4" target="_blank" class="video-link">🎬 Demo</a></div>
             </div>
 
+            <!-- Saturday - Leg Day B -->
             <div id="saturday" class="workout-day">
                 <div class="day-header">
                     <h2 class="day-title">Saturday - Leg Day B</h2>
@@ -440,6 +453,7 @@
         </div>
 
 
+        <!-- IRONAX WORKOUTS TAB -->
         <div id="page-ironax" class="page-view">
             <div class="nutrition-section" style="border-left: 4px solid var(--ironax-orange); background: #fff7ed;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
@@ -455,6 +469,7 @@
                 <button class="ironax-tab-btn" id="ironax-btn-legs" onclick="switchIronaxDay('legs')">Leg Day</button>
             </div>
 
+            <!-- Ironax Push Day -->
             <div id="ironax-push" class="ironax-day active">
                 <div class="day-header">
                     <h2 class="day-title" style="color: var(--ironax-orange)">Mon / Thu - Push</h2>
@@ -502,6 +517,7 @@
                 </div>
             </div>
 
+            <!-- Ironax Pull Day -->
             <div id="ironax-pull" class="ironax-day">
                 <div class="day-header">
                     <h2 class="day-title" style="color: var(--ironax-orange)">Tue / Fri - Pull</h2>
@@ -549,6 +565,7 @@
                 </div>
             </div>
 
+            <!-- Ironax Leg Day -->
             <div id="ironax-legs" class="ironax-day">
                 <div class="day-header">
                     <h2 class="day-title" style="color: var(--ironax-orange)">Wed / Sat - Legs</h2>
@@ -598,12 +615,14 @@
         </div>
 
 
+        <!-- MUSCLE GROWTH KNOWLEDGE TAB -->
         <div id="page-growth" class="page-view">
             <div class="nutrition-section" style="border-left: 4px solid var(--primary); background: #eff6ff;">
                 <h3 style="color:var(--primary); margin-bottom: 4px;">📈 Muscle Synthesis Mechanics</h3>
                 <p style="font-size: 0.85rem; color: #1e40af; line-height: 1.4;">Muscle tissue isn't built in the gym; it is broken down in the gym and rebuilt stronger during recovery. True structural growth requires strict devotion to the three foundational pillars.</p>
             </div>
 
+            <!-- Growth Timeline Component -->
             <div class="nutrition-section">
                 <h2>⏱️ The Hypertrophy Timeline</h2>
                 <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 10px;">What happens biologically as you train consistently:</p>
@@ -624,6 +643,7 @@
                 </div>
             </div>
 
+            <!-- The Three Pillars of Growth -->
             <div class="nutrition-section">
                 <h2>🔑 The 3 Pillars of Muscle Growth</h2>
                 <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 12px;">Select a pillar below to analyze its core growth protocols:</p>
@@ -668,6 +688,7 @@
         </div>
 
 
+        <!-- CRICKET POWER HITTING TAB -->
         <div id="page-cricket" class="page-view">
             <div class="nutrition-section" style="border-left: 4px solid var(--cricket-gold); background: #fffdf5;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
@@ -745,6 +766,7 @@
         </div>
 
 
+        <!-- NUTRITION VIEW PANEL -->
         <div id="page-nutrition" class="page-view">
             <div class="nutrition-section">
                 <h2>📅 Weekly Muscle Gain Schedule</h2>
@@ -783,6 +805,7 @@
         </div>
 
 
+        <!-- SPORTS PSYCHOLOGY VIEW PANEL -->
         <div id="page-psychology" class="page-view">
             <div class="nutrition-section" style="border-left: 4px solid var(--psychology-teal); background: #f0fdfa;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
@@ -794,6 +817,7 @@
 
             <h2 class="day-title" style="border-color: var(--psychology-teal); margin-bottom: 15px;">🧠 Top 5 Sports Psychology Strategies</h2>
 
+            <!-- Topic 1: Diaphragmatic Box Breathing -->
             <div class="exercise-card">
                 <div class="exercise-info" onclick="handleCardClick(this)">
                     <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
@@ -806,6 +830,7 @@
                 <a href="https://www.youtu.be.com/watch?v=FJJazamW4gA" target="_blank" class="video-link">🎬 Video</a>
             </div>
 
+            <!-- Topic 2: Pre-Performance Routines -->
             <div class="exercise-card">
                 <div class="exercise-info" onclick="handleCardClick(this)">
                     <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
@@ -818,6 +843,7 @@
                 <a href="https://www.youtu.be.com/watch?v=yG6eT_kS3Is" target="_blank" class="video-link">🎬 Video</a>
             </div>
 
+            <!-- Topic 3: Vivid Script Visualization -->
             <div class="exercise-card">
                 <div class="exercise-info" onclick="handleCardClick(this)">
                     <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
@@ -830,6 +856,7 @@
                 <a href="https://www.youtu.be.com/watch?v=48coMKvshN8" target="_blank" class="video-link">🎬 Video</a>
             </div>
 
+            <!-- Topic 4: Cognitive Restructuring -->
             <div class="exercise-card">
                 <div class="exercise-info" onclick="handleCardClick(this)">
                     <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
@@ -842,6 +869,7 @@
                 <a href="https://www.youtu.be.com/watch?v=778F3Vf8wJw" target="_blank" class="video-link">🎬 Video</a>
             </div>
 
+            <!-- Topic 5: Process over Outcome Goal Setting -->
             <div class="exercise-card">
                 <div class="exercise-info" onclick="handleCardClick(this)">
                     <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
@@ -854,6 +882,46 @@
                 <a href="https://www.youtu.be.com/watch?v=D1s0zclgCio" target="_blank" class="video-link">🎬 Video</a>
             </div>
         </div>
+
+
+        <!-- NEW: KARATE TAB -->
+        <div id="page-karate" class="page-view">
+            <div class="nutrition-section" style="border-left: 4px solid var(--karate-red); background: #fef2f2;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+                    <h3 style="color:var(--karate-red);">🥋 Karate Fundamentals</h3>
+                    <span class="badge" style="background: #fee2e2; color: #b91c1c;">Skill & Power</span>
+                </div>
+                <p style="font-size: 0.85rem; font-style: italic; color: #991b1b;">"Karate begins and ends with respect. Build a solid foundation through precise form and explosive kinetic alignment."</p>
+            </div>
+
+            <h2 class="day-title" style="border-color: var(--karate-red); margin-bottom: 15px;">Technique & Conditioning</h2>
+
+            <!-- Step 1: How to Tie Belts -->
+            <div class="exercise-card">
+                <div class="exercise-info" onclick="handleCardClick(this)">
+                    <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
+                    <div class="exercise-details">
+                        <h3>1. How to Tie Your Karate Belt</h3>
+                        <div class="meta-tags"><span class="tag-karate">Knot Technique</span></div>
+                        <p style="font-size:0.75rem; color:var(--text-light); margin-top:4px;">💡 Center the belt, wrap it evenly around your waist, cross over, and secure the clean traditional flat square knot.</p>
+                    </div>
+                </div>
+                <a href="https://www.youtube.com/watch?v=U8o1YQKzZ84" target="_blank" class="video-link">🎬 Video</a>
+            </div>
+
+            <!-- Step 2: Exercise for Karate -->
+            <div class="exercise-card">
+                <div class="exercise-info" onclick="handleCardClick(this)">
+                    <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
+                    <div class="exercise-details">
+                        <h3>2. Fundamental Karate Exercise</h3>
+                        <div class="meta-tags"><span class="tag-karate">Hip Rotation & Kicks</span></div>
+                        <p style="font-size:0.75rem; color:var(--text-light); margin-top:4px;">💡 Condition your body to drive the knee straight up dynamically and project explosive force through hip-to-limb kinetic timing.</p>
+                    </div>
+                </div>
+                <a href="https://www.youtube.com/watch?v=_HRkls06xcg" target="_blank" class="video-link">🎬 Video</a>
+            </div>
+        </div>
     </main>
 
     <footer>
@@ -861,7 +929,7 @@
             © 2026 CricBuild Pro. All Rights Reserved.
         </p>
         <p style="font-size: 0.75rem; color: var(--text-light); opacity: 0.75; margin-top: 4px;">
-            v2.6.0 • Optimized for Athlete Hypertrophy & Ballistic Power
+            v2.7.0 • Optimized for Athlete Hypertrophy, Ballistic Power & Martial Arts
         </p>
     </footer>
 
