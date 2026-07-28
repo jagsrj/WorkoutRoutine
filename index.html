@@ -29,6 +29,7 @@
             --psychology-teal: #0d9488;
             --ironax-orange: #f97316;
             --karate-red: #dc2626;
+            --pullups-cyan: #06b6d4;
         }
         * {
             box-sizing: border-box;
@@ -66,7 +67,7 @@
             letter-spacing: 0.8px;
         }
         
-        /* Navigation (Updated for PWA compatibility and support for 7 items) */
+        /* Navigation (Updated for PWA compatibility and support for 8 items) */
         .main-nav {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -78,7 +79,7 @@
         }
         @media (min-width: 600px) {
             .main-nav {
-                grid-template-columns: repeat(7, 1fr);
+                grid-template-columns: repeat(8, 1fr);
             }
         }
         .nav-btn {
@@ -202,6 +203,7 @@
         }
         .exercise-info { display: flex; align-items: center; gap: 14px; flex: 1; cursor: pointer; min-width: 0; }
         .exercise-checkbox { width: 26px; height: 26px; accent-color: var(--primary); border-radius: 6px; flex-shrink: 0; }
+        .exercise-checkbox:focus-visible { outline: 2px solid var(--primary); }
         .exercise-details { min-width: 0; flex: 1; }
         .exercise-details h3 { font-size: 1.05rem; margin-bottom: 6px; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
@@ -211,6 +213,7 @@
         .tag-psych { background-color: #ccfbf1; color: #115e59; padding: 3px 8px; border-radius: 6px; }
         .tag-ironax { background-color: #ffedd5; color: #ea580c; padding: 3px 8px; border-radius: 6px; }
         .tag-karate { background-color: #fee2e2; color: #b91c1c; padding: 3px 8px; border-radius: 6px; }
+        .tag-pullups { background-color: #ecfeff; color: #0891b2; padding: 3px 8px; border-radius: 6px; }
         
         .video-link {
             display: inline-flex;
@@ -331,10 +334,11 @@
         <p>Bodybuilding for Modern Cricketers</p>
     </header>
 
-    <!-- Main Navigation Module (Updated to 7 Buttons for Karate Integration) -->
+    <!-- Main Navigation Module (Updated to 8 Buttons for Pull-Ups Tab Integration) -->
     <nav class="main-nav">
         <button class="nav-btn active" id="btn-workout" onclick="showPage('workout')">💪 Workouts</button>
         <button class="nav-btn" id="btn-ironax" onclick="showPage('ironax')">⚙️ Ironax</button>
+        <button class="nav-btn" id="btn-pullups" onclick="showPage('pullups')">✨ Pull-ups</button>
         <button class="nav-btn" id="btn-growth" onclick="showPage('growth')">📈 Growth</button>
         <button class="nav-btn" id="btn-cricket" onclick="showPage('cricket')">🏏 Cricket</button>
         <button class="nav-btn" id="btn-nutrition" onclick="showPage('nutrition')">🥗 Nutrition</button>
@@ -371,7 +375,7 @@
                 <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Military Press</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=2yjwXTZQDDI" target="_blank" class="video-link">🎬 Demo</a></div>
                 <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Lateral Raises</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=3VcKaXpzqRo" target="_blank" class="video-link">🎬 Demo</a></div>
                 <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Face Pulley</h3><div class="meta-tags"><span class="tag-sets">4 Sets</span><span class="tag-reps">8-10 Reps</span></div><p style="font-size:0.75rem; color:var(--text-light); margin-top:4px;">💡 Pull rope below face to safely hit rear delts</p></div></div><a href="https://www.youtube.com/watch?v=rep-qVOkqgk" target="_blank" class="video-link">🎬 Demo</a></div>
-                <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Triceps Pull Downs</h3><div class="meta-tags"><span class="tag-sets">3 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=U0kBTdeLvDA" target="_blank" class="video-link">🎬 Demo</a></div>
+                <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"> Triceps Pull Downs</h3><div class="meta-tags"><span class="tag-sets">3 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=U0kBTdeLvDA" target="_blank" class="video-link">🎬 Demo</a></div>
                 <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Close Grip Bench Press</h3><div class="meta-tags"><span class="tag-sets">3 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=nEF0bv2FW94" target="_blank" class="video-link">🎬 Demo</a></div>
                 <div class="exercise-card"><div class="exercise-info" onclick="handleCardClick(this)"><input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)"><div class="exercise-details"><h3>Weighted Parallel Bar Dips</h3><div class="meta-tags"><span class="tag-sets">3 Sets</span><span class="tag-reps">8-10 Reps</span></div></div></div><a href="https://www.youtube.com/watch?v=sM6XUdt1rm4" target="_blank" class="video-link">🎬 Demo</a></div>
             </div>
@@ -615,6 +619,59 @@
         </div>
 
 
+        <!-- PULL-UPS EXERCISE MATRIX TAB -->
+        <div id="page-pullups" class="page-view">
+            <div class="nutrition-section" style="border-left: 4px solid var(--pullups-cyan); background: #ecfeff;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+                    <h3 style="color:#0891b2;">✨ Pull-Ups Progression System</h3>
+                    <span class="badge" style="background: #cffafe; color: #0891b2;">Kinetic Control</span>
+                </div>
+                <p style="font-size: 0.85rem; font-style: italic; color: #0e7490;">"Mastering the strict pull-up requires strengthening structural mechanics across target muscle groups to efficiently pull your entire body weight."</p>
+            </div>
+
+            <h2 class="day-title" style="border-color: var(--pullups-cyan); margin-bottom: 15px;">Target Muscle Framework</h2>
+
+            <!-- Group 1: Latissimus Dorsi & Upper Back -->
+            <div class="exercise-card">
+                <div class="exercise-info" onclick="handleCardClick(this)">
+                    <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
+                    <div class="exercise-details">
+                        <h3>1. Latissimus Dorsi & Upper Back</h3>
+                        <div class="meta-tags"><span class="tag-pullups">Primary Mover</span></div>
+                        <p style="font-size:0.75rem; color:var(--text-light); margin-top:4px;">💡 Scapular pull-ups and lat pulldowns build vertical pulling strength and teach shoulder depression.</p>
+                    </div>
+                </div>
+                <a href="https://www.youtube.com/watch?v=J3bA3X28-2A" target="_blank" class="video-link">🎬 Video</a>
+            </div>
+
+            <!-- Group 2: Biceps & Brachioradialis -->
+            <div class="exercise-card">
+                <div class="exercise-info" onclick="handleCardClick(this)">
+                    <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
+                    <div class="exercise-details">
+                        <h3>2. Biceps, Forearms & Grip Stability</h3>
+                        <div class="meta-tags"><span class="tag-pullups">Arm Assistance</span></div>
+                        <p style="font-size:0.75rem; color:var(--text-light); margin-top:4px;">💡 Flexion mechanics pull your chest to the bar. Condition grip endurance with passive hangs and hammer curls.</p>
+                    </div>
+                </div>
+                <a href="https://www.youtube.com/watch?v=T_7bM0qj2_E" target="_blank" class="video-link">🎬 Video</a>
+            </div>
+
+            <!-- Group 3: Core & Lower Trapezius -->
+            <div class="exercise-card">
+                <div class="exercise-info" onclick="handleCardClick(this)">
+                    <input type="checkbox" class="exercise-checkbox" onchange="toggleComplete(this)">
+                    <div class="exercise-details">
+                        <h3>3. Core Stability & Lower Trapezius</h3>
+                        <div class="meta-tags"><span class="tag-pullups">Stabilization</span></div>
+                        <p style="font-size:0.75rem; color:var(--text-light); margin-top:4px;">💡 Eliminates body swing and energy leaks. Maintain a tight hollow-body position using hanging leg raises.</p>
+                    </div>
+                </div>
+                <a href="https://www.youtube.com/watch?v=34d7Kk26Dzo" target="_blank" class="video-link">🎬 Video</a>
+            </div>
+        </div>
+
+
         <!-- MUSCLE GROWTH KNOWLEDGE TAB -->
         <div id="page-growth" class="page-view">
             <div class="nutrition-section" style="border-left: 4px solid var(--primary); background: #eff6ff;">
@@ -805,7 +862,7 @@
         </div>
 
 
-        <!-- SPORTS PSYCHOLOGY VIEW PANEL (Updated with Fixed YouTube Links) -->
+        <!-- SPORTS PSYCHOLOGY VIEW PANEL -->
         <div id="page-psychology" class="page-view">
             <div class="nutrition-section" style="border-left: 4px solid var(--psychology-teal); background: #f0fdfa;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
