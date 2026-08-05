@@ -22,17 +22,31 @@
             border: 1px solid #333;
             color: #fff;
         }
-        .form-control, .form-select {
-            background-color: #2b2b2b;
-            border: 1px solid #444;
-            color: #fff;
+        
+        /* High-contrast inputs and explicit labels */
+        .input-label {
+            color: #0d6efd;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        .form-control:focus, .form-select:focus {
-            background-color: #333;
-            color: #fff;
-            border-color: #0d6efd;
+        .form-control {
+            background-color: #2b2b2b !important;
+            color: #ffffff !important;
+            border: 1px solid #555 !important;
+        }
+        .form-control:focus {
+            background-color: #333333 !important;
+            color: #ffffff !important;
+            border-color: #0d6efd !important;
             box-shadow: none;
         }
+        .form-control::placeholder {
+            color: #888888 !important;
+            opacity: 1;
+        }
+
         .journal-entry {
             border-left: 3px solid #0d6efd;
             padding-left: 10px;
@@ -111,9 +125,15 @@
                     <small class="text-muted mb-2 d-block">Chest, Front Delts, Triceps</small>
                     <div id="sets-bench">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-auto"><span class="small text-muted">Set 1</span></div>
-                            <div class="col"><input type="number" class="form-control form-control-sm reps-input" placeholder="Reps" inputmode="numeric"></div>
-                            <div class="col"><input type="number" class="form-control form-control-sm weight-input" placeholder="Weight" step="0.5" inputmode="decimal"></div>
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Reps</span>
+                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 10" inputmode="numeric">
+                            </div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Weight (kg)</span>
+                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 60" step="0.5" inputmode="decimal">
+                            </div>
                         </div>
                     </div>
                     <div class="d-flex gap-2 mt-2">
@@ -128,9 +148,15 @@
                     <small class="text-muted mb-2 d-block">Shoulders, Triceps, Core</small>
                     <div id="sets-ohp">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-auto"><span class="small text-muted">Set 1</span></div>
-                            <div class="col"><input type="number" class="form-control form-control-sm reps-input" placeholder="Reps" inputmode="numeric"></div>
-                            <div class="col"><input type="number" class="form-control form-control-sm weight-input" placeholder="Weight" step="0.5" inputmode="decimal"></div>
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Reps</span>
+                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 8" inputmode="numeric">
+                            </div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Weight (kg)</span>
+                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 40" step="0.5" inputmode="decimal">
+                            </div>
                         </div>
                     </div>
                     <div class="d-flex gap-2 mt-2">
@@ -145,9 +171,15 @@
                     <small class="text-muted mb-2 d-block">Upper Chest, Shoulders</small>
                     <div id="sets-incline-db">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-auto"><span class="small text-muted">Set 1</span></div>
-                            <div class="col"><input type="number" class="form-control form-control-sm reps-input" placeholder="Reps" inputmode="numeric"></div>
-                            <div class="col"><input type="number" class="form-control form-control-sm weight-input" placeholder="Weight" step="0.5" inputmode="decimal"></div>
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Reps</span>
+                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 10" inputmode="numeric">
+                            </div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Weight (kg)</span>
+                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 22" step="0.5" inputmode="decimal">
+                            </div>
                         </div>
                     </div>
                     <div class="d-flex gap-2 mt-2">
@@ -162,9 +194,15 @@
                     <small class="text-muted mb-2 d-block">Lower Chest, Triceps</small>
                     <div id="sets-dips">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-auto"><span class="small text-muted">Set 1</span></div>
-                            <div class="col"><input type="number" class="form-control form-control-sm reps-input" placeholder="Reps" inputmode="numeric"></div>
-                            <div class="col"><input type="number" class="form-control form-control-sm weight-input" placeholder="Added Wt" step="0.5" inputmode="decimal"></div>
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Reps</span>
+                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 12" inputmode="numeric">
+                            </div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Added Wt (kg)</span>
+                                <input type="number" class="form-control form-control-sm weight-input" placeholder="0 for BW" step="0.5" inputmode="decimal">
+                            </div>
                         </div>
                     </div>
                     <div class="d-flex gap-2 mt-2">
@@ -179,9 +217,15 @@
                     <small class="text-muted mb-2 d-block">Triceps, Inner Chest</small>
                     <div id="sets-cgbp">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-auto"><span class="small text-muted">Set 1</span></div>
-                            <div class="col"><input type="number" class="form-control form-control-sm reps-input" placeholder="Reps" inputmode="numeric"></div>
-                            <div class="col"><input type="number" class="form-control form-control-sm weight-input" placeholder="Weight" step="0.5" inputmode="decimal"></div>
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Reps</span>
+                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 10" inputmode="numeric">
+                            </div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Weight (kg)</span>
+                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 50" step="0.5" inputmode="decimal">
+                            </div>
                         </div>
                     </div>
                     <div class="d-flex gap-2 mt-2">
@@ -199,9 +243,15 @@
                     <small class="text-muted mb-2 d-block">Lats, Upper Back, Biceps</small>
                     <div id="sets-pullups">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-auto"><span class="small text-muted">Set 1</span></div>
-                            <div class="col"><input type="number" class="form-control form-control-sm reps-input" placeholder="Reps" inputmode="numeric"></div>
-                            <div class="col"><input type="number" class="form-control form-control-sm weight-input" placeholder="Added Wt" step="0.5" inputmode="decimal"></div>
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Reps</span>
+                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 8" inputmode="numeric">
+                            </div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Added Wt (kg)</span>
+                                <input type="number" class="form-control form-control-sm weight-input" placeholder="0 for BW" step="0.5" inputmode="decimal">
+                            </div>
                         </div>
                     </div>
                     <div class="d-flex gap-2 mt-2">
@@ -216,9 +266,15 @@
                     <small class="text-muted mb-2 d-block">Posterior Chain, Hamstrings, Erector Spinae</small>
                     <div id="sets-deadlift">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-auto"><span class="small text-muted">Set 1</span></div>
-                            <div class="col"><input type="number" class="form-control form-control-sm reps-input" placeholder="Reps" inputmode="numeric"></div>
-                            <div class="col"><input type="number" class="form-control form-control-sm weight-input" placeholder="Weight" step="0.5" inputmode="decimal"></div>
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Reps</span>
+                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 5" inputmode="numeric">
+                            </div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Weight (kg)</span>
+                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 100" step="0.5" inputmode="decimal">
+                            </div>
                         </div>
                     </div>
                     <div class="d-flex gap-2 mt-2">
@@ -233,9 +289,15 @@
                     <small class="text-muted mb-2 d-block">Lats, Rhomboids, Mid-Back</small>
                     <div id="sets-row">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-auto"><span class="small text-muted">Set 1</span></div>
-                            <div class="col"><input type="number" class="form-control form-control-sm reps-input" placeholder="Reps" inputmode="numeric"></div>
-                            <div class="col"><input type="number" class="form-control form-control-sm weight-input" placeholder="Weight" step="0.5" inputmode="decimal"></div>
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Reps</span>
+                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 10" inputmode="numeric">
+                            </div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Weight (kg)</span>
+                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 50" step="0.5" inputmode="decimal">
+                            </div>
                         </div>
                     </div>
                     <div class="d-flex gap-2 mt-2">
@@ -250,9 +312,15 @@
                     <small class="text-muted mb-2 d-block">Lats, Upper Back Width</small>
                     <div id="sets-latpulldown">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-auto"><span class="small text-muted">Set 1</span></div>
-                            <div class="col"><input type="number" class="form-control form-control-sm reps-input" placeholder="Reps" inputmode="numeric"></div>
-                            <div class="col"><input type="number" class="form-control form-control-sm weight-input" placeholder="Weight" step="0.5" inputmode="decimal"></div>
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Reps</span>
+                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 12" inputmode="numeric">
+                            </div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Weight (kg)</span>
+                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 45" step="0.5" inputmode="decimal">
+                            </div>
                         </div>
                     </div>
                     <div class="d-flex gap-2 mt-2">
@@ -267,9 +335,15 @@
                     <small class="text-muted mb-2 d-block">Rear Delts, Upper Traps, Rotator Cuff</small>
                     <div id="sets-facepulls">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-auto"><span class="small text-muted">Set 1</span></div>
-                            <div class="col"><input type="number" class="form-control form-control-sm reps-input" placeholder="Reps" inputmode="numeric"></div>
-                            <div class="col"><input type="number" class="form-control form-control-sm weight-input" placeholder="Weight" step="0.5" inputmode="decimal"></div>
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Reps</span>
+                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 15" inputmode="numeric">
+                            </div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Weight (kg)</span>
+                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 20" step="0.5" inputmode="decimal">
+                            </div>
                         </div>
                     </div>
                     <div class="d-flex gap-2 mt-2">
@@ -480,9 +554,15 @@
         const row = document.createElement('div');
         row.className = 'row g-2 align-items-center mb-2 set-row';
         row.innerHTML = `
-            <div class="col-auto"><span class="small text-muted">Set ${setNum}</span></div>
-            <div class="col"><input type="number" class="form-control form-control-sm reps-input" placeholder="Reps" inputmode="numeric"></div>
-            <div class="col"><input type="number" class="form-control form-control-sm weight-input" placeholder="Weight" step="0.5" inputmode="decimal"></div>
+            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set ${setNum}</span></div>
+            <div class="col-5">
+                <span class="input-label d-block mb-1">Reps</span>
+                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 10" inputmode="numeric">
+            </div>
+            <div class="col-5">
+                <span class="input-label d-block mb-1">Weight (kg)</span>
+                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 50" step="0.5" inputmode="decimal">
+            </div>
         `;
         container.appendChild(row);
     }
@@ -554,7 +634,7 @@
                 entryDiv.className = 'journal-entry';
 
                 const setsFormatted = entry.sets.map((s, i) => 
-                    `<span class="set-badge">Set ${i+1}: <strong>${s.reps}</strong> reps @ <strong>${s.weight}</strong></span>`
+                    `<span class="set-badge">Set ${i+1}: <strong>${s.reps}</strong> reps @ <strong>${s.weight}</strong> kg</span>`
                 ).join('');
 
                 entryDiv.innerHTML = `
