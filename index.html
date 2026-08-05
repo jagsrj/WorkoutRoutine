@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>CricBuild Pro - Workout Routine & Progress Journal</title>
+    <title>CricBuild Pro - Tracking & Training</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -50,12 +50,16 @@
         }
         .nav-pills .nav-link {
             color: #aaa;
-            font-size: 0.85rem;
-            padding: 8px 6px;
+            font-size: 0.8rem;
+            padding: 8px 4px;
         }
         .nav-pills .nav-link.active {
             background-color: #0d6efd;
             color: #fff;
+        }
+        .video-btn {
+            font-size: 0.8rem;
+            text-decoration: none;
         }
     </style>
 </head>
@@ -68,13 +72,16 @@
         <span class="badge bg-secondary" id="current-date-badge"></span>
     </div>
 
-    <!-- Navigation Tabs -->
+    <!-- Main Navigation Tabs -->
     <ul class="nav nav-pills nav-justified mb-3 gap-1" id="mainTab" role="tablist">
         <li class="nav-item">
-            <button class="nav-link active" id="ironax-tab-btn" data-bs-toggle="tab" data-bs-target="#ironax" type="button">Ironax</button>
+            <button class="nav-link active" id="tracking-tab-btn" data-bs-toggle="tab" data-bs-target="#tracking" type="button">Tracking</button>
         </li>
         <li class="nav-item">
-            <button class="nav-link" id="pullups-tab-btn" data-bs-toggle="tab" data-bs-target="#pullups" type="button">Pull-Ups</button>
+            <button class="nav-link" id="training-tab-btn" data-bs-toggle="tab" data-bs-target="#training" type="button">Training Demos</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="journal-tab-btn" data-bs-toggle="tab" data-bs-target="#journal" type="button" onclick="renderJournal()">Journal</button>
         </li>
         <li class="nav-item">
             <button class="nav-link" id="karate-tab-btn" data-bs-toggle="tab" data-bs-target="#karate" type="button">Karate</button>
@@ -85,26 +92,23 @@
         <li class="nav-item">
             <button class="nav-link" id="mindset-tab-btn" data-bs-toggle="tab" data-bs-target="#mindset" type="button">Mindset</button>
         </li>
-        <li class="nav-item">
-            <button class="nav-link" id="journal-tab-btn" data-bs-toggle="tab" data-bs-target="#journal" type="button" onclick="renderJournal()">Journal</button>
-        </li>
     </ul>
 
     <div class="tab-content" id="mainTabContent">
         
-        <!-- 1. IRONAX TAB -->
-        <div class="tab-pane fade show active" id="ironax" role="tabpanel">
+        <!-- 1. TRACKING TAB -->
+        <div class="tab-pane fade show active" id="tracking" role="tabpanel">
             <div class="btn-group w-100 mb-3" role="group">
-                <button type="button" class="btn btn-sm btn-outline-primary active" id="btn-push" onclick="showIronaxSubTab('push')">Push Day</button>
-                <button type="button" class="btn btn-sm btn-outline-primary" id="btn-pull" onclick="showIronaxSubTab('pull')">Pull Day</button>
+                <button type="button" class="btn btn-sm btn-outline-primary active" id="btn-track-push" onclick="showTrackingSubTab('push')">Push Day</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="btn-track-pull" onclick="showTrackingSubTab('pull')">Pull Day</button>
             </div>
 
-            <!-- Ironax Push Exercises -->
-            <div id="ironax-push-list">
-                <!-- Barbell Bench Press -->
+            <!-- PUSH DAY TRACKING -->
+            <div id="tracking-push-list">
+                <!-- 1. Bench Press -->
                 <div class="card p-3 mb-3">
-                    <h6 class="mb-1">Barbell Bench Press</h6>
-                    <small class="text-muted mb-2 d-block">Targets: Chest, Anterior Deltoids, Triceps</small>
+                    <h6 class="mb-1">1. Barbell Bench Press</h6>
+                    <small class="text-muted mb-2 d-block">Chest, Front Delts, Triceps</small>
                     <div id="sets-bench">
                         <div class="row g-2 align-items-center mb-2 set-row">
                             <div class="col-auto"><span class="small text-muted">Set 1</span></div>
@@ -118,10 +122,10 @@
                     </div>
                 </div>
 
-                <!-- Overhead Press -->
+                <!-- 2. OHP -->
                 <div class="card p-3 mb-3">
-                    <h6 class="mb-1">Overhead Barbell Press (OHP)</h6>
-                    <small class="text-muted mb-2 d-block">Targets: Shoulders, Triceps, Core</small>
+                    <h6 class="mb-1">2. Overhead Press (OHP)</h6>
+                    <small class="text-muted mb-2 d-block">Shoulders, Triceps, Core</small>
                     <div id="sets-ohp">
                         <div class="row g-2 align-items-center mb-2 set-row">
                             <div class="col-auto"><span class="small text-muted">Set 1</span></div>
@@ -135,10 +139,27 @@
                     </div>
                 </div>
 
-                <!-- Dips -->
+                <!-- 3. Incline Dumbbell Press -->
                 <div class="card p-3 mb-3">
-                    <h6 class="mb-1">Weighted / Bodyweight Dips</h6>
-                    <small class="text-muted mb-2 d-block">Targets: Lower Chest, Triceps</small>
+                    <h6 class="mb-1">3. Incline Dumbbell Press</h6>
+                    <small class="text-muted mb-2 d-block">Upper Chest, Shoulders</small>
+                    <div id="sets-incline-db">
+                        <div class="row g-2 align-items-center mb-2 set-row">
+                            <div class="col-auto"><span class="small text-muted">Set 1</span></div>
+                            <div class="col"><input type="number" class="form-control form-control-sm reps-input" placeholder="Reps" inputmode="numeric"></div>
+                            <div class="col"><input type="number" class="form-control form-control-sm weight-input" placeholder="Weight" step="0.5" inputmode="decimal"></div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-incline-db')">+ Set</button>
+                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Incline DB Press', 'sets-incline-db')">Save</button>
+                    </div>
+                </div>
+
+                <!-- 4. Dips -->
+                <div class="card p-3 mb-3">
+                    <h6 class="mb-1">4. Weighted / Bodyweight Dips</h6>
+                    <small class="text-muted mb-2 d-block">Lower Chest, Triceps</small>
                     <div id="sets-dips">
                         <div class="row g-2 align-items-center mb-2 set-row">
                             <div class="col-auto"><span class="small text-muted">Set 1</span></div>
@@ -151,14 +172,48 @@
                         <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Dips', 'sets-dips')">Save</button>
                     </div>
                 </div>
+
+                <!-- 5. Close-Grip Bench Press -->
+                <div class="card p-3 mb-3">
+                    <h6 class="mb-1">5. Close-Grip Bench Press</h6>
+                    <small class="text-muted mb-2 d-block">Triceps, Inner Chest</small>
+                    <div id="sets-cgbp">
+                        <div class="row g-2 align-items-center mb-2 set-row">
+                            <div class="col-auto"><span class="small text-muted">Set 1</span></div>
+                            <div class="col"><input type="number" class="form-control form-control-sm reps-input" placeholder="Reps" inputmode="numeric"></div>
+                            <div class="col"><input type="number" class="form-control form-control-sm weight-input" placeholder="Weight" step="0.5" inputmode="decimal"></div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-cgbp')">+ Set</button>
+                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Close-Grip Bench', 'sets-cgbp')">Save</button>
+                    </div>
+                </div>
             </div>
 
-            <!-- Ironax Pull Exercises (Hidden by default) -->
-            <div id="ironax-pull-list" class="d-none">
-                <!-- Deadlift -->
+            <!-- PULL DAY TRACKING -->
+            <div id="tracking-pull-list" class="d-none">
+                <!-- 1. Pull-Ups Tracker -->
+                <div class="card p-3 mb-3 border-primary">
+                    <h6 class="mb-1 text-primary">1. Pull-Ups / Weighted Pull-Ups</h6>
+                    <small class="text-muted mb-2 d-block">Lats, Upper Back, Biceps</small>
+                    <div id="sets-pullups">
+                        <div class="row g-2 align-items-center mb-2 set-row">
+                            <div class="col-auto"><span class="small text-muted">Set 1</span></div>
+                            <div class="col"><input type="number" class="form-control form-control-sm reps-input" placeholder="Reps" inputmode="numeric"></div>
+                            <div class="col"><input type="number" class="form-control form-control-sm weight-input" placeholder="Added Wt" step="0.5" inputmode="decimal"></div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-pullups')">+ Set</button>
+                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Pull-Ups', 'sets-pullups')">Save</button>
+                    </div>
+                </div>
+
+                <!-- 2. Deadlift -->
                 <div class="card p-3 mb-3">
-                    <h6 class="mb-1">Barbell Deadlift</h6>
-                    <small class="text-muted mb-2 d-block">Targets: Posterior Chain, Hamstrings, Lower Back</small>
+                    <h6 class="mb-1">2. Barbell Deadlift</h6>
+                    <small class="text-muted mb-2 d-block">Posterior Chain, Hamstrings, Erector Spinae</small>
                     <div id="sets-deadlift">
                         <div class="row g-2 align-items-center mb-2 set-row">
                             <div class="col-auto"><span class="small text-muted">Set 1</span></div>
@@ -172,10 +227,10 @@
                     </div>
                 </div>
 
-                <!-- Bent Over Row -->
+                <!-- 3. Bent-Over Row -->
                 <div class="card p-3 mb-3">
-                    <h6 class="mb-1">Bent-Over Barbell Row</h6>
-                    <small class="text-muted mb-2 d-block">Targets: Lats, Rhomboids, Upper Back</small>
+                    <h6 class="mb-1">3. Bent-Over Barbell Row</h6>
+                    <small class="text-muted mb-2 d-block">Lats, Rhomboids, Mid-Back</small>
                     <div id="sets-row">
                         <div class="row g-2 align-items-center mb-2 set-row">
                             <div class="col-auto"><span class="small text-muted">Set 1</span></div>
@@ -188,64 +243,192 @@
                         <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Barbell Row', 'sets-row')">Save</button>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- 2. PULL-UPS TAB -->
-        <div class="tab-pane fade" id="pullups" role="tabpanel">
-            <div class="card p-3 mb-3">
-                <h6 class="mb-1">Pull-Up Progressions</h6>
-                <p class="small text-muted">Log your pull-ups, chin-ups, or weighted reps here.</p>
-                
-                <div id="sets-pullups">
-                    <div class="row g-2 align-items-center mb-2 set-row">
-                        <div class="col-auto"><span class="small text-muted">Set 1</span></div>
-                        <div class="col"><input type="number" class="form-control form-control-sm reps-input" placeholder="Reps" inputmode="numeric"></div>
-                        <div class="col"><input type="number" class="form-control form-control-sm weight-input" placeholder="Added Wt" step="0.5" inputmode="decimal"></div>
+                <!-- 4. Lat Pulldown / Cable Row -->
+                <div class="card p-3 mb-3">
+                    <h6 class="mb-1">4. Lat Pulldown / Seated Cable Row</h6>
+                    <small class="text-muted mb-2 d-block">Lats, Upper Back Width</small>
+                    <div id="sets-latpulldown">
+                        <div class="row g-2 align-items-center mb-2 set-row">
+                            <div class="col-auto"><span class="small text-muted">Set 1</span></div>
+                            <div class="col"><input type="number" class="form-control form-control-sm reps-input" placeholder="Reps" inputmode="numeric"></div>
+                            <div class="col"><input type="number" class="form-control form-control-sm weight-input" placeholder="Weight" step="0.5" inputmode="decimal"></div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-latpulldown')">+ Set</button>
+                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Lat Pulldown', 'sets-latpulldown')">Save</button>
                     </div>
                 </div>
-                <div class="d-flex gap-2 mt-2">
-                    <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-pullups')">+ Set</button>
-                    <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Pull-Ups', 'sets-pullups')">Save</button>
+
+                <!-- 5. Face Pulls / Barbell Shrugs -->
+                <div class="card p-3 mb-3">
+                    <h6 class="mb-1">5. Face Pulls / Barbell Shrugs</h6>
+                    <small class="text-muted mb-2 d-block">Rear Delts, Upper Traps, Rotator Cuff</small>
+                    <div id="sets-facepulls">
+                        <div class="row g-2 align-items-center mb-2 set-row">
+                            <div class="col-auto"><span class="small text-muted">Set 1</span></div>
+                            <div class="col"><input type="number" class="form-control form-control-sm reps-input" placeholder="Reps" inputmode="numeric"></div>
+                            <div class="col"><input type="number" class="form-control form-control-sm weight-input" placeholder="Weight" step="0.5" inputmode="decimal"></div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-facepulls')">+ Set</button>
+                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Face Pulls / Shrugs', 'sets-facepulls')">Save</button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- 3. KARATE TAB -->
-        <div class="tab-pane fade" id="karate" role="tabpanel">
-            <div class="card p-3 mb-3">
-                <h6>Karate & Martial Arts Drills</h6>
-                <p class="small text-muted mb-0">Use this section for tracking kata reps, conditioning routines, or stance holds.</p>
+        <!-- 2. TRAINING DEMOS TAB -->
+        <div class="tab-pane fade" id="training" role="tabpanel">
+            <div class="btn-group w-100 mb-3" role="group">
+                <button type="button" class="btn btn-sm btn-outline-primary active" id="btn-demo-push" onclick="showDemoSubTab('push')">Push Demos</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="btn-demo-pull" onclick="showDemoSubTab('pull')">Pull Demos</button>
+            </div>
+
+            <!-- PUSH DEMOS -->
+            <div id="demo-push-list">
+                <div class="card p-3 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Barbell Bench Press</h6>
+                            <small class="text-muted">Form & Setup Tutorial</small>
+                        </div>
+                        <a href="https://www.youtube.com/watch?v=vcBig73ojpE" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
+                    </div>
+                </div>
+
+                <div class="card p-3 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Overhead Press (OHP)</h6>
+                            <small class="text-muted">Standing Barbell Form</small>
+                        </div>
+                        <a href="https://www.youtube.com/watch?v=2yjwXTZQDDI" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
+                    </div>
+                </div>
+
+                <div class="card p-3 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Incline Dumbbell Press</h6>
+                            <small class="text-muted">Upper Chest Focus</small>
+                        </div>
+                        <a href="https://www.youtube.com/watch?v=8iPEnn-ltC8" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
+                    </div>
+                </div>
+
+                <div class="card p-3 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Dips (Weighted/Bodyweight)</h6>
+                            <small class="text-muted">Chest & Triceps Technique</small>
+                        </div>
+                        <a href="https://www.youtube.com/watch?v=2z8JmcrW-As" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
+                    </div>
+                </div>
+
+                <div class="card p-3 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Close-Grip Bench Press</h6>
+                            <small class="text-muted">Tricep Hypertrophy Guide</small>
+                        </div>
+                        <a href="https://www.youtube.com/watch?v=nEF0bv2w9Fc" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PULL DEMOS -->
+            <div id="demo-pull-list" class="d-none">
+                <div class="card p-3 mb-2 border-primary">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0 text-primary">Pull-Ups & Progressions</h6>
+                            <small class="text-muted">Scapular Activation & Form</small>
+                        </div>
+                        <a href="https://www.youtube.com/watch?v=-ZIpSoTRsuE" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
+                    </div>
+                </div>
+
+                <div class="card p-3 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Barbell Deadlift</h6>
+                            <small class="text-muted">Conventional Deadlift Execution</small>
+                        </div>
+                        <a href="https://www.youtube.com/watch?v=op9kVnSso6Q" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
+                    </div>
+                </div>
+
+                <div class="card p-3 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Bent-Over Barbell Row</h6>
+                            <small class="text-muted">Strict Back Row Technique</small>
+                        </div>
+                        <a href="https://www.youtube.com/watch?v=FWJR5Ve8bnQ" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
+                    </div>
+                </div>
+
+                <div class="card p-3 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Lat Pulldown</h6>
+                            <small class="text-muted">Lat Engagement & Grip Guide</small>
+                        </div>
+                        <a href="https://www.youtube.com/watch?v=CAwf7n6Luuc" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
+                    </div>
+                </div>
+
+                <div class="card p-3 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Face Pulls</h6>
+                            <small class="text-muted">Rear Delt & Shoulder Health</small>
+                        </div>
+                        <a href="https://www.youtube.com/watch?v=eIq5CB9WXqc" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- 4. NUTRITION TAB -->
-        <div class="tab-pane fade" id="nutrition" role="tabpanel">
-            <div class="card p-3 mb-3">
-                <h6>Nutrition Principles</h6>
-                <ul class="small text-muted mb-0 ps-3">
-                    <li>Focus on whole-food protein sources and vegetables.</li>
-                    <li>Ensure proper hydration on training days.</li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- 5. MINDSET TAB -->
-        <div class="tab-pane fade" id="mindset" role="tabpanel">
-            <div class="card p-3 mb-3">
-                <h6>Daily Focus & Mindset</h6>
-                <p class="small text-muted mb-0">Consistency over intensity. Track your workouts daily and build momentum over time.</p>
-            </div>
-        </div>
-
-        <!-- 6. JOURNAL TAB -->
+        <!-- 3. JOURNAL TAB -->
         <div class="tab-pane fade" id="journal" role="tabpanel">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="mb-0 text-uppercase text-muted">Continuous History</h6>
+                <h6 class="mb-0 text-uppercase text-muted">Continuous History Log</h6>
                 <button class="btn btn-outline-warning btn-sm" onclick="exportBackup()">Export Backup</button>
             </div>
             <div id="journal-logs-container">
                 <!-- Logged entries render dynamically -->
+            </div>
+        </div>
+
+        <!-- 4. KARATE TAB -->
+        <div class="tab-pane fade" id="karate" role="tabpanel">
+            <div class="card p-3 mb-3">
+                <h6>Karate & Martial Arts Fundamentals</h6>
+                <p class="small text-muted mb-0">Track kata repetitions, stances, conditioning drills, and flexibility exercises here.</p>
+            </div>
+        </div>
+
+        <!-- 5. NUTRITION TAB -->
+        <div class="tab-pane fade" id="nutrition" role="tabpanel">
+            <div class="card p-3 mb-3">
+                <h6>Nutrition Principles</h6>
+                <ul class="small text-muted mb-0 ps-3">
+                    <li>Prioritize clean protein sources, eggs, and whole meats.</li>
+                    <li>Focus on high-fiber vegetables and adequate daily hydration.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 6. MINDSET TAB -->
+        <div class="tab-pane fade" id="mindset" role="tabpanel">
+            <div class="card p-3 mb-3">
+                <h6>Athletic Mindset & Focus</h6>
+                <p class="small text-muted mb-0">Maintain continuous progress through consistent logging, controlled mechanical form, and steady overload.</p>
             </div>
         </div>
 
@@ -256,21 +439,36 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // Current Date Display
+    // Current Date Badge Display
     document.getElementById('current-date-badge').innerText = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
-    // Toggle Push / Pull Day Views
-    function showIronaxSubTab(type) {
+    // Toggle Tracking Push/Pull Views
+    function showTrackingSubTab(type) {
         if (type === 'push') {
-            document.getElementById('ironax-push-list').classList.remove('d-none');
-            document.getElementById('ironax-pull-list').classList.add('d-none');
-            document.getElementById('btn-push').classList.add('active');
-            document.getElementById('btn-pull').classList.remove('active');
+            document.getElementById('tracking-push-list').classList.remove('d-none');
+            document.getElementById('tracking-pull-list').classList.add('d-none');
+            document.getElementById('btn-track-push').classList.add('active');
+            document.getElementById('btn-track-pull').classList.remove('active');
         } else {
-            document.getElementById('ironax-push-list').classList.add('d-none');
-            document.getElementById('ironax-pull-list').classList.remove('d-none');
-            document.getElementById('btn-push').classList.remove('active');
-            document.getElementById('btn-pull').classList.add('active');
+            document.getElementById('tracking-push-list').classList.add('d-none');
+            document.getElementById('tracking-pull-list').classList.remove('d-none');
+            document.getElementById('btn-track-push').classList.remove('active');
+            document.getElementById('btn-track-pull').classList.add('active');
+        }
+    }
+
+    // Toggle Training Demo Push/Pull Views
+    function showDemoSubTab(type) {
+        if (type === 'push') {
+            document.getElementById('demo-push-list').classList.remove('d-none');
+            document.getElementById('demo-pull-list').classList.add('d-none');
+            document.getElementById('btn-demo-push').classList.add('active');
+            document.getElementById('btn-demo-pull').classList.remove('active');
+        } else {
+            document.getElementById('demo-push-list').classList.add('d-none');
+            document.getElementById('demo-pull-list').classList.remove('d-none');
+            document.getElementById('btn-demo-push').classList.remove('active');
+            document.getElementById('btn-demo-pull').classList.add('active');
         }
     }
 
@@ -324,7 +522,7 @@
 
         localStorage.setItem('workout_journal', JSON.stringify(journal));
 
-        // Reset inputs
+        // Reset input fields
         setRows.forEach(row => {
             row.querySelector('.reps-input').value = '';
             row.querySelector('.weight-input').value = '';
