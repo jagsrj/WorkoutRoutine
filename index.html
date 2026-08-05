@@ -49,13 +49,18 @@
 
         .journal-entry {
             border-left: 3px solid #0d6efd;
-            padding-left: 10px;
-            margin-bottom: 12px;
+            padding-left: 12px;
+            margin-bottom: 14px;
+            background-color: #1a1a1a;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            border-radius: 0 4px 4px 0;
         }
         .set-badge {
             background-color: #2b2b2b;
+            color: #ffffff;
             border: 1px solid #444;
-            padding: 2px 8px;
+            padding: 3px 8px;
             border-radius: 4px;
             font-size: 0.85rem;
             margin-right: 5px;
@@ -634,24 +639,24 @@
 
         <!-- 3. JOURNAL TAB -->
         <div class="tab-pane fade" id="journal" role="tabpanel">
-            <!-- Journal Overview & Instructions Card -->
-            <div class="card p-3 mb-3 border-secondary">
-                <h6 class="text-primary mb-2">About Your Workout Journal</h6>
-                <p class="small text-muted mb-2">
-                    The Journal acts as your personal training logbook. It automatically aggregates every exercise session you log on the <strong>Tracking</strong> tab and organizes it by date, allowing you to monitor long-term progressive overload without needing a physical notebook.
+            <!-- High-Contrast Journal Overview & Guidance Card -->
+            <div class="card p-3 mb-3" style="background-color: #1e1e1e; border: 1px solid #0d6efd;">
+                <h6 class="fw-bold mb-2" style="color: #0d6efd !important;">About Your Workout Journal</h6>
+                <p class="small mb-2" style="color: #e0e0e0 !important; line-height: 1.4;">
+                    The Journal acts as your personal digital logbook. It automatically aggregates every exercise session you record in the <strong>Tracking</strong> tab and organizes it chronologically by date.
                 </p>
-                <div class="bg-dark p-2 rounded mb-2">
-                    <small class="d-block text-light fw-bold mb-1">How to Use:</small>
-                    <ol class="small text-muted mb-0 ps-3">
-                        <li>Log reps and weights in the <strong>Tracking</strong> tab and tap <strong>Save</strong>.</li>
-                        <li>Switch to this <strong>Journal</strong> tab to review completed sets and timestamps for the day.</li>
-                        <li>Use the <strong>Export Backup</strong> button to save a local JSON file of your entire training history.</li>
+                <div class="p-2 rounded mb-1" style="background-color: #252525; border: 1px solid #3d3d3d;">
+                    <strong class="d-block small mb-1" style="color: #ffffff !important;">How to Use:</strong>
+                    <ol class="small mb-0 ps-3" style="color: #d0d0d0 !important;">
+                        <li class="mb-1">Log reps and weight on the <strong>Tracking</strong> tab and tap <strong>Save</strong>.</li>
+                        <li class="mb-1">Switch to this <strong>Journal</strong> tab to review your session history.</li>
+                        <li>Tap <strong>Export Backup</strong> to download a local JSON file of your logs.</li>
                     </ol>
                 </div>
             </div>
 
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="mb-0 text-uppercase text-muted">Continuous History Log</h6>
+                <h6 class="mb-0 text-uppercase fw-bold" style="color: #0d6efd !important; letter-spacing: 0.5px;">Continuous History Log</h6>
                 <button class="btn btn-outline-warning btn-sm" onclick="exportBackup()">Export Backup</button>
             </div>
             
@@ -779,7 +784,7 @@
         alert(`${exerciseName} recorded in your Journal!`);
     }
 
-    // Render Saved Entries in Journal Tab
+    // Render Saved Entries in Journal Tab with High-Contrast Text
     function renderJournal() {
         const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
         const container = document.getElementById('journal-logs-container');
@@ -788,14 +793,14 @@
         const dates = Object.keys(journal).sort((a, b) => new Date(b) - new Date(a));
 
         if (dates.length === 0) {
-            container.innerHTML = '<p class="text-muted small">No logged sessions yet. Save an exercise in the Tracking tab to start building your log!</p>';
+            container.innerHTML = '<p class="small" style="color: #aaaaaa !important;">No logged sessions yet. Save an exercise in the Tracking tab to start building your log!</p>';
             return;
         }
 
         dates.forEach(date => {
             const group = document.createElement('div');
             group.className = 'mb-4';
-            group.innerHTML = `<h6 class="text-primary border-bottom border-secondary pb-1 mb-2">${date}</h6>`;
+            group.innerHTML = `<h6 class="border-bottom border-secondary pb-1 mb-2 fw-bold" style="color: #0d6efd !important;">${date}</h6>`;
 
             journal[date].forEach(entry => {
                 const entryDiv = document.createElement('div');
@@ -807,8 +812,8 @@
 
                 entryDiv.innerHTML = `
                     <div class="d-flex justify-content-between align-items-center">
-                        <strong style="color: #fff;">${entry.exercise}</strong>
-                        <small class="text-muted" style="font-size: 0.75rem;">${entry.timestamp}</small>
+                        <strong style="color: #ffffff !important; font-size: 0.95rem;">${entry.exercise}</strong>
+                        <small style="color: #aaaaaa !important; font-size: 0.75rem;">${entry.timestamp}</small>
                     </div>
                     <div class="mt-1">${setsFormatted}</div>
                 `;
