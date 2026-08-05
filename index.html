@@ -64,8 +64,8 @@
         }
         .nav-pills .nav-link {
             color: #aaa;
-            font-size: 0.8rem;
-            padding: 8px 4px;
+            font-size: 0.85rem;
+            padding: 8px 12px;
         }
         .nav-pills .nav-link.active {
             background-color: #0d6efd;
@@ -97,15 +97,6 @@
         <li class="nav-item">
             <button class="nav-link" id="journal-tab-btn" data-bs-toggle="tab" data-bs-target="#journal" type="button" onclick="renderJournal()">Journal</button>
         </li>
-        <li class="nav-item">
-            <button class="nav-link" id="karate-tab-btn" data-bs-toggle="tab" data-bs-target="#karate" type="button">Karate</button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link" id="nutrition-tab-btn" data-bs-toggle="tab" data-bs-target="#nutrition" type="button">Nutrition</button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link" id="mindset-tab-btn" data-bs-toggle="tab" data-bs-target="#mindset" type="button">Mindset</button>
-        </li>
     </ul>
 
     <div class="tab-content" id="mainTabContent">
@@ -115,6 +106,7 @@
             <div class="btn-group w-100 mb-3" role="group">
                 <button type="button" class="btn btn-sm btn-outline-primary active" id="btn-track-push" onclick="showTrackingSubTab('push')">Push Day</button>
                 <button type="button" class="btn btn-sm btn-outline-primary" id="btn-track-pull" onclick="showTrackingSubTab('pull')">Pull Day</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="btn-track-legs" onclick="showTrackingSubTab('legs')">Leg Day</button>
             </div>
 
             <!-- PUSH DAY TRACKING -->
@@ -352,6 +344,124 @@
                     </div>
                 </div>
             </div>
+
+            <!-- LEG DAY TRACKING -->
+            <div id="tracking-legs-list" class="d-none">
+                <!-- 1. Barbell Back Squat -->
+                <div class="card p-3 mb-3">
+                    <h6 class="mb-1">1. Barbell Back Squat</h6>
+                    <small class="text-muted mb-2 d-block">Quads, Glutes, Core Strength</small>
+                    <div id="sets-squat">
+                        <div class="row g-2 align-items-center mb-2 set-row">
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Reps</span>
+                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 8" inputmode="numeric">
+                            </div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Weight (kg)</span>
+                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 80" step="0.5" inputmode="decimal">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-squat')">+ Set</button>
+                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Barbell Back Squat', 'sets-squat')">Save</button>
+                    </div>
+                </div>
+
+                <!-- 2. Romanian Deadlift -->
+                <div class="card p-3 mb-3">
+                    <h6 class="mb-1">2. Romanian Deadlift (RDL)</h6>
+                    <small class="text-muted mb-2 d-block">Hamstrings, Glutes, Lower Back</small>
+                    <div id="sets-rdl">
+                        <div class="row g-2 align-items-center mb-2 set-row">
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Reps</span>
+                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 10" inputmode="numeric">
+                            </div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Weight (kg)</span>
+                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 60" step="0.5" inputmode="decimal">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-rdl')">+ Set</button>
+                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Romanian Deadlift', 'sets-rdl')">Save</button>
+                    </div>
+                </div>
+
+                <!-- 3. Bulgarian Split Squats -->
+                <div class="card p-3 mb-3">
+                    <h6 class="mb-1">3. Bulgarian Split Squat</h6>
+                    <small class="text-muted mb-2 d-block">Unilateral Quad & Glute Hypertrophy</small>
+                    <div id="sets-split-squat">
+                        <div class="row g-2 align-items-center mb-2 set-row">
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Reps</span>
+                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 10" inputmode="numeric">
+                            </div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Weight (kg)</span>
+                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 16" step="0.5" inputmode="decimal">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-split-squat')">+ Set</button>
+                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Bulgarian Split Squat', 'sets-split-squat')">Save</button>
+                    </div>
+                </div>
+
+                <!-- 4. Leg Press -->
+                <div class="card p-3 mb-3">
+                    <h6 class="mb-1">4. Leg Press</h6>
+                    <small class="text-muted mb-2 d-block">Overall Leg Volume & Quad Drive</small>
+                    <div id="sets-leg-press">
+                        <div class="row g-2 align-items-center mb-2 set-row">
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Reps</span>
+                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 12" inputmode="numeric">
+                            </div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Weight (kg)</span>
+                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 120" step="0.5" inputmode="decimal">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-leg-press')">+ Set</button>
+                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Leg Press', 'sets-leg-press')">Save</button>
+                    </div>
+                </div>
+
+                <!-- 5. Standing Calf Raises -->
+                <div class="card p-3 mb-3">
+                    <h6 class="mb-1">5. Standing Calf Raise</h6>
+                    <small class="text-muted mb-2 d-block">Gastrocnemius & Ankle Stability</small>
+                    <div id="sets-calf-raise">
+                        <div class="row g-2 align-items-center mb-2 set-row">
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Reps</span>
+                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 15" inputmode="numeric">
+                            </div>
+                            <div class="col-5">
+                                <span class="input-label d-block mb-1">Weight (kg)</span>
+                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 40" step="0.5" inputmode="decimal">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-calf-raise')">+ Set</button>
+                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Standing Calf Raise', 'sets-calf-raise')">Save</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- 2. TRAINING DEMOS TAB -->
@@ -359,6 +469,7 @@
             <div class="btn-group w-100 mb-3" role="group">
                 <button type="button" class="btn btn-sm btn-outline-primary active" id="btn-demo-push" onclick="showDemoSubTab('push')">Push Demos</button>
                 <button type="button" class="btn btn-sm btn-outline-primary" id="btn-demo-pull" onclick="showDemoSubTab('pull')">Pull Demos</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="btn-demo-legs" onclick="showDemoSubTab('legs')">Leg Demos</button>
             </div>
 
             <!-- PUSH DEMOS -->
@@ -466,43 +577,86 @@
                     </div>
                 </div>
             </div>
+
+            <!-- LEG DEMOS -->
+            <div id="demo-legs-list" class="d-none">
+                <div class="card p-3 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Barbell Back Squat</h6>
+                            <small class="text-muted">Depth & Brace Technique</small>
+                        </div>
+                        <a href="https://www.youtube.com/watch?v=ultWZbUMPL8" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
+                    </div>
+                </div>
+
+                <div class="card p-3 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Romanian Deadlift (RDL)</h6>
+                            <small class="text-muted">Hip Hinge Mechanics</small>
+                        </div>
+                        <a href="https://www.youtube.com/watch?v=JCXUYuzwNrM" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
+                    </div>
+                </div>
+
+                <div class="card p-3 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Bulgarian Split Squat</h6>
+                            <small class="text-muted">Balance & Foot Placement</small>
+                        </div>
+                        <a href="https://www.youtube.com/watch?v=2C-uNgKwple" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
+                    </div>
+                </div>
+
+                <div class="card p-3 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Leg Press</h6>
+                            <small class="text-muted">Foot Position & Knee Safety</small>
+                        </div>
+                        <a href="https://www.youtube.com/watch?v=IZxyjW7MPJQ" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
+                    </div>
+                </div>
+
+                <div class="card p-3 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Standing Calf Raise</h6>
+                            <small class="text-muted">Full Stretch & Peak Contraction</small>
+                        </div>
+                        <a href="https://www.youtube.com/watch?v=-M4-G8p8fmc" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- 3. JOURNAL TAB -->
         <div class="tab-pane fade" id="journal" role="tabpanel">
+            <!-- Journal Overview & Instructions Card -->
+            <div class="card p-3 mb-3 border-secondary">
+                <h6 class="text-primary mb-2">About Your Workout Journal</h6>
+                <p class="small text-muted mb-2">
+                    The Journal acts as your personal training logbook. It automatically aggregates every exercise session you log on the <strong>Tracking</strong> tab and organizes it by date, allowing you to monitor long-term progressive overload without needing a physical notebook.
+                </p>
+                <div class="bg-dark p-2 rounded mb-2">
+                    <small class="d-block text-light fw-bold mb-1">How to Use:</small>
+                    <ol class="small text-muted mb-0 ps-3">
+                        <li>Log reps and weights in the <strong>Tracking</strong> tab and tap <strong>Save</strong>.</li>
+                        <li>Switch to this <strong>Journal</strong> tab to review completed sets and timestamps for the day.</li>
+                        <li>Use the <strong>Export Backup</strong> button to save a local JSON file of your entire training history.</li>
+                    </ol>
+                </div>
+            </div>
+
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h6 class="mb-0 text-uppercase text-muted">Continuous History Log</h6>
                 <button class="btn btn-outline-warning btn-sm" onclick="exportBackup()">Export Backup</button>
             </div>
+            
             <div id="journal-logs-container">
                 <!-- Logged entries render dynamically -->
-            </div>
-        </div>
-
-        <!-- 4. KARATE TAB -->
-        <div class="tab-pane fade" id="karate" role="tabpanel">
-            <div class="card p-3 mb-3">
-                <h6>Karate & Martial Arts Fundamentals</h6>
-                <p class="small text-muted mb-0">Track kata repetitions, stances, conditioning drills, and flexibility exercises here.</p>
-            </div>
-        </div>
-
-        <!-- 5. NUTRITION TAB -->
-        <div class="tab-pane fade" id="nutrition" role="tabpanel">
-            <div class="card p-3 mb-3">
-                <h6>Nutrition Principles</h6>
-                <ul class="small text-muted mb-0 ps-3">
-                    <li>Prioritize clean protein sources, eggs, and whole meats.</li>
-                    <li>Focus on high-fiber vegetables and adequate daily hydration.</li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- 6. MINDSET TAB -->
-        <div class="tab-pane fade" id="mindset" role="tabpanel">
-            <div class="card p-3 mb-3">
-                <h6>Athletic Mindset & Focus</h6>
-                <p class="small text-muted mb-0">Maintain continuous progress through consistent logging, controlled mechanical form, and steady overload.</p>
             </div>
         </div>
 
@@ -516,33 +670,47 @@
     // Current Date Badge Display
     document.getElementById('current-date-badge').innerText = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
-    // Toggle Tracking Push/Pull Views
+    // Toggle Tracking Push/Pull/Leg Views
     function showTrackingSubTab(type) {
+        document.getElementById('tracking-push-list').classList.add('d-none');
+        document.getElementById('tracking-pull-list').classList.add('d-none');
+        document.getElementById('tracking-legs-list').classList.add('d-none');
+
+        document.getElementById('btn-track-push').classList.remove('active');
+        document.getElementById('btn-track-pull').classList.remove('active');
+        document.getElementById('btn-track-legs').classList.remove('active');
+
         if (type === 'push') {
             document.getElementById('tracking-push-list').classList.remove('d-none');
-            document.getElementById('tracking-pull-list').classList.add('d-none');
             document.getElementById('btn-track-push').classList.add('active');
-            document.getElementById('btn-track-pull').classList.remove('active');
-        } else {
-            document.getElementById('tracking-push-list').classList.add('d-none');
+        } else if (type === 'pull') {
             document.getElementById('tracking-pull-list').classList.remove('d-none');
-            document.getElementById('btn-track-push').classList.remove('active');
             document.getElementById('btn-track-pull').classList.add('active');
+        } else if (type === 'legs') {
+            document.getElementById('tracking-legs-list').classList.remove('d-none');
+            document.getElementById('btn-track-legs').classList.add('active');
         }
     }
 
-    // Toggle Training Demo Push/Pull Views
+    // Toggle Training Demo Push/Pull/Leg Views
     function showDemoSubTab(type) {
+        document.getElementById('demo-push-list').classList.add('d-none');
+        document.getElementById('demo-pull-list').classList.add('d-none');
+        document.getElementById('demo-legs-list').classList.add('d-none');
+
+        document.getElementById('btn-demo-push').classList.remove('active');
+        document.getElementById('btn-demo-pull').classList.remove('active');
+        document.getElementById('btn-demo-legs').classList.remove('active');
+
         if (type === 'push') {
             document.getElementById('demo-push-list').classList.remove('d-none');
-            document.getElementById('demo-pull-list').classList.add('d-none');
             document.getElementById('btn-demo-push').classList.add('active');
-            document.getElementById('btn-demo-pull').classList.remove('active');
-        } else {
-            document.getElementById('demo-push-list').classList.add('d-none');
+        } else if (type === 'pull') {
             document.getElementById('demo-pull-list').classList.remove('d-none');
-            document.getElementById('btn-demo-push').classList.remove('active');
             document.getElementById('btn-demo-pull').classList.add('active');
+        } else if (type === 'legs') {
+            document.getElementById('demo-legs-list').classList.remove('d-none');
+            document.getElementById('btn-demo-legs').classList.add('active');
         }
     }
 
@@ -620,7 +788,7 @@
         const dates = Object.keys(journal).sort((a, b) => new Date(b) - new Date(a));
 
         if (dates.length === 0) {
-            container.innerHTML = '<p class="text-muted small">No logged sessions yet. Save an exercise to start your tracking timeline!</p>';
+            container.innerHTML = '<p class="text-muted small">No logged sessions yet. Save an exercise in the Tracking tab to start building your log!</p>';
             return;
         }
 
