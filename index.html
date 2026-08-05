@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>CricBuild Pro - Tracking & Training</title>
+    <title>JAMS FITNESS - Tracking & Training</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
         body {
@@ -31,12 +33,12 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        .form-control {
+        .form-control, .form-select {
             background-color: #2b2b2b !important;
             color: #ffffff !important;
             border: 1px solid #555 !important;
         }
-        .form-control:focus {
+        .form-control:focus, .form-select:focus {
             background-color: #333333 !important;
             color: #ffffff !important;
             border-color: #0d6efd !important;
@@ -69,8 +71,8 @@
         }
         .nav-pills .nav-link {
             color: #aaa;
-            font-size: 0.85rem;
-            padding: 8px 12px;
+            font-size: 0.8rem;
+            padding: 8px 10px;
         }
         .nav-pills .nav-link.active {
             background-color: #0d6efd;
@@ -87,7 +89,7 @@
 <div class="container py-3">
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="h5 mb-0 text-primary fw-bold">CricBuild Pro</h2>
+        <h2 class="h5 mb-0 text-primary fw-bold">JAMS FITNESS</h2>
         <span class="badge bg-secondary" id="current-date-badge"></span>
     </div>
 
@@ -97,10 +99,13 @@
             <button class="nav-link active" id="tracking-tab-btn" data-bs-toggle="tab" data-bs-target="#tracking" type="button">Tracking</button>
         </li>
         <li class="nav-item">
-            <button class="nav-link" id="training-tab-btn" data-bs-toggle="tab" data-bs-target="#training" type="button">Training Demos</button>
+            <button class="nav-link" id="training-tab-btn" data-bs-toggle="tab" data-bs-target="#training" type="button">Demos</button>
         </li>
         <li class="nav-item">
             <button class="nav-link" id="journal-tab-btn" data-bs-toggle="tab" data-bs-target="#journal" type="button" onclick="renderJournal()">Journal</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="trends-tab-btn" data-bs-toggle="tab" data-bs-target="#trends" type="button" onclick="initTrendsTab()">Trends</button>
         </li>
     </ul>
 
@@ -665,6 +670,23 @@
             </div>
         </div>
 
+        <!-- 4. TRENDS TAB -->
+        <div class="tab-pane fade" id="trends" role="tabpanel">
+            <div class="card p-3 mb-3">
+                <h6 class="fw-bold text-primary mb-2">Exercise Growth Trends</h6>
+                <p class="small text-muted mb-3">Select an exercise to plot your peak weight lifted over time.</p>
+                
+                <label for="exercise-select" class="input-label mb-1">Select Exercise</label>
+                <select id="exercise-select" class="form-select form-select-sm mb-3" onchange="updateTrendChart()">
+                    <!-- Dynamically populated from logged history -->
+                </select>
+
+                <div style="position: relative; height: 260px; width: 100%;">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
@@ -672,6 +694,8 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+    let trendChartInstance = null;
+
     // Current Date Badge Display
     document.getElementById('current-date-badge').innerText = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
@@ -824,6 +848,110 @@
         });
     }
 
+    // Initialize & Populate Trends Tab
+    function initTrendsTab() {
+        const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
+        const select = document.getElementById('exercise-select');
+        select.innerHTML = '';
+
+        const exercises = new Set();
+        Object.keys(journal).forEach(date => {
+            journal[date].forEach(entry => {
+                exercises.add(entry.exercise);
+            });
+        });
+
+        if (exercises.size === 0) {
+            select.innerHTML = '<option value="">No recorded exercises yet</option>';
+            if (trendChartInstance) trendChartInstance.destroy();
+            return;
+        }
+
+        exercises.forEach(ex => {
+            const opt = document.createElement('option');
+            opt.value = ex;
+            opt.innerText = ex;
+            select.appendChild(opt);
+        });
+
+        updateTrendChart();
+    }
+
+    // Render / Update Chart.js Growth Line
+    function updateTrendChart() {
+        const selectedExercise = document.getElementById('exercise-select').value;
+        if (!selectedExercise) return;
+
+        const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
+        const dates = Object.keys(journal).sort((a, b) => new Date(a) - new Date(b));
+
+        const chartLabels = [];
+        const chartData = [];
+
+        dates.forEach(date => {
+            let maxWeight = 0;
+            let found = false;
+
+            journal[date].forEach(entry => {
+                if (entry.exercise === selectedExercise) {
+                    entry.sets.forEach(s => {
+                        if (s.weight > maxWeight) maxWeight = s.weight;
+                    });
+                    found = true;
+                }
+            });
+
+            if (found) {
+                chartLabels.push(date);
+                chartData.push(maxWeight);
+            }
+        });
+
+        const ctx = document.getElementById('trendChart').getContext('2d');
+
+        if (trendChartInstance) {
+            trendChartInstance.destroy();
+        }
+
+        trendChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: `Max Weight Lifted (kg)`,
+                    data: chartData,
+                    borderColor: '#0d6efd',
+                    backgroundColor: 'rgba(13, 110, 253, 0.15)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                    pointBackgroundColor: '#0d6efd',
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        ticks: { color: '#aaa' },
+                        grid: { color: '#2b2b2b' }
+                    },
+                    y: {
+                        ticks: { color: '#aaa' },
+                        grid: { color: '#2b2b2b' },
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: { color: '#fff' }
+                    }
+                }
+            }
+        });
+    }
+
     // Export Backup File
     function exportBackup() {
         const data = localStorage.getItem('workout_journal');
@@ -833,7 +961,7 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `cricbuild_journal_${new Date().toISOString().split('T')[0]}.json`;
+        a.download = `jams_fitness_journal_${new Date().toISOString().split('T')[0]}.json`;
         a.click();
     }
 </script>
