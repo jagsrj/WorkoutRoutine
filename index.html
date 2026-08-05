@@ -56,6 +56,7 @@
             background-color: #1a1a1a;
             padding-top: 8px;
             padding-bottom: 8px;
+            padding-right: 8px;
             border-radius: 0 4px 4px 0;
         }
         .set-badge {
@@ -113,6 +114,19 @@
         
         <!-- 1. TRACKING TAB -->
         <div class="tab-pane fade show active" id="tracking" role="tabpanel">
+            
+            <!-- Date Selector for Logging (Current or Past Date) -->
+            <div class="card p-2 mb-3 bg-dark border-secondary">
+                <div class="row align-items-center">
+                    <div class="col-5">
+                        <span class="input-label d-block">Log Date:</span>
+                    </div>
+                    <div class="col-7">
+                        <input type="date" id="workout-date-picker" class="form-control form-control-sm text-white">
+                    </div>
+                </div>
+            </div>
+
             <div class="btn-group w-100 mb-3" role="group">
                 <button type="button" class="btn btn-sm btn-outline-primary active" id="btn-track-push" onclick="showTrackingSubTab('push')">Push Day</button>
                 <button type="button" class="btn btn-sm btn-outline-primary" id="btn-track-pull" onclick="showTrackingSubTab('pull')">Pull Day</button>
@@ -127,14 +141,17 @@
                     <small class="text-muted mb-2 d-block">Chest, Front Delts, Triceps</small>
                     <div id="sets-bench">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
-                            <div class="col-5">
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Reps</span>
                                 <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 10" inputmode="numeric">
                             </div>
-                            <div class="col-5">
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Weight (kg)</span>
                                 <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 60" step="0.5" inputmode="decimal">
+                            </div>
+                            <div class="col-2 text-end pt-3">
+                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
                             </div>
                         </div>
                     </div>
@@ -150,14 +167,17 @@
                     <small class="text-muted mb-2 d-block">Shoulders, Triceps, Core</small>
                     <div id="sets-ohp">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
-                            <div class="col-5">
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Reps</span>
                                 <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 8" inputmode="numeric">
                             </div>
-                            <div class="col-5">
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Weight (kg)</span>
                                 <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 40" step="0.5" inputmode="decimal">
+                            </div>
+                            <div class="col-2 text-end pt-3">
+                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
                             </div>
                         </div>
                     </div>
@@ -173,14 +193,17 @@
                     <small class="text-muted mb-2 d-block">Upper Chest, Shoulders</small>
                     <div id="sets-incline-db">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
-                            <div class="col-5">
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Reps</span>
                                 <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 10" inputmode="numeric">
                             </div>
-                            <div class="col-5">
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Weight (kg)</span>
                                 <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 22" step="0.5" inputmode="decimal">
+                            </div>
+                            <div class="col-2 text-end pt-3">
+                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
                             </div>
                         </div>
                     </div>
@@ -196,14 +219,17 @@
                     <small class="text-muted mb-2 d-block">Lower Chest, Triceps</small>
                     <div id="sets-dips">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
-                            <div class="col-5">
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Reps</span>
                                 <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 12" inputmode="numeric">
                             </div>
-                            <div class="col-5">
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Added Wt (kg)</span>
                                 <input type="number" class="form-control form-control-sm weight-input" placeholder="0 for BW" step="0.5" inputmode="decimal">
+                            </div>
+                            <div class="col-2 text-end pt-3">
+                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
                             </div>
                         </div>
                     </div>
@@ -219,14 +245,17 @@
                     <small class="text-muted mb-2 d-block">Triceps, Inner Chest</small>
                     <div id="sets-cgbp">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
-                            <div class="col-5">
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Reps</span>
                                 <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 10" inputmode="numeric">
                             </div>
-                            <div class="col-5">
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Weight (kg)</span>
                                 <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 50" step="0.5" inputmode="decimal">
+                            </div>
+                            <div class="col-2 text-end pt-3">
+                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
                             </div>
                         </div>
                     </div>
@@ -245,14 +274,17 @@
                     <small class="text-muted mb-2 d-block">Lats, Upper Back, Biceps</small>
                     <div id="sets-pullups">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
-                            <div class="col-5">
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Reps</span>
                                 <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 8" inputmode="numeric">
                             </div>
-                            <div class="col-5">
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Added Wt (kg)</span>
                                 <input type="number" class="form-control form-control-sm weight-input" placeholder="0 for BW" step="0.5" inputmode="decimal">
+                            </div>
+                            <div class="col-2 text-end pt-3">
+                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
                             </div>
                         </div>
                     </div>
@@ -268,14 +300,17 @@
                     <small class="text-muted mb-2 d-block">Posterior Chain, Hamstrings, Erector Spinae</small>
                     <div id="sets-deadlift">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
-                            <div class="col-5">
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Reps</span>
                                 <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 5" inputmode="numeric">
                             </div>
-                            <div class="col-5">
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Weight (kg)</span>
                                 <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 100" step="0.5" inputmode="decimal">
+                            </div>
+                            <div class="col-2 text-end pt-3">
+                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
                             </div>
                         </div>
                     </div>
@@ -291,14 +326,17 @@
                     <small class="text-muted mb-2 d-block">Lats, Rhomboids, Mid-Back</small>
                     <div id="sets-row">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
-                            <div class="col-5">
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Reps</span>
                                 <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 10" inputmode="numeric">
                             </div>
-                            <div class="col-5">
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Weight (kg)</span>
                                 <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 50" step="0.5" inputmode="decimal">
+                            </div>
+                            <div class="col-2 text-end pt-3">
+                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
                             </div>
                         </div>
                     </div>
@@ -314,14 +352,17 @@
                     <small class="text-muted mb-2 d-block">Lats, Upper Back Width</small>
                     <div id="sets-latpulldown">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
-                            <div class="col-5">
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Reps</span>
                                 <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 12" inputmode="numeric">
                             </div>
-                            <div class="col-5">
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Weight (kg)</span>
                                 <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 45" step="0.5" inputmode="decimal">
+                            </div>
+                            <div class="col-2 text-end pt-3">
+                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
                             </div>
                         </div>
                     </div>
@@ -337,14 +378,17 @@
                     <small class="text-muted mb-2 d-block">Rear Delts, Upper Traps, Rotator Cuff</small>
                     <div id="sets-facepulls">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
-                            <div class="col-5">
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Reps</span>
                                 <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 15" inputmode="numeric">
                             </div>
-                            <div class="col-5">
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Weight (kg)</span>
                                 <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 20" step="0.5" inputmode="decimal">
+                            </div>
+                            <div class="col-2 text-end pt-3">
+                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
                             </div>
                         </div>
                     </div>
@@ -363,14 +407,17 @@
                     <small class="text-muted mb-2 d-block">Quads, Glutes, Core Strength</small>
                     <div id="sets-squat">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
-                            <div class="col-5">
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Reps</span>
                                 <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 8" inputmode="numeric">
                             </div>
-                            <div class="col-5">
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Weight (kg)</span>
                                 <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 80" step="0.5" inputmode="decimal">
+                            </div>
+                            <div class="col-2 text-end pt-3">
+                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
                             </div>
                         </div>
                     </div>
@@ -386,14 +433,17 @@
                     <small class="text-muted mb-2 d-block">Hamstrings, Glutes, Lower Back</small>
                     <div id="sets-rdl">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
-                            <div class="col-5">
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Reps</span>
                                 <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 10" inputmode="numeric">
                             </div>
-                            <div class="col-5">
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Weight (kg)</span>
                                 <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 60" step="0.5" inputmode="decimal">
+                            </div>
+                            <div class="col-2 text-end pt-3">
+                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
                             </div>
                         </div>
                     </div>
@@ -409,14 +459,17 @@
                     <small class="text-muted mb-2 d-block">Unilateral Quad & Glute Hypertrophy</small>
                     <div id="sets-split-squat">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
-                            <div class="col-5">
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Reps</span>
                                 <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 10" inputmode="numeric">
                             </div>
-                            <div class="col-5">
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Weight (kg)</span>
                                 <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 16" step="0.5" inputmode="decimal">
+                            </div>
+                            <div class="col-2 text-end pt-3">
+                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
                             </div>
                         </div>
                     </div>
@@ -432,14 +485,17 @@
                     <small class="text-muted mb-2 d-block">Overall Leg Volume & Quad Drive</small>
                     <div id="sets-leg-press">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
-                            <div class="col-5">
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Reps</span>
                                 <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 12" inputmode="numeric">
                             </div>
-                            <div class="col-5">
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Weight (kg)</span>
                                 <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 120" step="0.5" inputmode="decimal">
+                            </div>
+                            <div class="col-2 text-end pt-3">
+                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
                             </div>
                         </div>
                     </div>
@@ -455,14 +511,17 @@
                     <small class="text-muted mb-2 d-block">Gastrocnemius & Ankle Stability</small>
                     <div id="sets-calf-raise">
                         <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set 1</span></div>
-                            <div class="col-5">
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Reps</span>
                                 <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 15" inputmode="numeric">
                             </div>
-                            <div class="col-5">
+                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Weight (kg)</span>
                                 <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 40" step="0.5" inputmode="decimal">
+                            </div>
+                            <div class="col-2 text-end pt-3">
+                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
                             </div>
                         </div>
                     </div>
@@ -653,9 +712,9 @@
                 <div class="p-2 rounded mb-1" style="background-color: #252525; border: 1px solid #3d3d3d;">
                     <strong class="d-block small mb-1" style="color: #ffffff !important;">How to Use:</strong>
                     <ol class="small mb-0 ps-3" style="color: #d0d0d0 !important;">
-                        <li class="mb-1">Log reps and weight on the <strong>Tracking</strong> tab and tap <strong>Save</strong>.</li>
-                        <li class="mb-1">Switch to this <strong>Journal</strong> tab to review your session history.</li>
-                        <li>Tap <strong>Export Backup</strong> to download a local JSON file of your logs.</li>
+                        <li class="mb-1">Select a past or current date at the top of the <strong>Tracking</strong> tab.</li>
+                        <li class="mb-1">Log sets, delete unneeded rows, and tap <strong>Save</strong>.</li>
+                        <li>Delete any accidental entries directly in this <strong>Journal</strong> tab using the red button.</li>
                     </ol>
                 </div>
             </div>
@@ -696,7 +755,9 @@
 <script>
     let trendChartInstance = null;
 
-    // Current Date Badge Display
+    // Set Default Date Picker to Today's Local Date (YYYY-MM-DD)
+    const todayIso = new Date().toISOString().split('T')[0];
+    document.getElementById('workout-date-picker').value = todayIso;
     document.getElementById('current-date-badge').innerText = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
     // Toggle Tracking Push/Pull/Leg Views
@@ -751,20 +812,43 @@
         const row = document.createElement('div');
         row.className = 'row g-2 align-items-center mb-2 set-row';
         row.innerHTML = `
-            <div class="col-2 text-start"><span class="small text-muted fw-bold">Set ${setNum}</span></div>
-            <div class="col-5">
+            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set ${setNum}</span></div>
+            <div class="col-4">
                 <span class="input-label d-block mb-1">Reps</span>
                 <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 10" inputmode="numeric">
             </div>
-            <div class="col-5">
+            <div class="col-4">
                 <span class="input-label d-block mb-1">Weight (kg)</span>
                 <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 50" step="0.5" inputmode="decimal">
+            </div>
+            <div class="col-2 text-end pt-3">
+                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
             </div>
         `;
         container.appendChild(row);
     }
 
-    // Save Workout Session to LocalStorage
+    // Remove an Unsaved Set Row
+    function removeSetRow(buttonEl) {
+        const row = buttonEl.closest('.set-row');
+        const container = row.parentElement;
+        
+        // Prevent deleting if it's the last remaining row in the card
+        if (container.querySelectorAll('.set-row').length > 1) {
+            row.remove();
+            // Recalculate set labels
+            container.querySelectorAll('.set-row').forEach((r, idx) => {
+                const label = r.querySelector('.set-num-label');
+                if (label) label.innerText = `Set ${idx + 1}`;
+            });
+        } else {
+            // If it's the last row, just clear values
+            row.querySelector('.reps-input').value = '';
+            row.querySelector('.weight-input').value = '';
+        }
+    }
+
+    // Save Workout Session to LocalStorage (Supports Custom/Past Dates)
     function saveWorkoutSession(exerciseName, containerId) {
         const container = document.getElementById(containerId);
         const setRows = container.querySelectorAll('.set-row');
@@ -784,13 +868,15 @@
         }
 
         const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
-        const today = new Date().toISOString().split('T')[0];
+        
+        // Get selected log date from input picker
+        const selectedDate = document.getElementById('workout-date-picker').value || todayIso;
 
-        if (!journal[today]) {
-            journal[today] = [];
+        if (!journal[selectedDate]) {
+            journal[selectedDate] = [];
         }
 
-        journal[today].push({
+        journal[selectedDate].push({
             id: Date.now(),
             exercise: exerciseName,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -805,10 +891,25 @@
             row.querySelector('.weight-input').value = '';
         });
 
-        alert(`${exerciseName} recorded in your Journal!`);
+        alert(`${exerciseName} recorded for ${selectedDate}!`);
     }
 
-    // Render Saved Entries in Journal Tab with High-Contrast Text
+    // Delete a Saved Record from Journal History
+    function deleteJournalEntry(date, entryId) {
+        if (!confirm('Are you sure you want to delete this workout log?')) return;
+
+        const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
+        if (journal[date]) {
+            journal[date] = journal[date].filter(entry => entry.id !== entryId);
+            if (journal[date].length === 0) {
+                delete journal[date];
+            }
+            localStorage.setItem('workout_journal', JSON.stringify(journal));
+            renderJournal();
+        }
+    }
+
+    // Render Saved Entries in Journal Tab
     function renderJournal() {
         const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
         const container = document.getElementById('journal-logs-container');
@@ -837,7 +938,10 @@
                 entryDiv.innerHTML = `
                     <div class="d-flex justify-content-between align-items-center">
                         <strong style="color: #ffffff !important; font-size: 0.95rem;">${entry.exercise}</strong>
-                        <small style="color: #aaaaaa !important; font-size: 0.75rem;">${entry.timestamp}</small>
+                        <div>
+                            <small class="me-2" style="color: #aaaaaa !important; font-size: 0.75rem;">${entry.timestamp}</small>
+                            <button class="btn btn-sm btn-outline-danger py-0 px-1" style="font-size: 0.7rem;" onclick="deleteJournalEntry('${date}', ${entry.id})">Delete</button>
+                        </div>
                     </div>
                     <div class="mt-1">${setsFormatted}</div>
                 `;
