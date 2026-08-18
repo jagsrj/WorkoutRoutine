@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>JAMS FITNESS - Tracking & Training</title>
+    <title>JAMS FITNESS - Hypertrophy Routine</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -115,7 +115,7 @@
         <!-- 1. TRACKING TAB -->
         <div class="tab-pane fade show active" id="tracking" role="tabpanel">
             
-            <!-- Date Selector for Logging (Current or Past Date) -->
+            <!-- Date Selector for Logging -->
             <div class="card p-2 mb-3 bg-dark border-secondary">
                 <div class="row align-items-center">
                     <div class="col-5">
@@ -130,25 +130,25 @@
             <div class="btn-group w-100 mb-3" role="group">
                 <button type="button" class="btn btn-sm btn-outline-primary active" id="btn-track-push" onclick="showTrackingSubTab('push')">Push Day</button>
                 <button type="button" class="btn btn-sm btn-outline-primary" id="btn-track-pull" onclick="showTrackingSubTab('pull')">Pull Day</button>
-                <button type="button" class="btn btn-sm btn-outline-primary" id="btn-track-legs" onclick="showTrackingSubTab('legs')">Leg Day</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="btn-track-legs" onclick="showTrackingSubTab('legs')">Legs & Core</button>
             </div>
 
             <!-- PUSH DAY TRACKING -->
             <div id="tracking-push-list">
-                <!-- 1. Bench Press -->
+                <!-- 1. Incline Dumbbell / Barbell Press -->
                 <div class="card p-3 mb-3">
-                    <h6 class="mb-1">1. Barbell Bench Press</h6>
-                    <small class="text-muted mb-2 d-block">Chest, Front Delts, Triceps</small>
-                    <div id="sets-bench">
+                    <h6 class="mb-1">1. Incline Dumbbell / Barbell Press</h6>
+                    <small class="text-muted mb-2 d-block">Target: Upper Chest (3–4 sets of 8–10 reps)</small>
+                    <div id="sets-incline-press">
                         <div class="row g-2 align-items-center mb-2 set-row">
                             <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
                             <div class="col-4">
                                 <span class="input-label d-block mb-1">Reps</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 10" inputmode="numeric">
+                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 8" inputmode="numeric">
                             </div>
                             <div class="col-4">
                                 <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 135" step="0.5" inputmode="decimal">
+                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 60" step="0.5" inputmode="decimal">
                             </div>
                             <div class="col-2 text-end pt-3">
                                 <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
@@ -156,21 +156,21 @@
                         </div>
                     </div>
                     <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-bench')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Barbell Bench Press', 'sets-bench')">Save</button>
+                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-incline-press')">+ Set</button>
+                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Incline DB/Barbell Press', 'sets-incline-press')">Save</button>
                     </div>
                 </div>
 
-                <!-- 2. OHP -->
+                <!-- 2. Overhead Barbell / Dumbbell Press -->
                 <div class="card p-3 mb-3">
-                    <h6 class="mb-1">2. Overhead Press (OHP)</h6>
-                    <small class="text-muted mb-2 d-block">Shoulders, Triceps, Core</small>
-                    <div id="sets-ohp">
+                    <h6 class="mb-1">2. Overhead Barbell / DB Shoulder Press</h6>
+                    <small class="text-muted mb-2 d-block">Target: Overall Shoulder Mass & Strength (3 sets of 6–8 reps)</small>
+                    <div id="sets-ohp-press">
                         <div class="row g-2 align-items-center mb-2 set-row">
                             <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
                             <div class="col-4">
                                 <span class="input-label d-block mb-1">Reps</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 8" inputmode="numeric">
+                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 6" inputmode="numeric">
                             </div>
                             <div class="col-4">
                                 <span class="input-label d-block mb-1">Weight (lbs)</span>
@@ -182,42 +182,16 @@
                         </div>
                     </div>
                     <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-ohp')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Overhead Press', 'sets-ohp')">Save</button>
+                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-ohp-press')">+ Set</button>
+                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Overhead Shoulder Press', 'sets-ohp-press')">Save</button>
                     </div>
                 </div>
 
-                <!-- 3. Incline Dumbbell Press -->
+                <!-- 3. Dumbbell Lateral Raises -->
                 <div class="card p-3 mb-3">
-                    <h6 class="mb-1">3. Incline Dumbbell Press</h6>
-                    <small class="text-muted mb-2 d-block">Upper Chest, Shoulders</small>
-                    <div id="sets-incline-db">
-                        <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Reps</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 10" inputmode="numeric">
-                            </div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 50" step="0.5" inputmode="decimal">
-                            </div>
-                            <div class="col-2 text-end pt-3">
-                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-incline-db')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Incline DB Press', 'sets-incline-db')">Save</button>
-                    </div>
-                </div>
-
-                <!-- 4. Dips -->
-                <div class="card p-3 mb-3">
-                    <h6 class="mb-1">4. Weighted / Bodyweight Dips</h6>
-                    <small class="text-muted mb-2 d-block">Lower Chest, Triceps</small>
-                    <div id="sets-dips">
+                    <h6 class="mb-1">3. Dumbbell Lateral Raises</h6>
+                    <small class="text-muted mb-2 d-block">Target: Side Delts for Shoulder Width / V-Taper (4 sets of 12–15 reps)</small>
+                    <div id="sets-lat-raises">
                         <div class="row g-2 align-items-center mb-2 set-row">
                             <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
                             <div class="col-4">
@@ -225,34 +199,8 @@
                                 <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 12" inputmode="numeric">
                             </div>
                             <div class="col-4">
-                                <span class="input-label d-block mb-1">Added Wt (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="0 for BW" step="0.5" inputmode="decimal">
-                            </div>
-                            <div class="col-2 text-end pt-3">
-                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-dips')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Dips', 'sets-dips')">Save</button>
-                    </div>
-                </div>
-
-                <!-- 5. Close-Grip Bench Press -->
-                <div class="card p-3 mb-3">
-                    <h6 class="mb-1">5. Close-Grip Bench Press</h6>
-                    <small class="text-muted mb-2 d-block">Triceps, Inner Chest</small>
-                    <div id="sets-cgbp">
-                        <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Reps</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 10" inputmode="numeric">
-                            </div>
-                            <div class="col-4">
                                 <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 115" step="0.5" inputmode="decimal">
+                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 20" step="0.5" inputmode="decimal">
                             </div>
                             <div class="col-2 text-end pt-3">
                                 <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
@@ -260,19 +208,19 @@
                         </div>
                     </div>
                     <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-cgbp')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Close-Grip Bench', 'sets-cgbp')">Save</button>
+                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-lat-raises')">+ Set</button>
+                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Dumbbell Lateral Raises', 'sets-lat-raises')">Save</button>
                     </div>
                 </div>
             </div>
 
             <!-- PULL DAY TRACKING -->
             <div id="tracking-pull-list" class="d-none">
-                <!-- 1. Pull-Ups Tracker -->
-                <div class="card p-3 mb-3 border-primary">
-                    <h6 class="mb-1 text-primary">1. Pull-Ups / Weighted Pull-Ups</h6>
-                    <small class="text-muted mb-2 d-block">Lats, Upper Back, Biceps</small>
-                    <div id="sets-pullups">
+                <!-- 1. Pull-Ups / Lat Pulldowns -->
+                <div class="card p-3 mb-3">
+                    <h6 class="mb-1">1. Weighted/BW Pull-Ups or Lat Pulldowns</h6>
+                    <small class="text-muted mb-2 d-block">Target: Lat Width / V-Taper (3–4 sets of 8–10 reps)</small>
+                    <div id="sets-pullups-lat">
                         <div class="row g-2 align-items-center mb-2 set-row">
                             <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
                             <div class="col-4">
@@ -280,7 +228,7 @@
                                 <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 8" inputmode="numeric">
                             </div>
                             <div class="col-4">
-                                <span class="input-label d-block mb-1">Added Wt (lbs)</span>
+                                <span class="input-label d-block mb-1">Weight (lbs)</span>
                                 <input type="number" class="form-control form-control-sm weight-input" placeholder="0 for BW" step="0.5" inputmode="decimal">
                             </div>
                             <div class="col-2 text-end pt-3">
@@ -289,154 +237,21 @@
                         </div>
                     </div>
                     <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-pullups')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Pull-Ups', 'sets-pullups')">Save</button>
+                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-pullups-lat')">+ Set</button>
+                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Pull-Ups / Lat Pulldown', 'sets-pullups-lat')">Save</button>
                     </div>
                 </div>
 
-                <!-- 2. Deadlift -->
+                <!-- 2. Barbell / Chest-Supported Rows -->
                 <div class="card p-3 mb-3">
-                    <h6 class="mb-1">2. Barbell Deadlift</h6>
-                    <small class="text-muted mb-2 d-block">Posterior Chain, Hamstrings, Erector Spinae</small>
-                    <div id="sets-deadlift">
-                        <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Reps</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 5" inputmode="numeric">
-                            </div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 225" step="0.5" inputmode="decimal">
-                            </div>
-                            <div class="col-2 text-end pt-3">
-                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-deadlift')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Barbell Deadlift', 'sets-deadlift')">Save</button>
-                    </div>
-                </div>
-
-                <!-- 3. Bent-Over Row -->
-                <div class="card p-3 mb-3">
-                    <h6 class="mb-1">3. Bent-Over Barbell Row</h6>
-                    <small class="text-muted mb-2 d-block">Lats, Rhomboids, Mid-Back</small>
-                    <div id="sets-row">
-                        <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Reps</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 10" inputmode="numeric">
-                            </div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 115" step="0.5" inputmode="decimal">
-                            </div>
-                            <div class="col-2 text-end pt-3">
-                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-row')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Barbell Row', 'sets-row')">Save</button>
-                    </div>
-                </div>
-
-                <!-- 4. Lat Pulldown / Cable Row -->
-                <div class="card p-3 mb-3">
-                    <h6 class="mb-1">4. Lat Pulldown / Seated Cable Row</h6>
-                    <small class="text-muted mb-2 d-block">Lats, Upper Back Width</small>
-                    <div id="sets-latpulldown">
-                        <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Reps</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 12" inputmode="numeric">
-                            </div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 100" step="0.5" inputmode="decimal">
-                            </div>
-                            <div class="col-2 text-end pt-3">
-                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-latpulldown')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Lat Pulldown', 'sets-latpulldown')">Save</button>
-                    </div>
-                </div>
-
-                <!-- 5. Face Pulls / Barbell Shrugs -->
-                <div class="card p-3 mb-3">
-                    <h6 class="mb-1">5. Face Pulls / Barbell Shrugs</h6>
-                    <small class="text-muted mb-2 d-block">Rear Delts, Upper Traps, Rotator Cuff</small>
-                    <div id="sets-facepulls">
-                        <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Reps</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 15" inputmode="numeric">
-                            </div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 45" step="0.5" inputmode="decimal">
-                            </div>
-                            <div class="col-2 text-end pt-3">
-                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-facepulls')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Face Pulls / Shrugs', 'sets-facepulls')">Save</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- LEG DAY TRACKING -->
-            <div id="tracking-legs-list" class="d-none">
-                <!-- 1. Barbell Back Squat -->
-                <div class="card p-3 mb-3">
-                    <h6 class="mb-1">1. Barbell Back Squat</h6>
-                    <small class="text-muted mb-2 d-block">Quads, Glutes, Core Strength</small>
-                    <div id="sets-squat">
+                    <h6 class="mb-1">2. Barbell Rows / Chest-Supported Rows</h6>
+                    <small class="text-muted mb-2 d-block">Target: Back Thickness & Posture (3 sets of 8–10 reps)</small>
+                    <div id="sets-rows">
                         <div class="row g-2 align-items-center mb-2 set-row">
                             <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
                             <div class="col-4">
                                 <span class="input-label d-block mb-1">Reps</span>
                                 <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 8" inputmode="numeric">
-                            </div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 175" step="0.5" inputmode="decimal">
-                            </div>
-                            <div class="col-2 text-end pt-3">
-                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-squat')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Barbell Back Squat', 'sets-squat')">Save</button>
-                    </div>
-                </div>
-
-                <!-- 2. Romanian Deadlift -->
-                <div class="card p-3 mb-3">
-                    <h6 class="mb-1">2. Romanian Deadlift (RDL)</h6>
-                    <small class="text-muted mb-2 d-block">Hamstrings, Glutes, Lower Back</small>
-                    <div id="sets-rdl">
-                        <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Reps</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 10" inputmode="numeric">
                             </div>
                             <div class="col-4">
                                 <span class="input-label d-block mb-1">Weight (lbs)</span>
@@ -448,16 +263,16 @@
                         </div>
                     </div>
                     <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-rdl')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Romanian Deadlift', 'sets-rdl')">Save</button>
+                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-rows')">+ Set</button>
+                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Barbell / Chest Rows', 'sets-rows')">Save</button>
                     </div>
                 </div>
 
-                <!-- 3. Bulgarian Split Squats -->
+                <!-- 3. Incline Dumbbell Bicep Curls -->
                 <div class="card p-3 mb-3">
-                    <h6 class="mb-1">3. Bulgarian Split Squat</h6>
-                    <small class="text-muted mb-2 d-block">Unilateral Quad & Glute Hypertrophy</small>
-                    <div id="sets-split-squat">
+                    <h6 class="mb-1">3. Incline Dumbbell Bicep Curls</h6>
+                    <small class="text-muted mb-2 d-block">Target: Bicep Stretch & Peak Definition (3 sets of 10–12 reps)</small>
+                    <div id="sets-incline-curls">
                         <div class="row g-2 align-items-center mb-2 set-row">
                             <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
                             <div class="col-4">
@@ -466,7 +281,7 @@
                             </div>
                             <div class="col-4">
                                 <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 35" step="0.5" inputmode="decimal">
+                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 25" step="0.5" inputmode="decimal">
                             </div>
                             <div class="col-2 text-end pt-3">
                                 <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
@@ -474,16 +289,71 @@
                         </div>
                     </div>
                     <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-split-squat')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Bulgarian Split Squat', 'sets-split-squat')">Save</button>
+                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-incline-curls')">+ Set</button>
+                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Incline DB Bicep Curls', 'sets-incline-curls')">Save</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LEGS & CORE TRACKING -->
+            <div id="tracking-legs-list" class="d-none">
+                <!-- 1. Barbell Squats or Leg Press -->
+                <div class="card p-3 mb-3">
+                    <h6 class="mb-1">1. Barbell Squats or Leg Press</h6>
+                    <small class="text-muted mb-2 d-block">Target: Overall Muscle Growth & Leg Drive (3–4 sets of 6–8 reps)</small>
+                    <div id="sets-squats-press">
+                        <div class="row g-2 align-items-center mb-2 set-row">
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
+                            <div class="col-4">
+                                <span class="input-label d-block mb-1">Reps</span>
+                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 6" inputmode="numeric">
+                            </div>
+                            <div class="col-4">
+                                <span class="input-label d-block mb-1">Weight (lbs)</span>
+                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 185" step="0.5" inputmode="decimal">
+                            </div>
+                            <div class="col-2 text-end pt-3">
+                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-squats-press')">+ Set</button>
+                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Squats / Leg Press', 'sets-squats-press')">Save</button>
                     </div>
                 </div>
 
-                <!-- 4. Leg Press -->
+                <!-- 2. Romanian Deadlifts (RDLs) -->
                 <div class="card p-3 mb-3">
-                    <h6 class="mb-1">4. Leg Press</h6>
-                    <small class="text-muted mb-2 d-block">Overall Leg Volume & Quad Drive</small>
-                    <div id="sets-leg-press">
+                    <h6 class="mb-1">2. Romanian Deadlifts (RDLs)</h6>
+                    <small class="text-muted mb-2 d-block">Target: Posterior Chain (3 sets of 8–10 reps)</small>
+                    <div id="sets-rdls">
+                        <div class="row g-2 align-items-center mb-2 set-row">
+                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
+                            <div class="col-4">
+                                <span class="input-label d-block mb-1">Reps</span>
+                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 8" inputmode="numeric">
+                            </div>
+                            <div class="col-4">
+                                <span class="input-label d-block mb-1">Weight (lbs)</span>
+                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 155" step="0.5" inputmode="decimal">
+                            </div>
+                            <div class="col-2 text-end pt-3">
+                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-rdls')">+ Set</button>
+                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Romanian Deadlifts (RDLs)', 'sets-rdls')">Save</button>
+                    </div>
+                </div>
+
+                <!-- 3. Hanging Leg Raises / Cable Woodchoppers -->
+                <div class="card p-3 mb-3">
+                    <h6 class="mb-1">3. Hanging Leg Raises / Cable Woodchoppers</h6>
+                    <small class="text-muted mb-2 d-block">Target: Abdominal Density & Core Stability (3 sets of 12–15 reps)</small>
+                    <div id="sets-core">
                         <div class="row g-2 align-items-center mb-2 set-row">
                             <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
                             <div class="col-4">
@@ -492,7 +362,7 @@
                             </div>
                             <div class="col-4">
                                 <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 270" step="0.5" inputmode="decimal">
+                                <input type="number" class="form-control form-control-sm weight-input" placeholder="0 for BW" step="0.5" inputmode="decimal">
                             </div>
                             <div class="col-2 text-end pt-3">
                                 <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
@@ -500,34 +370,8 @@
                         </div>
                     </div>
                     <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-leg-press')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Leg Press', 'sets-leg-press')">Save</button>
-                    </div>
-                </div>
-
-                <!-- 5. Standing Calf Raises -->
-                <div class="card p-3 mb-3">
-                    <h6 class="mb-1">5. Standing Calf Raise</h6>
-                    <small class="text-muted mb-2 d-block">Gastrocnemius & Ankle Stability</small>
-                    <div id="sets-calf-raise">
-                        <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Reps</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="e.g. 15" inputmode="numeric">
-                            </div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 90" step="0.5" inputmode="decimal">
-                            </div>
-                            <div class="col-2 text-end pt-3">
-                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-calf-raise')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Standing Calf Raise', 'sets-calf-raise')">Save</button>
+                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-core')">+ Set</button>
+                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Hanging Leg Raises / Woodchoppers', 'sets-core')">Save</button>
                     </div>
                 </div>
             </div>
@@ -538,7 +382,7 @@
             <div class="btn-group w-100 mb-3" role="group">
                 <button type="button" class="btn btn-sm btn-outline-primary active" id="btn-demo-push" onclick="showDemoSubTab('push')">Push Demos</button>
                 <button type="button" class="btn btn-sm btn-outline-primary" id="btn-demo-pull" onclick="showDemoSubTab('pull')">Pull Demos</button>
-                <button type="button" class="btn btn-sm btn-outline-primary" id="btn-demo-legs" onclick="showDemoSubTab('legs')">Leg Demos</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="btn-demo-legs" onclick="showDemoSubTab('legs')">Legs & Core Demos</button>
             </div>
 
             <!-- PUSH DEMOS -->
@@ -546,27 +390,7 @@
                 <div class="card p-3 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="mb-0">Barbell Bench Press</h6>
-                            <small class="text-muted">Form & Setup Tutorial</small>
-                        </div>
-                        <a href="https://www.youtube.com/watch?v=vcBig73ojpE" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
-                    </div>
-                </div>
-
-                <div class="card p-3 mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">Overhead Press (OHP)</h6>
-                            <small class="text-muted">Standing Barbell Form</small>
-                        </div>
-                        <a href="https://www.youtube.com/watch?v=2yjwXTZQDDI" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
-                    </div>
-                </div>
-
-                <div class="card p-3 mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">Incline Dumbbell Press</h6>
+                            <h6 class="mb-0">Incline DB / Barbell Press</h6>
                             <small class="text-muted">Upper Chest Focus</small>
                         </div>
                         <a href="https://www.youtube.com/watch?v=8iPEnn-ltC8" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
@@ -576,31 +400,31 @@
                 <div class="card p-3 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="mb-0">Dips (Weighted/Bodyweight)</h6>
-                            <small class="text-muted">Chest & Triceps Technique</small>
+                            <h6 class="mb-0">Overhead Shoulder Press</h6>
+                            <small class="text-muted">Standing Barbell / DB Setup</small>
                         </div>
-                        <a href="https://www.youtube.com/watch?v=2z8JmcrW-As" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
+                        <a href="https://www.youtube.com/watch?v=2yjwXTZQDDI" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
                     </div>
                 </div>
 
                 <div class="card p-3 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="mb-0">Close-Grip Bench Press</h6>
-                            <small class="text-muted">Tricep Hypertrophy Guide</small>
+                            <h6 class="mb-0">Dumbbell Lateral Raises</h6>
+                            <small class="text-muted">Side Delt Isolation & Form</small>
                         </div>
-                        <a href="https://www.youtube.com/watch?v=nEF0bv2w9Fc" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
+                        <a href="https://www.youtube.com/watch?v=3VcKaXpzqRo" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
                     </div>
                 </div>
             </div>
 
             <!-- PULL DEMOS -->
             <div id="demo-pull-list" class="d-none">
-                <div class="card p-3 mb-2 border-primary">
+                <div class="card p-3 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="mb-0 text-primary">Pull-Ups & Progressions</h6>
-                            <small class="text-muted">Scapular Activation & Form</small>
+                            <h6 class="mb-0">Pull-Ups & Lat Pulldowns</h6>
+                            <small class="text-muted">Lat Engagement & V-Taper</small>
                         </div>
                         <a href="https://www.youtube.com/watch?v=-ZIpSoTRsuE" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
                     </div>
@@ -609,18 +433,8 @@
                 <div class="card p-3 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="mb-0">Barbell Deadlift</h6>
-                            <small class="text-muted">Conventional Deadlift Execution</small>
-                        </div>
-                        <a href="https://www.youtube.com/watch?v=op9kVnSso6Q" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
-                    </div>
-                </div>
-
-                <div class="card p-3 mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">Bent-Over Barbell Row</h6>
-                            <small class="text-muted">Strict Back Row Technique</small>
+                            <h6 class="mb-0">Barbell / Chest-Supported Rows</h6>
+                            <small class="text-muted">Mid-Back Thickness</small>
                         </div>
                         <a href="https://www.youtube.com/watch?v=FWJR5Ve8bnQ" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
                     </div>
@@ -629,31 +443,21 @@
                 <div class="card p-3 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="mb-0">Lat Pulldown</h6>
-                            <small class="text-muted">Lat Engagement & Grip Guide</small>
+                            <h6 class="mb-0">Incline DB Bicep Curls</h6>
+                            <small class="text-muted">Long Head Bicep Stretch</small>
                         </div>
-                        <a href="https://www.youtube.com/watch?v=CAwf7n6Luuc" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
-                    </div>
-                </div>
-
-                <div class="card p-3 mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">Face Pulls</h6>
-                            <small class="text-muted">Rear Delt & Shoulder Health</small>
-                        </div>
-                        <a href="https://www.youtube.com/watch?v=eIq5CB9WXqc" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
+                        <a href="https://www.youtube.com/watch?v=soxrZlIl35U" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
                     </div>
                 </div>
             </div>
 
-            <!-- LEG DEMOS -->
+            <!-- LEGS & CORE DEMOS -->
             <div id="demo-legs-list" class="d-none">
                 <div class="card p-3 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="mb-0">Barbell Back Squat</h6>
-                            <small class="text-muted">Depth & Brace Technique</small>
+                            <h6 class="mb-0">Barbell Squats & Leg Press</h6>
+                            <small class="text-muted">Quad & Drive Technique</small>
                         </div>
                         <a href="https://www.youtube.com/watch?v=ultWZbUMPL8" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
                     </div>
@@ -662,8 +466,8 @@
                 <div class="card p-3 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="mb-0">Romanian Deadlift (RDL)</h6>
-                            <small class="text-muted">Hip Hinge Mechanics</small>
+                            <h6 class="mb-0">Romanian Deadlifts (RDLs)</h6>
+                            <small class="text-muted">Hip Hinge & Hamstring Stretch</small>
                         </div>
                         <a href="https://www.youtube.com/watch?v=JCXUYuzwNem" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
                     </div>
@@ -672,30 +476,10 @@
                 <div class="card p-3 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="mb-0">Bulgarian Split Squat</h6>
-                            <small class="text-muted">Balance & Foot Placement</small>
+                            <h6 class="mb-0">Hanging Leg Raises & Woodchoppers</h6>
+                            <small class="text-muted">Core Stability & Obliques</small>
                         </div>
-                        <a href="https://www.youtube.com/watch?v=2C-uNgKwple" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
-                    </div>
-                </div>
-
-                <div class="card p-3 mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">Leg Press</h6>
-                            <small class="text-muted">Foot Position & Knee Safety</small>
-                        </div>
-                        <a href="https://www.youtube.com/watch?v=IZxyjW7MPJQ" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
-                    </div>
-                </div>
-
-                <div class="card p-3 mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">Standing Calf Raise</h6>
-                            <small class="text-muted">Full Stretch & Peak Contraction</small>
-                        </div>
-                        <a href="https://www.youtube.com/watch?v=-M4-G8p8fmc" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
+                        <a href="https://www.youtube.com/watch?v=hdng3Nm1x_E" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
                     </div>
                 </div>
             </div>
@@ -703,19 +487,18 @@
 
         <!-- 3. JOURNAL TAB -->
         <div class="tab-pane fade" id="journal" role="tabpanel">
-            <!-- High-Contrast Journal Overview & Guidance Card -->
             <div class="card p-3 mb-3" style="background-color: #1e1e1e; border: 1px solid #0d6efd;">
                 <h6 class="fw-bold mb-2" style="color: #0d6efd !important;">About Your Workout Journal</h6>
                 <p class="small mb-2" style="color: #e0e0e0 !important; line-height: 1.4;">
-                    The Journal acts as your personal digital logbook. It automatically aggregates every exercise session you record in the <strong>Tracking</strong> tab and organizes it chronologically by date.
+                    The Journal aggregates every exercise session logged in <strong>Tracking</strong> and organizes it chronologically by date.
                 </p>
                 <div class="p-2 rounded mb-1" style="background-color: #252525; border: 1px solid #3d3d3d;">
-                    <strong class="d-block small mb-1" style="color: #ffffff !important;">How to Use:</strong>
-                    <ol class="small mb-0 ps-3" style="color: #d0d0d0 !important;">
-                        <li class="mb-1">Select a past or current date at the top of the <strong>Tracking</strong> tab.</li>
-                        <li class="mb-1">Log sets in pounds (lbs), delete unneeded rows, and tap <strong>Save</strong>.</li>
-                        <li>Delete any accidental entries directly in this <strong>Journal</strong> tab using the red button.</li>
-                    </ol>
+                    <strong class="d-block small mb-1" style="color: #ffffff !important;">Progression Rules:</strong>
+                    <ul class="small mb-0 ps-3" style="color: #d0d0d0 !important;">
+                        <li class="mb-1"><strong>Progressive Overload:</strong> Add weight or extra reps every 1–2 weeks while keeping strict form.</li>
+                        <li class="mb-1"><strong>Prioritize Compounds:</strong> Heavy presses, pulls, and squats come first when energy is highest.</li>
+                        <li><strong>Nutrition:</strong> High protein intake with slight deficit (leaning) or small surplus (mass).</li>
+                    </ul>
                 </div>
             </div>
 
@@ -760,7 +543,7 @@
     document.getElementById('workout-date-picker').value = todayIso;
     document.getElementById('current-date-badge').innerText = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
-    // Toggle Tracking Push/Pull/Leg Views
+    // Toggle Tracking Sub-Views
     function showTrackingSubTab(type) {
         document.getElementById('tracking-push-list').classList.add('d-none');
         document.getElementById('tracking-pull-list').classList.add('d-none');
@@ -782,7 +565,7 @@
         }
     }
 
-    // Toggle Training Demo Push/Pull/Leg Views
+    // Toggle Training Demo Views
     function showDemoSubTab(type) {
         document.getElementById('demo-push-list').classList.add('d-none');
         document.getElementById('demo-pull-list').classList.add('d-none');
@@ -819,7 +602,7 @@
             </div>
             <div class="col-4">
                 <span class="input-label d-block mb-1">Weight (lbs)</span>
-                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 100" step="0.5" inputmode="decimal">
+                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 50" step="0.5" inputmode="decimal">
             </div>
             <div class="col-2 text-end pt-3">
                 <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
@@ -828,27 +611,24 @@
         container.appendChild(row);
     }
 
-    // Remove an Unsaved Set Row
+    // Remove Set Row
     function removeSetRow(buttonEl) {
         const row = buttonEl.closest('.set-row');
         const container = row.parentElement;
         
-        // Prevent deleting if it's the last remaining row in the card
         if (container.querySelectorAll('.set-row').length > 1) {
             row.remove();
-            // Recalculate set labels
             container.querySelectorAll('.set-row').forEach((r, idx) => {
                 const label = r.querySelector('.set-num-label');
                 if (label) label.innerText = `Set ${idx + 1}`;
             });
         } else {
-            // If it's the last row, just clear values
             row.querySelector('.reps-input').value = '';
             row.querySelector('.weight-input').value = '';
         }
     }
 
-    // Save Workout Session to LocalStorage (Supports Custom/Past Dates)
+    // Save Workout Session to LocalStorage
     function saveWorkoutSession(exerciseName, containerId) {
         const container = document.getElementById(containerId);
         const setRows = container.querySelectorAll('.set-row');
@@ -868,8 +648,6 @@
         }
 
         const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
-        
-        // Get selected log date from input picker
         const selectedDate = document.getElementById('workout-date-picker').value || todayIso;
 
         if (!journal[selectedDate]) {
@@ -885,7 +663,6 @@
 
         localStorage.setItem('workout_journal', JSON.stringify(journal));
 
-        // Reset input fields
         setRows.forEach(row => {
             row.querySelector('.reps-input').value = '';
             row.querySelector('.weight-input').value = '';
@@ -894,7 +671,7 @@
         alert(`${exerciseName} recorded for ${selectedDate}!`);
     }
 
-    // Delete a Saved Record from Journal History
+    // Delete Record from Journal History
     function deleteJournalEntry(date, entryId) {
         if (!confirm('Are you sure you want to delete this workout log?')) return;
 
@@ -952,7 +729,7 @@
         });
     }
 
-    // Initialize & Populate Trends Tab
+    // Initialize Trends Tab
     function initTrendsTab() {
         const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
         const select = document.getElementById('exercise-select');
@@ -981,7 +758,7 @@
         updateTrendChart();
     }
 
-    // Render / Update Chart.js Growth Line
+    // Render Trend Chart
     function updateTrendChart() {
         const selectedExercise = document.getElementById('exercise-select').value;
         if (!selectedExercise) return;
