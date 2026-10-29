@@ -1,1155 +1,742 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>JAMS FITNESS - 6-Month Upper/Lower Plan</title>
-    
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <style>
-        body {
-            background-color: #121212;
-            color: #e0e0e0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            padding-bottom: 70px;
-        }
-        .card {
-            background-color: #1e1e1e;
-            border: 1px solid #333;
-            color: #fff;
-        }
-        
-        .input-label {
-            color: #0d6efd;
-            font-weight: 600;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .form-control, .form-select {
-            background-color: #2b2b2b !important;
-            color: #ffffff !important;
-            border: 1px solid #555 !important;
-        }
-        .form-control:focus, .form-select:focus {
-            background-color: #333333 !important;
-            color: #ffffff !important;
-            border-color: #0d6efd !important;
-            box-shadow: none;
-        }
-        .form-control::placeholder {
-            color: #888888 !important;
-            opacity: 1;
-        }
-
-        .journal-entry {
-            border-left: 3px solid #0d6efd;
-            padding-left: 12px;
-            margin-bottom: 14px;
-            background-color: #1a1a1a;
-            padding-top: 8px;
-            padding-bottom: 8px;
-            padding-right: 8px;
-            border-radius: 0 4px 4px 0;
-        }
-        .set-badge {
-            background-color: #2b2b2b;
-            color: #ffffff;
-            border: 1px solid #444;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            margin-right: 5px;
-            display: inline-block;
-            margin-top: 4px;
-        }
-        .nav-pills .nav-link {
-            color: #aaa;
-            font-size: 0.78rem;
-            padding: 8px 6px;
-        }
-        .nav-pills .nav-link.active {
-            background-color: #0d6efd;
-            color: #fff;
-        }
-        .video-btn {
-            font-size: 0.8rem;
-            text-decoration: none;
-        }
-        .plan-badge {
-            background-color: #252525;
-            border: 1px solid #3d3d3d;
-            border-radius: 6px;
-            padding: 10px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#2563eb">
+<meta name="description" content="JAMS Fitness — simple workout plans for Beginner, Intermediate and Expert. Find your level, follow the plan, track your progress.">
+<title>JAMS Fitness — Workouts for every level</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<style>
+:root{
+  --bg:#f5f7fb; --card:#ffffff; --text:#0f172a; --muted:#64748b; --line:#e5e9f2;
+  --brand:#2563eb; --brand-soft:#e8efff; --ok:#16a34a; --warn:#d97706; --bad:#dc2626;
+  --lvl:#2563eb; --lvl-soft:#e8efff;
+  --radius:20px; --shadow:0 1px 2px rgba(15,23,42,.05),0 6px 20px rgba(15,23,42,.06);
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0b1020;--card:#151b2e;--text:#eef2ff;--muted:#94a3b8;--line:#263049;--brand-soft:#1c2a4d;--shadow:none}
+}
+body[data-level="beginner"]{--lvl:#16a34a;--lvl-soft:#e6f6ec}
+body[data-level="intermediate"]{--lvl:#ea580c;--lvl-soft:#fdeee4}
+body[data-level="expert"]{--lvl:#7c3aed;--lvl-soft:#f0e9fe}
+@media (prefers-color-scheme:dark){
+  body[data-level="beginner"]{--lvl-soft:#12301f}
+  body[data-level="intermediate"]{--lvl-soft:#3a2214}
+  body[data-level="expert"]{--lvl-soft:#2a1f47}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font:17px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+.wrap{max-width:560px;margin:0 auto;padding:16px 16px calc(110px + var(--safe-b))}
+h1,h2,h3{margin:0;line-height:1.15;letter-spacing:-.01em}
+h1{font-size:28px;font-weight:800}
+h2{font-size:21px;font-weight:800}
+h3{font-size:18px;font-weight:700}
+p{margin:0}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.row{display:flex;align-items:center;gap:10px}
+.between{justify-content:space-between}
+.stack>*+*{margin-top:12px}
+.stack-lg>*+*{margin-top:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;background:var(--lvl-soft);color:var(--lvl);font-weight:700;font-size:14px;border:0}
+.chip{display:inline-block;padding:3px 10px;border-radius:999px;background:var(--bg);border:1px solid var(--line);font-size:13px;color:var(--muted);margin:2px 4px 2px 0}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:54px;padding:12px 18px;border-radius:16px;border:0;background:var(--lvl);color:#fff;font-weight:800;font-size:18px;transition:transform .08s}
+.btn:active{transform:scale(.98)}
+.btn.secondary{background:var(--lvl-soft);color:var(--lvl)}
+.btn.ghost{background:transparent;color:var(--text);border:1.5px solid var(--line)}
+.btn.danger{background:#fde8e8;color:var(--bad)}
+.btn.sm{min-height:42px;font-size:15px;border-radius:12px;width:auto;padding:8px 14px}
+.link{background:none;border:0;color:var(--lvl);font-weight:700;padding:6px 0}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:19px;letter-spacing:.02em}
+.logo svg{width:34px;height:34px}
+/* Tab bar */
+.tabbar{position:fixed;left:0;right:0;bottom:0;background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:var(--safe-b);z-index:20}
+.tabbar .in{display:flex;max-width:560px;width:100%}
+.tab{flex:1;background:none;border:0;padding:9px 0 10px;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--muted);font-size:12.5px;font-weight:700}
+.tab .ic{font-size:23px;line-height:1;filter:grayscale(1);opacity:.65}
+.tab.on{color:var(--lvl)}
+.tab.on .ic{filter:none;opacity:1}
+/* Hero */
+.hero{background:linear-gradient(135deg,var(--lvl),color-mix(in srgb,var(--lvl) 60%,#000));color:#fff;border:0}
+.hero .muted{color:rgba(255,255,255,.85)}
+.hero .btn{background:#fff;color:var(--lvl)}
+.big-emoji{font-size:44px;line-height:1}
+/* Week strip */
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.day{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 0 7px;text-align:center;font-size:12px;color:var(--muted)}
+.day b{display:block;font-size:13px;color:var(--text)}
+.day .e{font-size:18px;display:block;margin-top:2px}
+.day.today{border:2px solid var(--lvl);background:var(--lvl-soft)}
+.day.done .e::after{content:"✓";color:var(--ok);font-weight:900;font-size:13px;margin-left:1px}
+/* Exercise card */
+.ex{padding:16px}
+.ex-head{display:flex;gap:12px;align-items:flex-start}
+.ex-emoji{width:52px;height:52px;flex:0 0 52px;border-radius:16px;background:var(--lvl-soft);display:grid;place-items:center;font-size:28px}
+.ex-title{font-weight:800;font-size:18px}
+.target{font-weight:700;color:var(--lvl);font-size:15px}
+details.how{margin-top:12px;border-radius:14px;background:var(--bg);padding:2px 14px}
+details.how summary{list-style:none;padding:10px 0;font-weight:700;color:var(--lvl);cursor:pointer}
+details.how summary::-webkit-details-marker{display:none}
+details.how summary::before{content:"▸ ";}
+details.how[open] summary::before{content:"▾ ";}
+details.how ol{margin:0 0 10px;padding-left:22px}
+details.how li{margin:6px 0}
+.tip{margin:6px 0 12px;padding:10px 12px;border-radius:12px;background:var(--card);border:1px dashed var(--line);font-size:15px}
+.hint{margin-top:10px;padding:10px 12px;border-radius:12px;background:#fff7e0;color:#7a4b00;font-size:15px;font-weight:600}
+@media (prefers-color-scheme:dark){.hint{background:#3a2e10;color:#ffd98a}}
+.sets{margin-top:12px}
+.set{display:grid;grid-template-columns:54px 1fr 1fr 56px;gap:8px;align-items:center;margin-top:8px}
+.set.nowt{grid-template-columns:54px 1fr 56px}
+.set label{display:block;font-size:12px;color:var(--muted);font-weight:700;margin-bottom:3px}
+.set .n{font-weight:800;color:var(--muted);font-size:15px}
+.num{width:100%;height:50px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);text-align:center;font-size:20px;font-weight:800;padding:0 4px}
+.num::placeholder{color:var(--muted);opacity:.55;font-weight:600}
+.num:focus{outline:none;border-color:var(--lvl)}
+.check{height:50px;width:56px;border-radius:14px;border:2px solid var(--line);background:var(--card);font-size:24px;color:var(--muted);align-self:end}
+.set.isdone .check{background:var(--ok);border-color:var(--ok);color:#fff}
+.set.isdone .num{border-color:color-mix(in srgb,var(--ok) 45%,var(--line))}
+.progress{height:10px;background:var(--line);border-radius:99px;overflow:hidden}
+.progress>i{display:block;height:100%;background:var(--lvl);border-radius:99px;transition:width .3s}
+/* Level cards */
+.lvl{border:2px solid var(--line);text-align:left;width:100%;background:var(--card);border-radius:var(--radius);padding:16px;display:block}
+.lvl.sel{border-color:var(--c)}
+.lvl .t{display:flex;gap:10px;align-items:center;font-weight:800;font-size:20px;color:var(--c)}
+.lvl ul{margin:8px 0 0;padding-left:20px;color:var(--text);font-size:15px}
+.lvl li{margin:3px 0}
+/* Quiz */
+.opt{display:flex;gap:14px;align-items:center;width:100%;min-height:64px;text-align:left;padding:14px 16px;border-radius:18px;border:2px solid var(--line);background:var(--card);font-size:17px;font-weight:600}
+.opt .e{font-size:28px}
+.opt:active,.opt.sel{border-color:var(--lvl);background:var(--lvl-soft)}
+.dots{display:flex;gap:6px;justify-content:center}
+.dots i{width:9px;height:9px;border-radius:9px;background:var(--line)}
+.dots i.on{background:var(--lvl);width:22px}
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 10px;text-align:center}
+.stat b{display:block;font-size:26px;font-weight:900;color:var(--lvl)}
+.stat span{font-size:13px;color:var(--muted);font-weight:600}
+.seg{display:flex;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px}
+.seg button{flex:1;border:0;background:none;padding:9px 2px;border-radius:10px;font-weight:700;font-size:14px;white-space:nowrap;color:var(--muted)}
+.seg button.on{background:var(--card);color:var(--lvl);box-shadow:var(--shadow)}
+select.sel{width:100%;height:50px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);padding:0 12px;font-size:16px;font-weight:600}
+input.txt{width:100%;height:56px;border-radius:16px;border:1.5px solid var(--line);background:var(--card);padding:0 16px;font-size:19px}
+input.txt:focus{outline:none;border-color:var(--lvl)}
+.hist{border-left:4px solid var(--lvl);padding:10px 12px;background:var(--card);border-radius:0 14px 14px 0;margin-top:8px}
+.badge{display:inline-block;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:2px 8px;font-size:13px;margin:4px 4px 0 0}
+.xbtn{border:0;background:none;color:var(--muted);font-size:14px;padding:4px 8px;border-radius:8px}
+.xbtn:hover{color:var(--bad)}
+/* Timer */
+.timer{position:fixed;left:12px;right:12px;bottom:calc(76px + var(--safe-b));max-width:536px;margin:0 auto;background:#0f172a;color:#fff;border-radius:20px;padding:12px 14px;display:flex;align-items:center;gap:12px;z-index:30;box-shadow:0 12px 30px rgba(0,0,0,.3);transform:translateY(calc(100% + 140px));visibility:hidden;transition:transform .25s,visibility .25s}
+.timer.show{transform:none;visibility:visible}
+.timer .t{font-size:30px;font-weight:900;font-variant-numeric:tabular-nums;min-width:74px}
+.timer button{border:0;border-radius:12px;padding:10px 12px;font-weight:800;background:rgba(255,255,255,.14);color:#fff}
+/* Modal & toast */
+.overlay{position:fixed;inset:0;background:rgba(2,6,23,.5);display:flex;align-items:flex-end;justify-content:center;z-index:50;padding:12px}
+.sheet{background:var(--card);border-radius:24px;padding:22px;max-width:520px;width:100%;margin-bottom:var(--safe-b)}
+.toast{position:fixed;left:50%;top:16px;transform:translate(-50%,-140%);background:#0f172a;color:#fff;padding:12px 18px;border-radius:14px;font-weight:700;z-index:60;transition:transform .25s;max-width:90vw;text-align:center}
+.toast.show{transform:translate(-50%,0)}
+.celebrate{position:fixed;inset:0;background:var(--bg);z-index:40;display:flex;align-items:center;justify-content:center;padding:24px;overflow:hidden}
+.confetti{position:absolute;top:-20px;width:10px;height:16px;border-radius:3px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+@media (prefers-reduced-motion:reduce){.confetti{display:none}}
+.chart{width:100%;height:auto;display:block}
+.empty{text-align:center;padding:28px 12px}
+.empty .big-emoji{margin-bottom:8px}
+.center{text-align:center}
+.hide{display:none!important}
+</style>
 </head>
-<body>
+<body data-level="beginner">
+<div class="wrap" id="view"></div>
 
-<div class="container py-3">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="h5 mb-0 text-primary fw-bold">JAMS FITNESS</h2>
-        <span class="badge bg-secondary" id="current-date-badge"></span>
-    </div>
+<nav class="tabbar" id="tabbar">
+  <div class="in">
+    <button class="tab" data-go="today"><span class="ic">🏠</span>Today</button>
+    <button class="tab" data-go="library"><span class="ic">📚</span>Exercises</button>
+    <button class="tab" data-go="progress"><span class="ic">📈</span>Progress</button>
+    <button class="tab" data-go="me"><span class="ic">🙂</span>Me</button>
+  </div>
+</nav>
 
-    <!-- Main Navigation Tabs -->
-    <ul class="nav nav-pills nav-justified mb-3 gap-1" id="mainTab" role="tablist">
-        <li class="nav-item">
-            <button class="nav-link active" id="tracking-tab-btn" data-bs-toggle="tab" data-bs-target="#tracking" type="button">Tracking</button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link" id="plan-tab-btn" data-bs-toggle="tab" data-bs-target="#plan" type="button">Master Plan</button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link" id="training-tab-btn" data-bs-toggle="tab" data-bs-target="#training" type="button">Demos</button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link" id="journal-tab-btn" data-bs-toggle="tab" data-bs-target="#journal" type="button" onclick="renderJournal()">Journal</button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link" id="trends-tab-btn" data-bs-toggle="tab" data-bs-target="#trends" type="button" onclick="initTrendsTab()">Trends</button>
-        </li>
-    </ul>
-
-    <div class="tab-content" id="mainTabContent">
-        
-        <!-- 1. TRACKING TAB -->
-        <div class="tab-pane fade show active" id="tracking" role="tabpanel">
-            
-            <!-- Date Selector for Logging -->
-            <div class="card p-2 mb-3 bg-dark border-secondary">
-                <div class="row align-items-center">
-                    <div class="col-5">
-                        <span class="input-label d-block">Log Date:</span>
-                    </div>
-                    <div class="col-7">
-                        <input type="date" id="workout-date-picker" class="form-control form-control-sm text-white">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sub-tabs for Upper A, Lower A, Upper B, Lower B -->
-            <div class="btn-group w-100 mb-3" role="group">
-                <button type="button" class="btn btn-sm btn-outline-primary active" id="btn-track-ua" onclick="showTrackingSubTab('ua')">Upper A</button>
-                <button type="button" class="btn btn-sm btn-outline-primary" id="btn-track-la" onclick="showTrackingSubTab('la')">Lower A</button>
-                <button type="button" class="btn btn-sm btn-outline-primary" id="btn-track-ub" onclick="showTrackingSubTab('ub')">Upper B</button>
-                <button type="button" class="btn btn-sm btn-outline-primary" id="btn-track-lb" onclick="showTrackingSubTab('lb')">Lower B</button>
-            </div>
-
-            <!-- UPPER BODY A TRACKING -->
-            <div id="tracking-ua-list">
-                <!-- 1. Bench Press -->
-                <div class="card p-3 mb-3">
-                    <h6 class="mb-1">1. Bench Press (Barbell)</h6>
-                    <small class="text-muted mb-2 d-block">Target: Chest & Triceps (3 sets x 8–10 reps) | Start: 75 lbs</small>
-                    <div id="sets-ua-bench">
-                        <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Reps</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="8-10" inputmode="numeric">
-                            </div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="75" step="0.5" inputmode="decimal">
-                            </div>
-                            <div class="col-2 text-end pt-3">
-                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-ua-bench')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Bench Press (Barbell)', 'sets-ua-bench')">Save</button>
-                    </div>
-                </div>
-
-                <!-- 2. Lat Pulldowns -->
-                <div class="card p-3 mb-3">
-                    <h6 class="mb-1">2. Lat Pulldowns</h6>
-                    <small class="text-muted mb-2 d-block">Target: Lat Width (3 sets x 10–12 reps) | Start: 60 lbs</small>
-                    <div id="sets-ua-lat">
-                        <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Reps</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="10-12" inputmode="numeric">
-                            </div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="60" step="0.5" inputmode="decimal">
-                            </div>
-                            <div class="col-2 text-end pt-3">
-                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-ua-lat')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Lat Pulldowns', 'sets-ua-lat')">Save</button>
-                    </div>
-                </div>
-
-                <!-- 3. Overhead Shoulder Press -->
-                <div class="card p-3 mb-3">
-                    <h6 class="mb-1">3. Overhead Shoulder Press (Dumbbells or Machine)</h6>
-                    <small class="text-muted mb-2 d-block">Target: Deltoids (3 sets x 10–12 reps) | Start: 30 lbs total</small>
-                    <div id="sets-ua-ohp">
-                        <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Reps</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="10-12" inputmode="numeric">
-                            </div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="30" step="0.5" inputmode="decimal">
-                            </div>
-                            <div class="col-2 text-end pt-3">
-                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-ua-ohp')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Overhead Shoulder Press', 'sets-ua-ohp')">Save</button>
-                    </div>
-                </div>
-
-                <!-- 4. Bicep Curls -->
-                <div class="card p-3 mb-3">
-                    <h6 class="mb-1">4. Bicep Curls</h6>
-                    <small class="text-muted mb-2 d-block">Target: Biceps (3 sets x 10–12 reps) | Start: 30 lbs total</small>
-                    <div id="sets-ua-curls">
-                        <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Reps</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="10-12" inputmode="numeric">
-                            </div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="30" step="0.5" inputmode="decimal">
-                            </div>
-                            <div class="col-2 text-end pt-3">
-                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-ua-curls')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Bicep Curls', 'sets-ua-curls')">Save</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- LOWER BODY & CORE A TRACKING -->
-            <div id="tracking-la-list" class="d-none">
-                <!-- 1. Leg Extensions -->
-                <div class="card p-3 mb-3">
-                    <h6 class="mb-1">1. Leg Extensions</h6>
-                    <small class="text-muted mb-2 d-block">Target: Quads (3 sets x 12–15 reps) | Start: 60 lbs</small>
-                    <div id="sets-la-legext">
-                        <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Reps</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="12-15" inputmode="numeric">
-                            </div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="60" step="0.5" inputmode="decimal">
-                            </div>
-                            <div class="col-2 text-end pt-3">
-                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-la-legext')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Leg Extensions', 'sets-la-legext')">Save</button>
-                    </div>
-                </div>
-
-                <!-- 2. Standing/Seated Calf Raises -->
-                <div class="card p-3 mb-3">
-                    <h6 class="mb-1">2. Calf Raises (Ironax Bar / Machine)</h6>
-                    <small class="text-muted mb-2 d-block">Target: Calves (4 sets x 15 reps) | Start: 65 lbs</small>
-                    <div id="sets-la-calves">
-                        <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Reps</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="15" inputmode="numeric">
-                            </div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="65" step="0.5" inputmode="decimal">
-                            </div>
-                            <div class="col-2 text-end pt-3">
-                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-la-calves')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Calf Raises', 'sets-la-calves')">Save</button>
-                    </div>
-                </div>
-
-                <!-- 3. Weighted Sit-Ups / Decline Sit-Ups -->
-                <div class="card p-3 mb-3">
-                    <h6 class="mb-1">3. Weighted Sit-Ups / Decline Sit-Ups</h6>
-                    <small class="text-muted mb-2 d-block">Target: Upper Abs & Core (3 sets x 12–15 reps) | Start: 65 lbs / Plate</small>
-                    <div id="sets-la-situps">
-                        <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Reps</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="12-15" inputmode="numeric">
-                            </div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="65" step="0.5" inputmode="decimal">
-                            </div>
-                            <div class="col-2 text-end pt-3">
-                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-la-situps')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Weighted Sit-Ups', 'sets-la-situps')">Save</button>
-                    </div>
-                </div>
-
-                <!-- 4. Romanian Deadlifts or Goblet Squats -->
-                <div class="card p-3 mb-3">
-                    <h6 class="mb-1">4. Romanian Deadlifts or Goblet Squats</h6>
-                    <small class="text-muted mb-2 d-block">Target: Hamstrings & Glutes (3 sets x 10–12 reps)</small>
-                    <div id="sets-la-rdl">
-                        <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Reps</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="10-12" inputmode="numeric">
-                            </div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 50" step="0.5" inputmode="decimal">
-                            </div>
-                            <div class="col-2 text-end pt-3">
-                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-la-rdl')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('RDL / Goblet Squats', 'sets-la-rdl')">Save</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- UPPER BODY B TRACKING -->
-            <div id="tracking-ub-list" class="d-none">
-                <!-- 1. Incline DB / Machine Chest Press -->
-                <div class="card p-3 mb-3">
-                    <h6 class="mb-1">1. Incline DB Press or Machine Chest Press</h6>
-                    <small class="text-muted mb-2 d-block">Target: Upper Chest (3 sets x 10–12 reps)</small>
-                    <div id="sets-ub-incpress">
-                        <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Reps</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="10-12" inputmode="numeric">
-                            </div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 40" step="0.5" inputmode="decimal">
-                            </div>
-                            <div class="col-2 text-end pt-3">
-                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-ub-incpress')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Incline Press', 'sets-ub-incpress')">Save</button>
-                    </div>
-                </div>
-
-                <!-- 2. Seated Cable Rows or DB Rows -->
-                <div class="card p-3 mb-3">
-                    <h6 class="mb-1">2. Seated Cable Rows or DB Rows</h6>
-                    <small class="text-muted mb-2 d-block">Target: Mid-Back Thickness (3 sets x 10–12 reps)</small>
-                    <div id="sets-ub-rows">
-                        <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Reps</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="10-12" inputmode="numeric">
-                            </div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 60" step="0.5" inputmode="decimal">
-                            </div>
-                            <div class="col-2 text-end pt-3">
-                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-ub-rows')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Seated Cable / DB Rows', 'sets-ub-rows')">Save</button>
-                    </div>
-                </div>
-
-                <!-- 3. Lateral Raises -->
-                <div class="card p-3 mb-3">
-                    <h6 class="mb-1">3. Lateral Raises (Dumbbell or Cable)</h6>
-                    <small class="text-muted mb-2 d-block">Target: Side Deltoids (3 sets x 12–15 reps)</small>
-                    <div id="sets-ub-latraises">
-                        <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Reps</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="12-15" inputmode="numeric">
-                            </div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 15" step="0.5" inputmode="decimal">
-                            </div>
-                            <div class="col-2 text-end pt-3">
-                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-ub-latraises')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Lateral Raises', 'sets-ub-latraises')">Save</button>
-                    </div>
-                </div>
-
-                <!-- 4. Tricep Pushdowns -->
-                <div class="card p-3 mb-3">
-                    <h6 class="mb-1">4. Tricep Pushdowns (Cable or Band)</h6>
-                    <small class="text-muted mb-2 d-block">Target: Triceps Definition (3 sets x 12–15 reps)</small>
-                    <div id="sets-ub-triceps">
-                        <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Reps</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="12-15" inputmode="numeric">
-                            </div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 35" step="0.5" inputmode="decimal">
-                            </div>
-                            <div class="col-2 text-end pt-3">
-                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-ub-triceps')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Tricep Pushdowns', 'sets-ub-triceps')">Save</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- LOWER BODY & CORE B TRACKING -->
-            <div id="tracking-lb-list" class="d-none">
-                <!-- 1. Leg Extensions -->
-                <div class="card p-3 mb-3">
-                    <h6 class="mb-1">1. Leg Extensions</h6>
-                    <small class="text-muted mb-2 d-block">Target: Quads (3 sets x 12–15 reps)</small>
-                    <div id="sets-lb-legext">
-                        <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Reps</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="12-15" inputmode="numeric">
-                            </div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 60" step="0.5" inputmode="decimal">
-                            </div>
-                            <div class="col-2 text-end pt-3">
-                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-lb-legext')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Leg Extensions (B)', 'sets-lb-legext')">Save</button>
-                    </div>
-                </div>
-
-                <!-- 2. Calf Raises -->
-                <div class="card p-3 mb-3">
-                    <h6 class="mb-1">2. Calf Raises</h6>
-                    <small class="text-muted mb-2 d-block">Target: Lower Leg (4 sets x 15 reps)</small>
-                    <div id="sets-lb-calves">
-                        <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Reps</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="15" inputmode="numeric">
-                            </div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 65" step="0.5" inputmode="decimal">
-                            </div>
-                            <div class="col-2 text-end pt-3">
-                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-lb-calves')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Calf Raises (B)', 'sets-lb-calves')">Save</button>
-                    </div>
-                </div>
-
-                <!-- 3. Planks / Hanging Leg Raises -->
-                <div class="card p-3 mb-3">
-                    <h6 class="mb-1">3. Planks / Hanging Leg Raises</h6>
-                    <small class="text-muted mb-2 d-block">Target: Abdominal Core (3 sets x 30–45s hold or 12–15 reps)</small>
-                    <div id="sets-lb-core">
-                        <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Reps / Secs</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="30-45" inputmode="numeric">
-                            </div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="0 or plate" step="0.5" inputmode="decimal">
-                            </div>
-                            <div class="col-2 text-end pt-3">
-                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-lb-core')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Planks / Leg Raises', 'sets-lb-core')">Save</button>
-                    </div>
-                </div>
-
-                <!-- 4. Bodyweight or DB Lunges / Step-Ups -->
-                <div class="card p-3 mb-3">
-                    <h6 class="mb-1">4. Bodyweight or DB Lunges / Step-Ups</h6>
-                    <small class="text-muted mb-2 d-block">Target: Unilateral Quads & Glutes (3 sets x 10 reps/leg)</small>
-                    <div id="sets-lb-lunges">
-                        <div class="row g-2 align-items-center mb-2 set-row">
-                            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set 1</span></div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Reps/Leg</span>
-                                <input type="number" class="form-control form-control-sm reps-input" placeholder="10" inputmode="numeric">
-                            </div>
-                            <div class="col-4">
-                                <span class="input-label d-block mb-1">Weight (lbs)</span>
-                                <input type="number" class="form-control form-control-sm weight-input" placeholder="e.g. 20" step="0.5" inputmode="decimal">
-                            </div>
-                            <div class="col-2 text-end pt-3">
-                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-sm btn-outline-secondary w-50" onclick="addSetRow('sets-lb-lunges')">+ Set</button>
-                        <button class="btn btn-sm btn-primary w-50" onclick="saveWorkoutSession('Lunges / Step-Ups', 'sets-lb-lunges')">Save</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 2. MASTER PLAN TAB -->
-        <div class="tab-pane fade" id="plan" role="tabpanel">
-            <div class="card p-3 mb-3 border-primary">
-                <h5 class="fw-bold text-primary mb-2">6-Month Master Plan Overview</h5>
-                <p class="small text-muted mb-3">Structured Upper/Lower split designed for age 44 (82 kg) to optimize muscle growth, body recomposition, and joint longevity.</p>
-
-                <div class="plan-badge mb-3">
-                    <h6 class="text-primary fw-bold mb-1">Phase Structure (24 Weeks)</h6>
-                    <ul class="small mb-0 ps-3">
-                        <li class="mb-1"><strong>Phase 1 (Weeks 1–8):</strong> Foundation & Structural Strength – Form mastery, tendon resilience, baseline consistency.</li>
-                        <li class="mb-1"><strong>Phase 2 (Weeks 9–16):</strong> Hypertrophy & Progression – Increased volume & intensity to drive muscle size and fat loss.</li>
-                        <li><strong>Phase 3 (Weeks 17–24):</strong> Peak Strength & Recomposition – Safely push main lifts to finalize visual transformation.</li>
-                    </ul>
-                </div>
-
-                <div class="plan-badge mb-3">
-                    <h6 class="text-primary fw-bold mb-1">Weekly Workout Schedule</h6>
-                    <ul class="small mb-0 list-unstyled">
-                        <li><strong>Mon:</strong> Upper Body A</li>
-                        <li><strong>Tue:</strong> Lower Body & Core A</li>
-                        <li><strong>Wed:</strong> Rest / Active Recovery (Light Treadmill / Cardio)</li>
-                        <li><strong>Thu:</strong> Upper Body B</li>
-                        <li><strong>Fri:</strong> Lower Body & Core B</li>
-                        <li><strong>Sat (Optional):</strong> Cardio, Core & Arms / Mobility</li>
-                        <li><strong>Sun:</strong> Rest</li>
-                    </ul>
-                </div>
-
-                <div class="plan-badge mb-3">
-                    <h6 class="text-primary fw-bold mb-1">Double Progression Rule</h6>
-                    <ol class="small mb-0 ps-3">
-                        <li>Choose rep range (e.g., 8–10 reps).</li>
-                        <li>Start with weight handled with strict form for 8 reps.</li>
-                        <li>Keep weight constant until completing target reps across all 3 sets.</li>
-                        <li>Increase weight by 2.5 to 5 lbs and reset to 8 reps.</li>
-                    </ol>
-                    <div class="mt-2 text-warning small fw-bold">Goal: Bench Press 75 lbs ➔ 115–125 lbs in 6 months.</div>
-                </div>
-
-                <div class="plan-badge">
-                    <h6 class="text-primary fw-bold mb-1">Nutrition & Macro Guidelines (82 kg)</h6>
-                    <ul class="small mb-0 ps-3">
-                        <li><strong>Protein Target:</strong> 135 g – 160 g daily (1.6–2.0 g/kg). Lean proteins: chicken breast, fish, eggs, Greek yogurt, whey.</li>
-                        <li><strong>Caloric Focus:</strong> Maintenance or slight 200–300 kcal deficit for body recomposition.</li>
-                        <li><strong>Recovery:</strong> 7–8 hours quality sleep for testosterone support and reduced joint inflammation.</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- 3. TRAINING DEMOS TAB -->
-        <div class="tab-pane fade" id="training" role="tabpanel">
-            <div class="btn-group w-100 mb-3" role="group">
-                <button type="button" class="btn btn-sm btn-outline-primary active" id="btn-demo-ua" onclick="showDemoSubTab('ua')">Upper A</button>
-                <button type="button" class="btn btn-sm btn-outline-primary" id="btn-demo-la" onclick="showDemoSubTab('la')">Lower A</button>
-                <button type="button" class="btn btn-sm btn-outline-primary" id="btn-demo-ub" onclick="showDemoSubTab('ub')">Upper B</button>
-                <button type="button" class="btn btn-sm btn-outline-primary" id="btn-demo-lb" onclick="showDemoSubTab('lb')">Lower B</button>
-            </div>
-
-            <!-- UPPER A DEMOS -->
-            <div id="demo-ua-list">
-                <div class="card p-3 mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">Barbell Bench Press</h6>
-                            <small class="text-muted">Compound Chest & Triceps</small>
-                        </div>
-                        <a href="https://www.youtube.com/watch?v=rT7DgCr-3pg" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
-                    </div>
-                </div>
-
-                <div class="card p-3 mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">Lat Pulldowns</h6>
-                            <small class="text-muted">Cable Back Width</small>
-                        </div>
-                        <a href="https://www.youtube.com/watch?v=CAwf7n6Luuc" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
-                    </div>
-                </div>
-
-                <div class="card p-3 mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">Dumbbell / Machine Overhead Press</h6>
-                            <small class="text-muted">Shoulders</small>
-                        </div>
-                        <a href="https://www.youtube.com/watch?v=qEwKCR5JCog" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
-                    </div>
-                </div>
-
-                <div class="card p-3 mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">Bicep Curls</h6>
-                            <small class="text-muted">Dumbbell or Cable</small>
-                        </div>
-                        <a href="https://www.youtube.com/watch?v=ykJmrZ5v0Oo" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- LOWER A DEMOS -->
-            <div id="demo-la-list" class="d-none">
-                <div class="card p-3 mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">Leg Extensions</h6>
-                            <small class="text-muted">Quad Isolation</small>
-                        </div>
-                        <a href="https://www.youtube.com/watch?v=YyvSfVjQeL0" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
-                    </div>
-                </div>
-
-                <div class="card p-3 mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">Standing / Seated Calf Raises</h6>
-                            <small class="text-muted">Ironax Bar / Machine</small>
-                        </div>
-                        <a href="https://www.youtube.com/watch?v=-M4-G8p8fmc" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
-                    </div>
-                </div>
-
-                <div class="card p-3 mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">Weighted / Decline Sit-Ups</h6>
-                            <small class="text-muted">Upper Abs & Core</small>
-                        </div>
-                        <a href="https://www.youtube.com/watch?v=1fbU_MkV7NE" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
-                    </div>
-                </div>
-
-                <div class="card p-3 mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">Romanian Deadlift / Goblet Squat</h6>
-                            <small class="text-muted">Hamstrings & Glutes</small>
-                        </div>
-                        <a href="https://www.youtube.com/watch?v=JCXUYuzwNrM" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- UPPER B DEMOS -->
-            <div id="demo-ub-list" class="d-none">
-                <div class="card p-3 mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">Incline DB Press / Machine Press</h6>
-                            <small class="text-muted">Upper Chest Focus</small>
-                        </div>
-                        <a href="https://www.youtube.com/watch?v=8iPEnn-ltC8" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
-                    </div>
-                </div>
-
-                <div class="card p-3 mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">Seated Cable Rows / DB Rows</h6>
-                            <small class="text-muted">Mid-Back Thickness</small>
-                        </div>
-                        <a href="https://www.youtube.com/watch?v=GZbfZ033f74" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
-                    </div>
-                </div>
-
-                <div class="card p-3 mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">Lateral Raises</h6>
-                            <small class="text-muted">Side Deltoid Isolation</small>
-                        </div>
-                        <a href="https://www.youtube.com/watch?v=3VcKaXpzqRo" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
-                    </div>
-                </div>
-
-                <div class="card p-3 mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">Tricep Pushdowns</h6>
-                            <small class="text-muted">Cable / Band</small>
-                        </div>
-                        <a href="https://www.youtube.com/watch?v=2-LAMcpzODU" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- LOWER B DEMOS -->
-            <div id="demo-lb-list" class="d-none">
-                <div class="card p-3 mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">Leg Extensions</h6>
-                            <small class="text-muted">Quads</small>
-                        </div>
-                        <a href="https://www.youtube.com/watch?v=YyvSfVjQeL0" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
-                    </div>
-                </div>
-
-                <div class="card p-3 mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">Planks / Hanging Leg Raises</h6>
-                            <small class="text-muted">Core & Abs</small>
-                        </div>
-                        <a href="https://www.youtube.com/watch?v=pSHjTRCQxIw" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
-                    </div>
-                </div>
-
-                <div class="card p-3 mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">Dumbbell Lunges / Step-Ups</h6>
-                            <small class="text-muted">Single-Leg Hypertrophy</small>
-                        </div>
-                        <a href="https://www.youtube.com/watch?v=D7KaRcUTQeE" target="_blank" class="btn btn-sm btn-danger video-btn">Watch Demo</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 4. JOURNAL TAB -->
-        <div class="tab-pane fade" id="journal" role="tabpanel">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="mb-0 text-uppercase fw-bold text-primary" style="letter-spacing: 0.5px;">Continuous History Log</h6>
-                <button class="btn btn-outline-warning btn-sm" onclick="exportBackup()">Export Backup</button>
-            </div>
-            
-            <div id="journal-logs-container">
-                <!-- Logged entries render dynamically -->
-            </div>
-        </div>
-
-        <!-- 5. TRENDS TAB -->
-        <div class="tab-pane fade" id="trends" role="tabpanel">
-            <div class="card p-3 mb-3">
-                <h6 class="fw-bold text-primary mb-2">Exercise Growth Trends</h6>
-                <p class="small text-muted mb-3">Select an exercise to plot your peak weight lifted over time.</p>
-                
-                <label for="exercise-select" class="input-label mb-1">Select Exercise</label>
-                <select id="exercise-select" class="form-select form-select-sm mb-3" onchange="updateTrendChart()">
-                    <!-- Dynamically populated from logged history -->
-                </select>
-
-                <div style="position: relative; height: 260px; width: 100%;">
-                    <canvas id="trendChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-    </div>
+<div class="timer" id="timer" role="status" aria-live="polite">
+  <div><div class="small" style="opacity:.75;font-weight:700">Rest time 😮‍💨</div><div class="t" id="timer-t">1:00</div></div>
+  <div style="flex:1"></div>
+  <button id="timer-add">+15s</button>
+  <button id="timer-skip">Skip ⏭</button>
 </div>
-
-<!-- Bootstrap 5 JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<div class="toast" id="toast"></div>
+<div id="layer"></div>
 
 <script>
-    let trendChartInstance = null;
+/* =========================================================
+   JAMS Fitness — single-file app. No build step, no server.
+   Data is stored on this device (localStorage).
+   ========================================================= */
 
-    // Set Default Date Picker to Today's Local Date
-    const todayIso = new Date().toISOString().split('T')[0];
-    document.getElementById('workout-date-picker').value = todayIso;
-    document.getElementById('current-date-badge').innerText = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+/* ---------- Levels ---------- */
+const LEVELS = {
+  beginner: {
+    name:'Beginner', emoji:'🌱', color:'#16a34a', rest:60,
+    tagline:'No equipment. Learn the moves.',
+    equipment:'Just you, a wall, a sturdy chair and a backpack',
+    who:['You are new to exercise, or coming back after a long break','You can do fewer than 6 push-ups','You want to work out at home','You are under 13 (always start here!)'],
+  },
+  intermediate: {
+    name:'Intermediate', emoji:'🔥', color:'#ea580c', rest:90,
+    tagline:'Dumbbells & machines. Build real strength.',
+    equipment:'Dumbbells, cable machines, a bench',
+    who:['You have exercised regularly for at least 2–3 months','You can do 6–20 push-ups with good form','You know how to use basic gym machines','You finished the Beginner plan and it feels easy'],
+  },
+  expert: {
+    name:'Expert', emoji:'🏆', color:'#7c3aed', rest:120,
+    tagline:'Barbells. Heavy lifts. Big goals.',
+    equipment:'Barbell, squat rack, pull-up bar, full gym',
+    who:['You have trained 3+ times a week for 6+ months','You can do 20+ push-ups and some pull-ups','You know how to squat, bench and deadlift safely','Adults only — or teens with a coach watching'],
+  },
+};
 
-    // Toggle Tracking Sub-Views
-    function showTrackingSubTab(type) {
-        document.getElementById('tracking-ua-list').classList.add('d-none');
-        document.getElementById('tracking-la-list').classList.add('d-none');
-        document.getElementById('tracking-ub-list').classList.add('d-none');
-        document.getElementById('tracking-lb-list').classList.add('d-none');
+/* ---------- Exercise library ---------- */
+const YT = id => 'https://www.youtube.com/watch?v=' + id;
+const YTS = q => 'https://www.youtube.com/results?search_query=' + encodeURIComponent('how to do ' + q + ' proper form');
 
-        document.getElementById('btn-track-ua').classList.remove('active');
-        document.getElementById('btn-track-la').classList.remove('active');
-        document.getElementById('btn-track-ub').classList.remove('active');
-        document.getElementById('btn-track-lb').classList.remove('active');
+const EX = {
+  // ---- Beginner (bodyweight) ----
+  knee_pushup:{name:'Knee Push-Ups',e:'🙌',m:['Chest','Arms'],steps:['Kneel on the floor and put your hands a little wider than your shoulders.','Keep your body straight from head to knees, like a plank.','Lower your chest towards the floor, then push back up.'],tip:'Too hard? Do them standing, pushing against a wall.'},
+  backpack_row:{name:'Backpack Rows',e:'🎒',m:['Back','Arms'],weight:true,steps:['Put a few books in a backpack. Hold it with both hands.','Bend forward at your hips with a flat back and soft knees.','Pull the bag up to your belly button, squeeze your back, then lower it slowly.'],tip:'Keep your back flat like a table — no rounding.'},
+  shoulder_tap:{name:'Plank Shoulder Taps',e:'👋',m:['Shoulders','Core'],per:'each side',steps:['Get into a push-up position with straight arms.','Lift one hand and tap the opposite shoulder.','Put it back and switch. Try not to rock your hips.'],tip:'Spread your feet wider to make it easier.'},
+  plank:{name:'Plank',e:'🧱',m:['Core'],time:true,steps:['Rest on your forearms and toes.','Make a straight line from head to heels.','Squeeze your tummy and breathe. Hold!'],tip:'Hips sagging? Drop to your knees and keep going.',video:YT('pSHjTRCQxIw')},
+  squat:{name:'Bodyweight Squats',e:'🪑',m:['Legs','Glutes'],steps:['Stand with feet shoulder-width apart.','Sit back like you are sitting on a chair. Keep your chest up.','Go down until thighs are about level with the floor, then stand up.'],tip:'Use a real chair behind you until you feel confident.'},
+  glute_bridge:{name:'Glute Bridges',e:'🌉',m:['Glutes','Hamstrings'],steps:['Lie on your back, knees bent, feet flat on the floor.','Push through your heels and lift your hips up high.','Squeeze your bottom at the top, then lower slowly.'],tip:'Hold the top for 2 seconds to make it harder.'},
+  calf_raise_bw:{name:'Calf Raises',e:'🦶',m:['Calves'],steps:['Stand tall and hold a wall for balance.','Rise up onto your tiptoes as high as you can.','Lower your heels slowly back down.'],tip:'Stand on a step and let your heels drop below it to work harder.',video:YT('-M4-G8p8fmc')},
+  dead_bug:{name:'Dead Bug',e:'🐞',m:['Core'],per:'each side',steps:['Lie on your back with arms pointing to the ceiling and knees bent up.','Slowly stretch one arm back and the opposite leg out.','Bring them back and switch sides. Keep your lower back on the floor.'],tip:'Slow is better. Breathe out as you stretch.'},
+  incline_pushup:{name:'Incline Push-Ups',e:'📐',m:['Chest','Arms'],steps:['Put your hands on a bench, sturdy table or stairs.','Walk your feet back until your body is straight.','Lower your chest to the edge, then push away.'],tip:'The lower the surface, the harder it is.'},
+  backpack_curl:{name:'Backpack Curls',e:'💪',m:['Biceps'],weight:true,steps:['Hold a backpack by the handle (or two water bottles).','Keep elbows tucked at your sides.','Curl it up to your shoulders, then lower slowly.'],tip:'No swinging! Keep your body still.'},
+  chair_dip:{name:'Chair Dips',e:'🪑',m:['Triceps'],steps:['Sit on the edge of a sturdy chair that will not slide. Hands next to your hips.','Slide your bottom off the chair, knees bent.','Bend your elbows to lower a little, then push back up.'],tip:'Only go down a little at first. Keep shoulders away from your ears.'},
+  bird_dog:{name:'Bird Dog',e:'🐕',m:['Core','Back'],per:'each side',steps:['Start on hands and knees.','Reach one arm forward and the opposite leg back.','Hold for 2 seconds, come back, switch.'],tip:'Pretend there is a cup of water on your back — do not spill it!'},
+  reverse_lunge:{name:'Reverse Lunges',e:'🦵',m:['Legs','Glutes'],per:'each leg',steps:['Stand tall with feet together.','Step one foot back and bend both knees.','Push through your front foot to stand back up. Switch legs.'],tip:'Hold a wall or chair for balance.'},
+  wall_sit:{name:'Wall Sit',e:'🧍',m:['Legs'],time:true,steps:['Lean your back flat against a wall.','Slide down until your knees are bent like a chair.','Hold it there. Keep breathing!'],tip:'Not as low? That is fine — go only as low as feels OK.'},
+  step_up:{name:'Step-Ups',e:'🪜',m:['Legs','Glutes'],per:'each leg',steps:['Stand in front of a low, sturdy step or the bottom stair.','Step up with one foot and stand tall on top.','Step down slowly. Do all reps, then switch legs.'],tip:'Push through the heel of the foot that is on the step.',video:YT('D7KaRcUTQeE')},
+  side_plank:{name:'Side Plank',e:'📏',m:['Core'],time:true,per:'each side',steps:['Lie on your side, propped up on your forearm.','Lift your hips so your body is straight.','Hold, then switch sides.'],tip:'Bend your bottom knee on the floor to make it easier.'},
 
-        if (type === 'ua') {
-            document.getElementById('tracking-ua-list').classList.remove('d-none');
-            document.getElementById('btn-track-ua').classList.add('active');
-        } else if (type === 'la') {
-            document.getElementById('tracking-la-list').classList.remove('d-none');
-            document.getElementById('btn-track-la').classList.add('active');
-        } else if (type === 'ub') {
-            document.getElementById('tracking-ub-list').classList.remove('d-none');
-            document.getElementById('btn-track-ub').classList.add('active');
-        } else if (type === 'lb') {
-            document.getElementById('tracking-lb-list').classList.remove('d-none');
-            document.getElementById('btn-track-lb').classList.add('active');
-        }
-    }
+  // ---- Intermediate (dumbbells & machines) ----
+  pushup:{name:'Push-Ups',e:'🙌',m:['Chest','Arms','Core'],steps:['Hands a little wider than your shoulders, body straight.','Lower your chest until it nearly touches the floor.','Push back up. Elbows point slightly back, not straight out.'],tip:'Can do 20 easily? Put your feet on a bench.'},
+  lat_pulldown:{name:'Lat Pulldowns',e:'⬇️',m:['Back','Biceps'],weight:true,start:'60 lbs',steps:['Sit at the machine with thighs under the pad. Grab the bar wide.','Lean back a little and pull the bar to your upper chest.','Squeeze your shoulder blades, then let the bar rise slowly.'],tip:'Pull with your elbows, not your hands.',video:YT('CAwf7n6Luuc')},
+  db_press:{name:'Dumbbell Shoulder Press',e:'🏋️',m:['Shoulders','Triceps'],weight:true,start:'15 lbs each',steps:['Sit tall on a bench with back support. Dumbbells at shoulder height.','Press them up until arms are straight.','Lower slowly back to your shoulders.'],tip:'Do not arch your lower back — squeeze your tummy.',video:YT('qEwKCR5JCog')},
+  db_curl:{name:'Bicep Curls',e:'💪',m:['Biceps'],weight:true,start:'15 lbs each',steps:['Stand tall holding dumbbells, palms facing forward.','Curl the weights up, keeping elbows by your sides.','Lower slowly — count to 3 on the way down.'],tip:'If you have to swing, the weight is too heavy.',video:YT('ykJmrZ5v0Oo')},
+  goblet_squat:{name:'Goblet Squats',e:'🏆',m:['Legs','Glutes','Core'],weight:true,start:'20 lbs',steps:['Hold one dumbbell at your chest with both hands.','Squat down between your knees, keeping your chest tall.','Drive up through your whole foot.'],tip:'Elbows go inside your knees at the bottom.'},
+  db_rdl:{name:'Dumbbell Romanian Deadlift',e:'🙇',m:['Hamstrings','Glutes','Back'],weight:true,start:'20 lbs each',steps:['Stand holding dumbbells in front of your thighs.','Push your hips back, sliding the weights down your legs. Back stays flat.','Stop when you feel a stretch behind your legs, then stand up.'],tip:'Think "hips back", not "bend down".',video:YT('JCXUYuzwNrM')},
+  leg_extension:{name:'Leg Extensions',e:'🦿',m:['Quads'],weight:true,start:'60 lbs',steps:['Sit in the machine with the pad on your lower shins.','Straighten your legs fully and squeeze.','Lower slowly.'],tip:'Hold the handles and keep your bottom on the seat.',video:YT('YyvSfVjQeL0')},
+  incline_db_press:{name:'Incline Dumbbell Press',e:'📐',m:['Upper Chest','Shoulders'],weight:true,start:'20 lbs each',steps:['Set a bench at a low incline. Lie back with dumbbells at chest level.','Press them up over your chest.','Lower slowly until your elbows are just below the bench.'],tip:'Keep your feet flat on the floor.',video:YT('8iPEnn-ltC8')},
+  cable_row:{name:'Seated Cable Rows',e:'🚣',m:['Back','Biceps'],weight:true,start:'60 lbs',steps:['Sit tall, feet on the platform, knees slightly bent.','Pull the handle to your belly, squeezing your shoulder blades.','Let it go forward slowly without rounding your back.'],tip:'Chest up, shoulders down.',video:YT('GZbfZ033f74')},
+  lateral_raise:{name:'Lateral Raises',e:'🕊️',m:['Shoulders'],weight:true,start:'10 lbs each',steps:['Stand holding light dumbbells at your sides.','Raise your arms out to the sides up to shoulder height.','Lower slowly.'],tip:'Go light! Lead with your elbows like you are pouring water.',video:YT('3VcKaXpzqRo')},
+  tricep_pushdown:{name:'Tricep Pushdowns',e:'⏬',m:['Triceps'],weight:true,start:'35 lbs',steps:['Stand at a cable machine holding the bar or rope.','Keep elbows pinned to your sides.','Push down until arms are straight, then let it rise slowly.'],tip:'Only your forearms should move.',video:YT('2-LAMcpzODU')},
+  db_lunge:{name:'Dumbbell Lunges',e:'🚶',m:['Legs','Glutes'],weight:true,per:'each leg',start:'15 lbs each',steps:['Hold dumbbells at your sides.','Step forward and lower until both knees are bent about 90°.','Push back up and switch legs.'],tip:'Keep your front knee over your foot, not caving in.',video:YT('D7KaRcUTQeE')},
+  leg_press:{name:'Leg Press',e:'🦵',m:['Legs','Glutes'],weight:true,start:'90 lbs',steps:['Sit in the machine with feet shoulder-width on the platform.','Unlock and lower the platform until knees are bent about 90°.','Press back up without locking your knees.'],tip:'Keep your lower back pressed into the seat.'},
+  calf_raise:{name:'Calf Raises',e:'🦶',m:['Calves'],weight:true,start:'65 lbs',steps:['Stand on the machine or a step holding weight.','Rise up onto your toes as high as you can.','Lower your heels below the step for a stretch.'],tip:'Pause at the top for one second.',video:YT('-M4-G8p8fmc')},
+  knee_raise:{name:'Hanging Knee Raises',e:'🧗',m:['Core'],steps:['Hang from a bar (or use the captain\'s chair).','Bring your knees up towards your chest.','Lower slowly without swinging.'],tip:'Can\'t hang yet? Do lying knee tucks on the floor.'},
 
-    // Toggle Training Demo Views
-    function showDemoSubTab(type) {
-        document.getElementById('demo-ua-list').classList.add('d-none');
-        document.getElementById('demo-la-list').classList.add('d-none');
-        document.getElementById('demo-ub-list').classList.add('d-none');
-        document.getElementById('demo-lb-list').classList.add('d-none');
+  // ---- Expert (barbell) ----
+  bench_press:{name:'Bench Press (Barbell)',e:'🏋️',m:['Chest','Triceps','Shoulders'],weight:true,start:'75 lbs',steps:['Lie on the bench, eyes under the bar, feet flat.','Grip slightly wider than shoulders, unrack and lower to mid-chest.','Press up and slightly back over your shoulders.'],tip:'Always use a spotter or safety pins when going heavy.',video:YT('rT7DgCr-3pg')},
+  pullup:{name:'Pull-Ups',e:'🧗',m:['Back','Biceps'],steps:['Hang from the bar, hands a bit wider than shoulders.','Pull your chest up towards the bar.','Lower all the way down under control.'],tip:'Can\'t do many yet? Use a band or the assisted machine.'},
+  ohp:{name:'Overhead Press (Barbell)',e:'🙆',m:['Shoulders','Triceps','Core'],weight:true,start:'55 lbs',steps:['Stand with the bar on your front shoulders, hands just outside them.','Squeeze your glutes and press the bar straight overhead.','Move your head through once the bar passes your face. Lower to shoulders.'],tip:'Tight tummy, tight glutes — no leaning back.'},
+  barbell_curl:{name:'Barbell Curls',e:'💪',m:['Biceps'],weight:true,start:'45 lbs',steps:['Stand holding the bar with palms up, shoulder-width.','Curl to your chest with elbows still.','Lower slowly.'],tip:'Use an EZ bar if your wrists feel strained.'},
+  back_squat:{name:'Back Squat (Barbell)',e:'🦍',m:['Legs','Glutes','Core'],weight:true,start:'95 lbs',steps:['Set the bar on your upper back in a rack. Step back, feet shoulder-width.','Brace your core and sit down between your heels until thighs are parallel.','Drive up, keeping your chest tall.'],tip:'Always set the safety bars in the rack.'},
+  rdl:{name:'Romanian Deadlift (Barbell)',e:'🙇',m:['Hamstrings','Glutes','Back'],weight:true,start:'95 lbs',steps:['Hold the bar at hip height, soft knees.','Push hips back, bar sliding down your thighs.','Stop at mid-shin or when your back wants to round; stand up.'],tip:'Bar stays touching your legs the whole time.',video:YT('JCXUYuzwNrM')},
+  decline_situp:{name:'Weighted Decline Sit-Ups',e:'🔻',m:['Abs'],weight:true,start:'10 lbs plate',steps:['Hook feet on a decline bench, hold a plate at your chest.','Curl up until your chest is near your knees.','Lower slowly.'],tip:'Curl your spine — don\'t just yank with your hips.',video:YT('1fbU_MkV7NE')},
+  incline_bench:{name:'Incline Bench Press (Barbell)',e:'📐',m:['Upper Chest','Shoulders'],weight:true,start:'65 lbs',steps:['Set the bench at about 30°. Unrack the bar.','Lower to your upper chest.','Press up over your chin.'],tip:'Use a spotter or safety arms.',video:YT('8iPEnn-ltC8')},
+  barbell_row:{name:'Barbell Rows',e:'🚣',m:['Back','Biceps'],weight:true,start:'75 lbs',steps:['Hinge forward with a flat back, bar hanging at knee level.','Pull the bar to your lower ribs.','Lower under control.'],tip:'Torso stays still — no jerking up.'},
+  dips:{name:'Parallel Bar Dips',e:'🤸',m:['Chest','Triceps'],steps:['Hold the bars with straight arms.','Lean slightly forward and lower until shoulders are just below elbows.','Press back up.'],tip:'Use the assisted machine if needed. Stop if shoulders hurt.'},
+  deadlift:{name:'Deadlift (Barbell)',e:'⚡',m:['Whole back side','Legs','Grip'],weight:true,start:'135 lbs',steps:['Feet under the bar, grip just outside your legs.','Chest up, back flat, pull the slack out of the bar.','Push the floor away and stand tall. Lower with control.'],tip:'Form first! Film yourself or ask a coach to check.'},
+  bulgarian:{name:'Bulgarian Split Squats',e:'🦩',m:['Legs','Glutes'],weight:true,per:'each leg',start:'20 lbs each',steps:['Stand in front of a bench, put one foot behind you on it.','Lower straight down until your front thigh is parallel.','Drive up through your front heel.'],tip:'Hold a wall for balance at first.'},
+  leg_raise:{name:'Hanging Leg Raises',e:'🧗',m:['Core'],steps:['Hang from a bar with straight arms.','Lift straight legs up to hip height or higher.','Lower slowly without swinging.'],tip:'Bend your knees if straight legs are too hard.',video:YT('pSHjTRCQxIw')},
+  ab_wheel:{name:'Ab Wheel Rollouts',e:'🛞',m:['Core'],steps:['Kneel holding an ab wheel under your shoulders.','Roll forward slowly, keeping your back flat.','Pull back with your abs.'],tip:'Only roll as far as you can without your back sagging.'},
+};
 
-        document.getElementById('btn-demo-ua').classList.remove('active');
-        document.getElementById('btn-demo-la').classList.remove('active');
-        document.getElementById('btn-demo-ub').classList.remove('active');
-        document.getElementById('btn-demo-lb').classList.remove('active');
+/* ---------- Plans: [exerciseId, sets, repsLow, repsHigh] ---------- */
+const WORKOUTS = {
+  ua:{name:'Upper Body A', sub:'Push & Pull', e:'💪'},
+  la:{name:'Lower Body A', sub:'Legs & Core', e:'🦵'},
+  ub:{name:'Upper Body B', sub:'Chest, Back & Arms', e:'🏋️'},
+  lb:{name:'Lower Body B', sub:'Legs & Balance', e:'⚡'},
+};
+const PLANS = {
+  beginner:{
+    ua:[['knee_pushup',3,6,10],['backpack_row',3,10,12],['shoulder_tap',3,6,10],['plank',3,15,30]],
+    la:[['squat',3,10,15],['glute_bridge',3,10,15],['calf_raise_bw',3,12,20],['dead_bug',3,6,10]],
+    ub:[['incline_pushup',3,8,12],['backpack_curl',3,10,15],['chair_dip',3,6,10],['bird_dog',3,6,10]],
+    lb:[['reverse_lunge',3,6,10],['wall_sit',3,15,30],['step_up',3,8,12],['side_plank',3,10,20]],
+  },
+  intermediate:{
+    ua:[['pushup',3,8,15],['lat_pulldown',3,10,12],['db_press',3,10,12],['db_curl',3,10,12]],
+    la:[['goblet_squat',3,10,12],['db_rdl',3,10,12],['leg_extension',3,12,15],['plank',3,30,45]],
+    ub:[['incline_db_press',3,10,12],['cable_row',3,10,12],['lateral_raise',3,12,15],['tricep_pushdown',3,12,15]],
+    lb:[['db_lunge',3,8,10],['leg_press',3,10,12],['calf_raise',4,12,15],['knee_raise',3,10,15]],
+  },
+  expert:{
+    ua:[['bench_press',4,6,8],['pullup',4,5,10],['ohp',3,6,8],['barbell_curl',3,8,10]],
+    la:[['back_squat',4,5,8],['rdl',3,8,10],['decline_situp',3,12,15],['calf_raise',4,12,15]],
+    ub:[['incline_bench',4,8,10],['barbell_row',4,8,10],['dips',3,8,12],['lateral_raise',3,12,15]],
+    lb:[['deadlift',3,3,5],['bulgarian',3,8,10],['leg_raise',3,10,15],['ab_wheel',3,8,12]],
+  },
+};
+// Sun..Sat
+const SCHEDULE = [
+  {k:'rest',  label:'Rest day', e:'😴', note:'Muscles grow when you rest. Sleep well and have fun!'},
+  {k:'ua'}, {k:'la'},
+  {k:'active',label:'Active rest', e:'🚶', note:'Go for a 20–30 minute walk, bike ride or play outside.'},
+  {k:'ub'}, {k:'lb'},
+  {k:'bonus', label:'Bonus day', e:'⭐', note:'Optional: play a sport, stretch, or repeat a workout you missed.'},
+];
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
-        if (type === 'ua') {
-            document.getElementById('demo-ua-list').classList.remove('d-none');
-            document.getElementById('btn-demo-ua').classList.add('active');
-        } else if (type === 'la') {
-            document.getElementById('demo-la-list').classList.remove('d-none');
-            document.getElementById('btn-demo-la').classList.add('active');
-        } else if (type === 'ub') {
-            document.getElementById('demo-ub-list').classList.remove('d-none');
-            document.getElementById('btn-demo-ub').classList.add('active');
-        } else if (type === 'lb') {
-            document.getElementById('demo-lb-list').classList.remove('d-none');
-            document.getElementById('btn-demo-lb').classList.add('active');
-        }
-    }
+/* ---------- Level quiz ---------- */
+const QUIZ = [
+  {q:'How often do you exercise right now?', a:[['🛋️','Hardly ever',0],['🚲','1–2 times a week',1],['🏃','3+ times a week, for 6+ months',2]]},
+  {q:'How many push-ups can you do in a row (good form)?', a:[['🤏','0–5',0],['✋','6–20',1],['🙌','More than 20',2]]},
+  {q:'Have you used gym weights before?', a:[['🤷','Never',0],['🏋️','Yes — dumbbells & machines',1],['🦍','Yes — barbell squat, bench & deadlift',2]]},
+  {q:'How long can you hold a plank?', a:[['⏱️','Less than 20 seconds',0],['⏲️','20–60 seconds',1],['🕰️','Over a minute',2]]},
+  {q:'How old are you?', note:'Only used to pick a safe level. It is not saved.', a:[['🧒','Under 13',0],['🧑','13–17',1],['🧔','18 or older',2]], age:true},
+];
 
-    // Dynamic Set Row Adder
-    function addSetRow(containerId) {
-        const container = document.getElementById(containerId);
-        const setNum = container.querySelectorAll('.set-row').length + 1;
-        
-        const row = document.createElement('div');
-        row.className = 'row g-2 align-items-center mb-2 set-row';
-        row.innerHTML = `
-            <div class="col-2 text-start"><span class="small text-muted fw-bold set-num-label">Set ${setNum}</span></div>
-            <div class="col-4">
-                <span class="input-label d-block mb-1">Reps</span>
-                <input type="number" class="form-control form-control-sm reps-input" placeholder="Reps" inputmode="numeric">
-            </div>
-            <div class="col-4">
-                <span class="input-label d-block mb-1">Weight (lbs)</span>
-                <input type="number" class="form-control form-control-sm weight-input" placeholder="lbs" step="0.5" inputmode="decimal">
-            </div>
-            <div class="col-2 text-end pt-3">
-                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSetRow(this)">×</button>
-            </div>
-        `;
-        container.appendChild(row);
-    }
+/* ---------- Storage ---------- */
+const store = {
+  get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},
+  del(k){try{localStorage.removeItem(k)}catch(e){}},
+};
+const JOURNAL_KEY='workout_journal'; // same key as the original app, so old history is kept
+let profile = Object.assign({name:'',level:null,unit:'lbs',rest:'auto'}, store.get('jams_profile',{}));
+const saveProfile=()=>store.set('jams_profile',profile);
+const getJournal=()=>{const j=store.get(JOURNAL_KEY,{});return (j&&typeof j==='object'&&!Array.isArray(j))?j:{}};
+const setJournal=j=>store.set(JOURNAL_KEY,j);
 
-    // Remove Set Row
-    function removeSetRow(buttonEl) {
-        const row = buttonEl.closest('.set-row');
-        const container = row.parentElement;
-        
-        if (container.querySelectorAll('.set-row').length > 1) {
-            row.remove();
-            container.querySelectorAll('.set-row').forEach((r, idx) => {
-                const label = r.querySelector('.set-num-label');
-                if (label) label.innerText = `Set ${idx + 1}`;
-            });
-        } else {
-            row.querySelector('.reps-input').value = '';
-            row.querySelector('.weight-input').value = '';
-        }
-    }
+/* ---------- Helpers ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const isoLocal=(d=new Date())=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; // local date, not UTC
+const parseIso=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const niceDate=s=>parseIso(s).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+const lvl=()=>LEVELS[profile.level]||LEVELS.beginner;
+const restSecs=()=>profile.rest==='auto'?lvl().rest:Number(profile.rest);
+const repsText=(p,ex)=>{const r=p[2]===p[3]?p[2]:`${p[2]}–${p[3]}`;return `${p[1]} sets × ${r} ${ex.time?'sec':'reps'}${ex.per?' '+ex.per:''}`};
+const toUnit=(w,from)=>{from=from||'lbs';if(from===profile.unit)return w;return profile.unit==='kg'?w/2.2046:w*2.2046};
+const round1=n=>Math.round(n*10)/10;
+const hello=()=>{const h=new Date().getHours();return h<12?'Good morning':h<17?'Good afternoon':'Good evening'};
 
-    // Save Workout Session to LocalStorage
-    function saveWorkoutSession(exerciseName, containerId) {
-        const container = document.getElementById(containerId);
-        const setRows = container.querySelectorAll('.set-row');
-        const setsData = [];
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),2200)}
+function confirmBox(title,body,okText,onOk,danger){
+  $('#layer').innerHTML=`<div class="overlay" id="ov"><div class="sheet stack"><h2>${title}</h2><p class="muted">${body}</p>
+  <button class="btn ${danger?'danger':''}" id="ok">${okText}</button><button class="btn ghost" id="cancel">Cancel</button></div></div>`;
+  const close=()=>$('#layer').innerHTML='';
+  $('#cancel').onclick=close;$('#ov').onclick=e=>{if(e.target.id==='ov')close()};
+  $('#ok').onclick=()=>{close();onOk()};
+}
 
-        setRows.forEach(row => {
-            const reps = parseInt(row.querySelector('.reps-input').value) || 0;
-            const weight = parseFloat(row.querySelector('.weight-input').value) || 0;
-            if (reps > 0 || weight > 0) {
-                setsData.push({ reps, weight });
-            }
-        });
+/* last logged session for an exercise name */
+function lastSession(name){
+  const j=getJournal();const dates=Object.keys(j).sort().reverse();
+  for(const d of dates){const list=(j[d]||[]).filter(e=>e.exercise===name);if(list.length)return list[list.length-1]}
+  return null;
+}
+function workoutDates(){const j=getJournal();return Object.keys(j).filter(d=>(j[d]||[]).length).sort()}
+function weekStart(d){const x=new Date(d);const off=(x.getDay()+6)%7;x.setDate(x.getDate()-off);x.setHours(0,0,0,0);return x}
+function weekStreak(){
+  const weeks=new Set(workoutDates().map(d=>isoLocal(weekStart(parseIso(d)))));
+  let w=weekStart(new Date()),n=0;
+  if(!weeks.has(isoLocal(w)))w.setDate(w.getDate()-7);
+  while(weeks.has(isoLocal(w))){n++;w.setDate(w.getDate()-7)}
+  return n;
+}
 
-        if (setsData.length === 0) {
-            alert('Please enter reps or weight for at least one set.');
-            return;
-        }
+/* ---------- Router ---------- */
+let route='today', routeArg=null;
+function go(r,arg){route=r;routeArg=arg;render();window.scrollTo(0,0)}
+document.getElementById('tabbar').addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)go(b.dataset.go)});
 
-        const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
-        const selectedDate = document.getElementById('workout-date-picker').value || todayIso;
+function render(){
+  document.body.dataset.level=profile.level||'beginner';
+  const onb=!profile.level||route==='onboard';
+  $('#tabbar').classList.toggle('hide',onb||route==='workout');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.go===route));
+  if(route!=='workout')hideTimer();
+  const v=$('#view');
+  if(onb) return renderOnboard(v);
+  ({today:renderToday,workout:renderWorkout,library:renderLibrary,progress:renderProgress,me:renderMe}[route]||renderToday)(v);
+}
+const logo=()=>`<div class="logo"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="var(--lvl)"/><path d="M14 27h6v10h-6zM44 27h6v10h-6zM20 23h5v18h-5zM39 23h5v18h-5zM25 30h14v4H25z" fill="#fff"/></svg>JAMS FITNESS</div>`;
+const topbar=(right='')=>`<div class="topbar">${logo()}${right}</div>`;
+const levelPill=()=>`<button class="pill" data-go-me>${lvl().emoji} ${lvl().name}</button>`;
+document.addEventListener('click',e=>{if(e.target.closest('[data-go-me]'))go('me')});
 
-        if (!journal[selectedDate]) {
-            journal[selectedDate] = [];
-        }
+/* ---------- Onboarding ---------- */
+let ob={step:0,answers:[],name:''};
+function renderOnboard(v){
+  const s=ob.step;
+  if(s===0){
+    v.innerHTML=`${topbar()}
+    <div class="stack-lg" style="padding-top:20px">
+      <div class="center"><div style="font-size:72px">🏋️‍♀️</div><h1 style="margin-top:10px">Get stronger,<br>one step at a time</h1>
+      <p class="muted" style="margin-top:10px">Easy-to-follow workouts for <b>Beginner</b>, <b>Intermediate</b> and <b>Expert</b>. We'll help you pick the right one.</p></div>
+      <div class="stack">
+        <div class="card row"><span class="big-emoji">🧭</span><div><b>Find your level</b><p class="muted small">5 quick questions</p></div></div>
+        <div class="card row"><span class="big-emoji">✅</span><div><b>Follow the plan</b><p class="muted small">Tap ✓ after each set — we time your rest</p></div></div>
+        <div class="card row"><span class="big-emoji">📈</span><div><b>Watch yourself improve</b><p class="muted small">We tell you when to make it harder</p></div></div>
+      </div>
+      <button class="btn" id="start">Let's go! 🚀</button>
+      <button class="btn ghost" id="pick">I already know my level</button>
+    </div>`;
+    $('#start').onclick=()=>{ob.step=1;render()};
+    $('#pick').onclick=()=>{ob.step=99;render()};
+    return;
+  }
+  if(s===1){
+    v.innerHTML=`${topbar()}<div class="stack-lg" style="padding-top:20px">
+      <div><h1>What should we call you? 👋</h1><p class="muted" style="margin-top:8px">A first name or nickname is perfect. You can skip this.</p></div>
+      <input class="txt" id="nm" maxlength="24" placeholder="Your name" value="${esc(ob.name||profile.name)}" autocomplete="given-name">
+      <button class="btn" id="next">Next</button><button class="link" id="skip" style="width:100%">Skip</button></div>`;
+    const next=()=>{ob.name=$('#nm').value.trim();ob.step=2;ob.answers=[];render()};
+    $('#next').onclick=next;$('#skip').onclick=()=>{ob.step=2;ob.answers=[];render()};
+    $('#nm').onkeydown=e=>{if(e.key==='Enter')next()};
+    return;
+  }
+  if(s>=2&&s<2+QUIZ.length){
+    const i=s-2,Q=QUIZ[i];
+    v.innerHTML=`${topbar(`<button class="link" id="back">← Back</button>`)}
+    <div class="stack-lg">
+      <div class="dots">${QUIZ.map((_,k)=>`<i class="${k<=i?'on':''}"></i>`).join('')}</div>
+      <div><p class="muted small" style="font-weight:700">QUESTION ${i+1} OF ${QUIZ.length}</p><h1 style="margin-top:6px">${Q.q}</h1>${Q.note?`<p class="muted small" style="margin-top:8px">${Q.note}</p>`:''}</div>
+      <div class="stack">${Q.a.map((a,k)=>`<button class="opt ${ob.answers[i]===k?'sel':''}" data-k="${k}"><span class="e">${a[0]}</span>${a[1]}</button>`).join('')}</div>
+    </div>`;
+    v.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ob.answers[i]=+b.dataset.k;b.classList.add('sel');setTimeout(()=>{ob.step++;render()},180)});
+    $('#back').onclick=()=>{ob.step--;render()};
+    return;
+  }
+  if(s===2+QUIZ.length){
+    const {level,reason}=scoreQuiz();
+    const L=LEVELS[level];
+    v.innerHTML=`${topbar()}<div class="stack-lg" style="padding-top:10px">
+      <div class="center"><div style="font-size:64px">${L.emoji}</div><p class="muted" style="font-weight:700;margin-top:6px">WE RECOMMEND</p><h1 style="color:${L.color};font-size:36px">${L.name}</h1>
+      <p class="muted" style="margin-top:8px">${reason}</p></div>
+      ${levelCard(level,true)}
+      <button class="btn" style="background:${L.color}" id="ok">Start ${L.name} ${L.emoji}</button>
+      <button class="btn ghost" id="other">Choose a different level</button></div>`;
+    $('#ok').onclick=()=>finishOnboard(level);
+    $('#other').onclick=()=>{ob.rec=level;ob.step=99;render()};
+    return;
+  }
+  // s===99 manual picker
+  v.innerHTML=`${topbar(`<button class="link" id="back">← Back</button>`)}<div class="stack-lg">
+    <div><h1>Pick your level</h1><p class="muted" style="margin-top:8px">Not sure? Choose <b>Beginner</b> — you can move up anytime.</p></div>
+    <div class="stack">${Object.keys(LEVELS).map(k=>`<button class="lvl" data-l="${k}" style="--c:${LEVELS[k].color}">${levelInner(k)}${ob.rec===k?'<p class="small" style="margin-top:8px;font-weight:700;color:var(--c)">⭐ Recommended for you</p>':''}</button>`).join('')}</div></div>`;
+  v.querySelectorAll('.lvl').forEach(b=>b.onclick=()=>finishOnboard(b.dataset.l));
+  $('#back').onclick=()=>{ob.step=ob.rec?2+QUIZ.length:0;render()};
+}
+function scoreQuiz(){
+  const a=ob.answers;const score=[0,1,2,3].reduce((s,i)=>s+(QUIZ[i].a[a[i]]?.[2]||0),0);
+  let level=score<=2?'beginner':score<=5?'intermediate':'expert';
+  let reason=level==='beginner'?'Perfect place to learn great form and build a strong base.':level==='intermediate'?'You have a good base. Time to add dumbbells and machines.':'You are experienced. Barbells and bigger lifts are next.';
+  const age=a[4];
+  if(age===0&&level!=='beginner'){level='beginner';reason='Under 13? Bodyweight training is the safest and best way to get strong. Ask an adult to help you check your form.'}
+  else if(age===1&&level==='expert'){level='intermediate';reason='You are strong! Under 18, stick with dumbbells and machines unless a coach is watching your barbell lifts.'}
+  else if(age===1)reason+=' Train with an adult or coach nearby when using weights.';
+  return {level,reason};
+}
+function levelInner(k){const L=LEVELS[k];return `<div class="t"><span style="font-size:28px">${L.emoji}</span>${L.name}</div>
+  <p style="margin-top:4px;font-weight:600">${L.tagline}</p><p class="muted small" style="margin-top:2px">🧰 ${L.equipment}</p>
+  <p class="small" style="margin-top:10px;font-weight:700">Choose this if:</p><ul>${L.who.map(w=>`<li>${w}</li>`).join('')}</ul>`}
+function levelCard(k,sel){return `<div class="lvl ${sel?'sel':''}" style="--c:${LEVELS[k].color}">${levelInner(k)}</div>`}
+function finishOnboard(level){
+  if(ob.name)profile.name=ob.name;
+  profile.level=level;saveProfile();ob={step:0,answers:[],name:''};
+  go('today');toast(`${LEVELS[level].emoji} You're on ${LEVELS[level].name}. Let's do this!`);
+}
 
-        journal[selectedDate].push({
-            id: Date.now(),
-            exercise: exerciseName,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            sets: setsData
-        });
+/* ---------- Today ---------- */
+function renderToday(v){
+  const now=new Date(),dow=now.getDay(),sched=SCHEDULE[dow];
+  const doneDates=new Set(workoutDates());
+  const ws=weekStart(now);
+  const strip=[1,2,3,4,5,6,0].map((d,i)=>{const dt=new Date(ws);dt.setDate(ws.getDate()+i);const s=SCHEDULE[d];
+    const e=s.k in WORKOUTS?WORKOUTS[s.k].e:s.e;
+    return `<div class="day ${d===dow?'today':''} ${doneDates.has(isoLocal(dt))?'done':''}"><b>${DAYS[d]}</b>${dt.getDate()}<span class="e">${e}</span></div>`}).join('');
+  const active=store.get('jams_active',null);
+  const isWork=sched.k in WORKOUTS;
+  const doneToday=doneDates.has(isoLocal());
+  let heroHtml;
+  if(active&&active.level===profile.level){
+    const W=WORKOUTS[active.key];
+    heroHtml=`<div class="card hero stack"><p class="muted" style="font-weight:700">⏸️ WORKOUT IN PROGRESS</p><h2>${W.e} ${W.name}</h2><button class="btn" data-start="${active.key}">Continue workout</button></div>`;
+  }else if(isWork){
+    const W=WORKOUTS[sched.k],plan=PLANS[profile.level][sched.k];
+    const mins=Math.round(plan.reduce((s,p)=>s+p[1],0)*(restSecs()+45)/60)+5;
+    heroHtml=`<div class="card hero stack">
+      <p class="muted" style="font-weight:700">${doneToday?'✅ DONE FOR TODAY — NICE!':"TODAY'S WORKOUT"}</p>
+      <div class="row"><span class="big-emoji">${W.e}</span><div><h2>${W.name}</h2><p class="muted">${W.sub} · ${plan.length} exercises · ~${mins} min</p></div></div>
+      <button class="btn" data-start="${sched.k}">${doneToday?'Do it again':'Start workout ▶'}</button></div>`;
+  }else{
+    heroHtml=`<div class="card hero stack"><div class="row"><span class="big-emoji">${sched.e}</span><div><h2>${sched.label}</h2><p class="muted">${sched.note}</p></div></div></div>`;
+  }
+  const others=Object.keys(WORKOUTS).filter(k=>k!==sched.k).map(k=>{const W=WORKOUTS[k];
+    return `<button class="card row" data-start="${k}" style="width:100%;text-align:left;padding:14px"><span class="ex-emoji">${W.e}</span><div style="flex:1"><b>${W.name}</b><p class="muted small">${W.sub}</p></div><span class="muted">›</span></button>`}).join('');
+  v.innerHTML=`${topbar(levelPill())}
+  <div class="stack-lg">
+    <div><h1>${hello()}${profile.name?', '+esc(profile.name):''}! ${['👋','💪','🌟'][dow%3]}</h1><p class="muted" style="margin-top:4px">${now.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'})}</p></div>
+    ${heroHtml}
+    <div><h3 style="margin-bottom:10px">This week</h3><div class="week">${strip}</div></div>
+    <div class="stack"><h3>${isWork?'Other workouts':'Want to train anyway?'}</h3>${others}</div>
+    ${tipOfDay()}
+  </div>`;
+  v.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>startWorkout(b.dataset.start));
+}
+const TIPS=['💧 Drink water before, during and after your workout.','🔥 Warm up for 5 minutes first — march on the spot, arm circles, jumping jacks.','🐢 Slow and controlled beats fast and sloppy.','😴 Sleep is when your muscles get stronger. Aim for 8–10 hours if you are a kid or teen.','🛑 Sore muscles are normal. Sharp pain is not — stop and tell an adult.','🎯 Good form first. Add weight or reps only when the moves look and feel right.','🗣️ Breathe out when you push or lift. Never hold your breath.'];
+function tipOfDay(){const t=TIPS[new Date().getDate()%TIPS.length];return `<div class="card row"><div><p class="small muted" style="font-weight:700">TIP OF THE DAY</p><p style="margin-top:4px">${t}</p></div></div>`}
 
-        localStorage.setItem('workout_journal', JSON.stringify(journal));
+/* ---------- Workout ---------- */
+function startWorkout(key){
+  let a=store.get('jams_active',null);
+  if(!(a&&a.key===key&&a.level===profile.level)){
+    const plan=PLANS[profile.level][key];
+    a={key,level:profile.level,date:isoLocal(),started:Date.now(),items:plan.map(p=>{
+      const ex=EX[p[0]],last=lastSession(ex.name);
+      let w='';if(ex.weight&&last){const mx=Math.max(...last.sets.map(s=>s.weight||0));if(mx>0)w=round1(toUnit(mx,last.unit))}
+      return {id:p[0],sets:Array.from({length:p[1]},()=>({reps:'',weight:w,done:false}))};
+    })};
+    store.set('jams_active',a);
+  }
+  go('workout',key);
+}
+function progressHint(p,ex){
+  const last=lastSession(ex.name);if(!last||!last.sets.length)return '';
+  const hitTop=last.sets.length>=p[1]&&last.sets.every(s=>s.reps>=p[3]);
+  if(!hitTop)return `<div class="hint">📋 Last time: ${last.sets.map(s=>s.reps+(ex.weight&&s.weight?' × '+round1(toUnit(s.weight,last.unit)):'')).join(', ')}. Try to beat it!</div>`;
+  if(ex.weight)return `<div class="hint">🚀 You hit ${p[3]} reps on every set last time — add ${profile.unit==='kg'?'2.5 kg':'5 lbs'} today!</div>`;
+  return `<div class="hint">🚀 Crushed it last time! Try ${ex.time?'5 more seconds':'2 more reps'} per set${ex.time?'':' or a harder version'}.</div>`;
+}
+function renderWorkout(v){
+  const a=store.get('jams_active',null);if(!a){go('today');return}
+  const W=WORKOUTS[a.key],plan=PLANS[a.level][a.key];
+  const total=a.items.reduce((s,it)=>s+it.sets.length,0),done=a.items.reduce((s,it)=>s+it.sets.filter(x=>x.done).length,0);
+  v.innerHTML=`<div class="topbar"><button class="link" id="back">← Back</button><input type="date" id="wdate" value="${a.date}" max="${isoLocal()}" class="num" style="width:auto;height:40px;font-size:15px;padding:0 10px" aria-label="Workout date"></div>
+  <div class="stack-lg">
+    <div><p class="muted" style="font-weight:700">${lvl().emoji} ${lvl().name.toUpperCase()}</p><h1>${W.e} ${W.name}</h1>
+      <div class="row" style="margin-top:12px"><div class="progress" style="flex:1"><i style="width:${total?done/total*100:0}%"></i></div><b class="small">${done}/${total} sets</b></div></div>
+    <div class="card small" style="background:var(--lvl-soft);border:0">🔥 <b>Warm up first:</b> 5 minutes of marching, arm circles or jumping jacks. Then tap <b>✓</b> after each set.</div>
+    ${a.items.map((it,i)=>{const p=plan[i],ex=EX[it.id];return `
+    <div class="card ex">
+      <div class="ex-head"><div class="ex-emoji">${ex.e}</div><div style="flex:1"><div class="ex-title">${i+1}. ${ex.name}</div><div class="target">${repsText(p,ex)}</div>
+        <div>${ex.m.map(m=>`<span class="chip">${m}</span>`).join('')}${ex.start&&!lastSession(ex.name)?`<span class="chip">Start ~${ex.start}</span>`:''}</div></div></div>
+      ${progressHint(p,ex)}
+      <details class="how"><summary>How to do it</summary><ol>${ex.steps.map(s=>`<li>${s}</li>`).join('')}</ol><div class="tip">💡 ${ex.tip}</div>
+        <a class="btn sm secondary" style="margin-bottom:12px;text-decoration:none;display:inline-flex" href="${ex.video||YTS(ex.name)}" target="_blank" rel="noopener">▶ Watch a video</a></details>
+      <div class="sets">${it.sets.map((s,k)=>`
+        <div class="set ${ex.weight?'':'nowt'} ${s.done?'isdone':''}">
+          <div class="n">Set ${k+1}</div>
+          <div><label>${ex.time?'Seconds':'Reps'}</label><input class="num" inputmode="numeric" type="number" min="0" placeholder="${p[2]===p[3]?p[2]:p[2]+'-'+p[3]}" value="${s.reps}" data-i="${i}" data-k="${k}" data-f="reps"></div>
+          ${ex.weight?`<div><label>Weight (${profile.unit})</label><input class="num" inputmode="decimal" type="number" min="0" step="0.5" placeholder="${profile.unit}" value="${s.weight}" data-i="${i}" data-k="${k}" data-f="weight"></div>`:''}
+          <button class="check" data-check="${i},${k}" aria-label="Mark set ${k+1} done">✓</button>
+        </div>`).join('')}</div>
+      <div class="row between" style="margin-top:8px"><button class="link" data-add="${i}">+ Add set</button>${it.sets.length>1?`<button class="link" style="color:var(--muted)" data-rm="${i}">− Remove set</button>`:''}</div>
+    </div>`}).join('')}
+    <button class="btn" id="finish">Finish workout 🎉</button>
+    <button class="btn ghost" id="quit">Cancel workout</button>
+  </div>`;
+  const save=()=>store.set('jams_active',a);
+  v.querySelectorAll('input.num[data-f]').forEach(inp=>inp.oninput=()=>{a.items[inp.dataset.i].sets[inp.dataset.k][inp.dataset.f]=inp.value;save()});
+  $('#wdate').onchange=e=>{a.date=e.target.value||isoLocal();save()};
+  v.querySelectorAll('[data-check]').forEach(b=>b.onclick=()=>{
+    const [i,k]=b.dataset.check.split(',').map(Number),s=a.items[i].sets[k],p=plan[i];
+    if(!s.done&&s.reps==='')s.reps=String(p[2]); // fill target if empty
+    s.done=!s.done;save();
+    const y=window.scrollY;renderWorkout(v);window.scrollTo(0,y);
+    if(s.done){const allDone=a.items.every(it=>it.sets.every(x=>x.done));if(allDone){hideTimer();toast('All sets done! Tap Finish 🎉')}else startTimer(restSecs())}
+  });
+  v.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const it=a.items[b.dataset.add];const l=it.sets[it.sets.length-1];it.sets.push({reps:'',weight:l?l.weight:'',done:false});save();const y=scrollY;renderWorkout(v);scrollTo(0,y)});
+  v.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{a.items[b.dataset.rm].sets.pop();save();const y=scrollY;renderWorkout(v);scrollTo(0,y)});
+  $('#back').onclick=()=>go('today');
+  $('#quit').onclick=()=>confirmBox('Cancel this workout?','Sets you have not finished will not be saved.','Yes, cancel',()=>{store.del('jams_active');go('today')},true);
+  $('#finish').onclick=()=>finishWorkout(a);
+}
+function finishWorkout(a){
+  const j=getJournal(),date=a.date||isoLocal();let sets=0,vol=0,n=0;
+  const time=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  a.items.forEach((it,i)=>{
+    const ex=EX[it.id];
+    const done=it.sets.filter(s=>s.done).map(s=>({reps:parseInt(s.reps)||0,weight:ex.weight?(parseFloat(s.weight)||0):0})).filter(s=>s.reps>0||s.weight>0);
+    if(!done.length)return;
+    (j[date]=j[date]||[]).push({id:Date.now()+i,exercise:ex.name,timestamp:time,sets:done,unit:profile.unit,level:a.level,workout:a.key});
+    sets+=done.length;n++;done.forEach(s=>vol+=s.reps*s.weight);
+  });
+  if(!sets){toast('Tap ✓ on at least one set first');return}
+  setJournal(j);store.del('jams_active');hideTimer();
+  const mins=Math.max(1,Math.round((Date.now()-a.started)/60000));
+  celebrate(sets,n,mins,vol);
+}
+function celebrate(sets,n,mins,vol){
+  const colors=['#16a34a','#ea580c','#7c3aed','#2563eb','#eab308','#ec4899'];
+  const conf=Array.from({length:60},(_,i)=>`<i class="confetti" style="left:${Math.random()*100}%;background:${colors[i%6]};animation-duration:${2+Math.random()*2.5}s;animation-delay:${Math.random()*.8}s"></i>`).join('');
+  const streak=weekStreak();
+  const praise=['Amazing work!','You crushed it!','Stronger than yesterday!','Way to go, champ!'][Math.floor(Math.random()*4)];
+  $('#layer').innerHTML=`<div class="celebrate">${conf}<div class="stack-lg center" style="max-width:420px;width:100%;position:relative">
+    <div style="font-size:84px">🏆</div><h1>${praise}${profile.name?'<br>'+esc(profile.name)+'!':''}</h1>
+    <div class="stats"><div class="stat"><b>${sets}</b><span>sets</span></div><div class="stat"><b>${mins}</b><span>${mins===1?'minute':'minutes'}</span></div><div class="stat"><b>${streak}</b><span>week streak 🔥</span></div></div>
+    ${vol>0?`<p class="muted">You moved <b>${Math.round(vol).toLocaleString()} ${profile.unit}</b> in total. That's ${vol>2000?'heavier than a car tire stack':'a lot of backpacks'}! 💪</p>`:'<p class="muted">Every rep makes you stronger. See you next time!</p>'}
+    <button class="btn" id="done">Done</button></div></div>`;
+  $('#done').onclick=()=>{$('#layer').innerHTML='';go('progress')};
+}
 
-        setRows.forEach(row => {
-            row.querySelector('.reps-input').value = '';
-            row.querySelector('.weight-input').value = '';
-        });
+/* ---------- Rest timer ---------- */
+let timerEnd=0,timerInt=null;
+function startTimer(sec){timerEnd=Date.now()+sec*1000;$('#timer').classList.add('show');tick();clearInterval(timerInt);timerInt=setInterval(tick,250)}
+function hideTimer(){clearInterval(timerInt);$('#timer').classList.remove('show')}
+function tick(){const left=Math.max(0,Math.ceil((timerEnd-Date.now())/1000));$('#timer-t').textContent=`${Math.floor(left/60)}:${pad(left%60)}`;
+  if(left<=0){hideTimer();beep();toast('⏰ Rest over — next set!')}}
+function beep(){try{navigator.vibrate&&navigator.vibrate([200,100,200]);const c=new (window.AudioContext||window.webkitAudioContext)();const o=c.createOscillator(),g=c.createGain();o.frequency.value=880;o.connect(g);g.connect(c.destination);g.gain.setValueAtTime(.2,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.6);o.start();o.stop(c.currentTime+.6)}catch(e){}}
+$('#timer-add').onclick=()=>{timerEnd+=15000;tick()};
+$('#timer-skip').onclick=hideTimer;
 
-        alert(`${exerciseName} recorded for ${selectedDate}!`);
-    }
+/* ---------- Library ---------- */
+let libLevel=null;
+function renderLibrary(v){
+  libLevel=libLevel||profile.level;
+  const plan=PLANS[libLevel];
+  v.innerHTML=`${topbar(levelPill())}<div class="stack-lg">
+    <div><h1>Exercises 📚</h1><p class="muted" style="margin-top:4px">Learn every move. Tap one to see how.</p></div>
+    <div class="seg">${Object.keys(LEVELS).map(k=>`<button class="${k===libLevel?'on':''}" data-l="${k}">${LEVELS[k].emoji} ${LEVELS[k].name}</button>`).join('')}</div>
+    <p class="small muted">🧰 ${LEVELS[libLevel].equipment}</p>
+    ${Object.keys(WORKOUTS).map(w=>`<div class="stack"><h3>${WORKOUTS[w].e} ${WORKOUTS[w].name} <span class="muted small">· ${WORKOUTS[w].sub}</span></h3>
+      ${plan[w].map(p=>{const ex=EX[p[0]];return `<div class="card ex"><div class="ex-head"><div class="ex-emoji">${ex.e}</div><div style="flex:1"><div class="ex-title">${ex.name}</div><div class="target">${repsText(p,ex)}</div><div>${ex.m.map(m=>`<span class="chip">${m}</span>`).join('')}</div></div></div>
+      <details class="how"><summary>How to do it</summary><ol>${ex.steps.map(s=>`<li>${s}</li>`).join('')}</ol><div class="tip">💡 ${ex.tip}</div>
+      <a class="btn sm secondary" style="margin-bottom:12px;text-decoration:none;display:inline-flex" href="${ex.video||YTS(ex.name)}" target="_blank" rel="noopener">▶ Watch a video</a></details></div>`}).join('')}</div>`).join('')}
+  </div>`;
+  v.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{libLevel=b.dataset.l;renderLibrary(v)});
+}
 
-    // Delete Record from Journal History
-    function deleteJournalEntry(date, entryId) {
-        if (!confirm('Are you sure you want to delete this workout log?')) return;
+/* ---------- Progress ---------- */
+let chartEx=null;
+function renderProgress(v){
+  const j=getJournal(),dates=workoutDates();
+  const totalSets=dates.reduce((s,d)=>s+j[d].reduce((a,e)=>a+(e.sets||[]).length,0),0);
+  const names=[...new Set(dates.flatMap(d=>j[d].map(e=>e.exercise)))].sort();
+  if(!names.includes(chartEx))chartEx=names[0]||null;
+  const lvlCount=dates.filter(d=>j[d].some(e=>e.level===profile.level)).length;
+  const nextLvl=profile.level==='beginner'?'intermediate':profile.level==='intermediate'?'expert':null;
+  const levelUp=nextLvl&&lvlCount>=24?`<div class="card stack" style="border:2px solid ${LEVELS[nextLvl].color}"><h3>🎖️ Ready to level up?</h3><p class="muted">You've done ${lvlCount} workouts on ${lvl().name}. If the workouts feel easy and your form is solid, try <b>${LEVELS[nextLvl].name}</b>.</p><button class="btn sm" style="background:${LEVELS[nextLvl].color}" data-go-me>See levels</button></div>`:'';
+  // last 12 weeks heat
+  const ws=weekStart(new Date()),set=new Set(dates);
+  let heat='';for(let w=11;w>=0;w--){let col='';for(let d=0;d<7;d++){const dt=new Date(ws);dt.setDate(ws.getDate()-w*7+d);const on=set.has(isoLocal(dt)),fut=dt>new Date();col+=`<i style="display:block;width:100%;aspect-ratio:1;border-radius:4px;background:${on?'var(--lvl)':fut?'transparent':'var(--line)'}"></i>`}heat+=`<div style="display:grid;gap:3px">${col}</div>`}
+  v.innerHTML=`${topbar(levelPill())}<div class="stack-lg">
+    <div><h1>Your progress 📈</h1></div>
+    <div class="stats"><div class="stat"><b>${dates.length}</b><span>workouts</span></div><div class="stat"><b>${weekStreak()}</b><span>week streak 🔥</span></div><div class="stat"><b>${totalSets}</b><span>sets done</span></div></div>
+    ${levelUp}
+    <div class="card stack"><h3>Last 12 weeks</h3><div style="display:grid;grid-template-columns:repeat(12,1fr);gap:3px">${heat}</div><p class="small muted">Each square is a day. Coloured = you worked out. Aim for 3–4 a week!</p></div>
+    <div class="card stack"><h3>How am I improving?</h3>
+      ${names.length?`<select class="sel" id="exsel">${names.map(n=>`<option ${n===chartEx?'selected':''}>${esc(n)}</option>`).join('')}</select><div id="chart"></div>`:`<div class="empty"><div class="big-emoji">🌱</div><p class="muted">Finish your first workout to see your progress chart here.</p></div>`}
+    </div>
+    <div class="stack"><div class="row between"><h3>History</h3></div>${historyHtml(j,dates)}</div>
+  </div>`;
+  if(names.length){drawChart();$('#exsel').onchange=e=>{chartEx=e.target.value;drawChart()}}
+  v.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const [d,id]=b.dataset.del.split('|');
+    confirmBox('Delete this entry?','This removes it from your history for good.','Delete',()=>{const jj=getJournal();jj[d]=(jj[d]||[]).filter(e=>String(e.id)!==id);if(!jj[d].length)delete jj[d];setJournal(jj);renderProgress(v);toast('Deleted')},true)});
+}
+function historyHtml(j,dates){
+  if(!dates.length)return `<div class="card empty"><div class="big-emoji">📒</div><p class="muted">No workouts yet. Your history will show up here.</p></div>`;
+  return dates.slice().reverse().slice(0,30).map(d=>`<div><p class="small" style="font-weight:800;color:var(--lvl);margin-top:6px">${niceDate(d)}</p>
+    ${j[d].map(e=>`<div class="hist"><div class="row between"><b>${esc(e.exercise)}</b><span><span class="small muted">${esc(e.timestamp||'')}</span><button class="xbtn" data-del="${d}|${esc(e.id)}" aria-label="Delete">🗑️</button></span></div>
+      <div>${(e.sets||[]).map((s,i)=>`<span class="badge">${i+1}: <b>${Number(s.reps)||0}</b>${s.weight?` × <b>${round1(toUnit(Number(s.weight),e.unit))}</b> ${profile.unit}`:''}</span>`).join('')}</div></div>`).join('')}</div>`).join('')
+    +(dates.length>30?`<p class="small muted center">Showing the latest 30 days. Export a backup to keep everything.</p>`:'');
+}
+function drawChart(){
+  const j=getJournal(),pts=[];let useW=false;
+  workoutDates().forEach(d=>{const es=j[d].filter(e=>e.exercise===chartEx);if(!es.length)return;
+    const all=es.flatMap(e=>e.sets.map(s=>({w:toUnit(Number(s.weight)||0,e.unit),r:Number(s.reps)||0})));
+    const mw=Math.max(...all.map(x=>x.w));if(mw>0)useW=true;pts.push({d,w:mw,r:Math.max(...all.map(x=>x.r))})});
+  const vals=pts.map(p=>useW?p.w:p.r),label=useW?`Heaviest weight (${profile.unit})`:'Best reps / seconds';
+  const W=340,H=200,L=36,R=12,T=16,B=30;const max=Math.max(...vals)*1.15||1,min=0;
+  const x=i=>pts.length===1?(L+W-R)/2:L+i*(W-L-R)/(pts.length-1),y=v=>T+(H-T-B)*(1-(v-min)/(max-min));
+  const grid=[0,.5,1].map(f=>{const v=min+(max-min)*f;return `<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${Math.round(v)}</text>`}).join('');
+  const path=vals.map((v,i)=>`${i?'L':'M'}${x(i)},${y(v)}`).join('');
+  const area=pts.length>1?`<path d="${path}L${x(vals.length-1)},${y(0)}L${x(0)},${y(0)}Z" fill="var(--lvl)" opacity=".12"/>`:'';
+  const dots=vals.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="4.5" fill="var(--card)" stroke="var(--lvl)" stroke-width="2.5"><title>${niceDate(pts[i].d)}: ${round1(v)}</title></circle>`).join('');
+  const lbl=i=>`<text x="${x(i)}" y="${H-8}" text-anchor="middle" font-size="11" fill="var(--muted)">${parseIso(pts[i].d).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</text>`;
+  const first=vals[0],last=vals[vals.length-1],diff=round1(last-first);
+  $('#chart').innerHTML=`<p class="small muted" style="font-weight:700">${label}</p><svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${label} over time">${grid}${area}<path d="${path}" fill="none" stroke="var(--lvl)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>${dots}${lbl(0)}${pts.length>1?lbl(pts.length-1):''}</svg>
+  <p style="margin-top:6px">${pts.length<2?'Do this exercise again to start your line! 📍':diff>0?`🎉 Up <b>${diff}</b> since you started. Keep going!`:diff===0?'Holding steady. Try to beat your best next time!':'Small dips are normal. Rest well and keep at it! 💪'}</p>`;
+}
 
-        const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
-        if (journal[date]) {
-            journal[date] = journal[date].filter(entry => entry.id !== entryId);
-            if (journal[date].length === 0) {
-                delete journal[date];
-            }
-            localStorage.setItem('workout_journal', JSON.stringify(journal));
-            renderJournal();
-        }
-    }
+/* ---------- Me / Settings ---------- */
+function renderMe(v){
+  v.innerHTML=`${topbar()}<div class="stack-lg">
+    <div class="row"><div class="ex-emoji" style="width:64px;height:64px;font-size:34px">${lvl().emoji}</div><div style="flex:1"><h1>${profile.name?esc(profile.name):'My profile'}</h1><p class="muted">${lvl().name} level</p></div></div>
+    <div class="card stack"><h3>Your name</h3><input class="txt" id="nm" maxlength="24" placeholder="Your name" value="${esc(profile.name)}"></div>
+    <div class="stack"><div class="row between"><h3>Your level</h3><button class="link" id="quiz">🧭 Retake the quiz</button></div>
+      ${Object.keys(LEVELS).map(k=>`<button class="lvl ${k===profile.level?'sel':''}" data-l="${k}" style="--c:${LEVELS[k].color}">${levelInner(k)}<p class="small" style="margin-top:8px;font-weight:800;color:var(--c)">${k===profile.level?'✓ Your current level':'Tap to switch'}</p></button>`).join('')}
+    </div>
+    <div class="card stack"><h3>Settings</h3>
+      <p class="small muted" style="font-weight:700">WEIGHT UNITS</p><div class="seg" id="unit">${['lbs','kg'].map(u=>`<button class="${profile.unit===u?'on':''}" data-u="${u}">${u}</button>`).join('')}</div>
+      <p class="small muted" style="font-weight:700">REST BETWEEN SETS</p><div class="seg" id="rest">${[['auto','Auto'],['45','45s'],['60','60s'],['90','90s'],['120','2m']].map(r=>`<button class="${String(profile.rest)===r[0]?'on':''}" data-r="${r[0]}">${r[1]}</button>`).join('')}</div>
+      <p class="small muted">Auto = ${lvl().rest}s for ${lvl().name}.</p>
+    </div>
+    <details class="card how" style="padding:4px 18px"><summary>📖 How this plan works</summary>
+      <p style="margin:4px 0 10px"><b>The week:</b> Mon Upper A · Tue Lower A · Wed active rest · Thu Upper B · Fri Lower B · Sat bonus · Sun rest.</p>
+      <p style="margin-bottom:10px"><b>Getting stronger (double progression):</b></p>
+      <ol><li>Each exercise has a rep range, like 8–12.</li><li>Use a weight (or version) you can do for the low number with good form.</li><li>Each workout, try for a few more reps.</li><li>When you hit the top number on every set, make it harder — add ${profile.unit==='kg'?'2.5 kg':'5 lbs'} or pick a harder version. The app tells you when!</li></ol>
+      <p style="margin-bottom:10px"><b>Big picture (6 months):</b> Weeks 1–8 learn perfect form · Weeks 9–16 build muscle with more reps & weight · Weeks 17–24 push your strength.</p></details>
+    <details class="card how" style="padding:4px 18px"><summary>🛡️ Safety first</summary><ol>
+      <li>Warm up for 5 minutes before every workout.</li><li>Form first, weight second. If it looks wobbly, go lighter.</li>
+      <li>Sore muscles the next day are normal. <b>Sharp pain is not</b> — stop and tell an adult.</li>
+      <li>Under 18? Lift weights with an adult or coach nearby. Under 13? Stick to Beginner bodyweight moves.</li>
+      <li>Use a spotter or safety bars for bench press and squats.</li><li>Drink water, eat well, sleep lots. Rest days matter!</li>
+      <li>Have a health condition or injury? Check with a doctor before starting.</li></ol></details>
+    <div class="card stack"><h3>Your data</h3><p class="small muted">Everything is saved on this device only. Make a backup to move it to a new phone.</p>
+      <button class="btn secondary" id="exp">⬇️ Download backup</button>
+      <label class="btn secondary" style="cursor:pointer">⬆️ Restore from backup<input type="file" id="imp" accept="application/json,.json" hidden></label>
+      <button class="btn danger" id="reset">Erase everything</button></div>
+    <p class="small muted center">JAMS Fitness · Made for every level 💙</p>
+  </div>`;
+  $('#nm').onchange=e=>{profile.name=e.target.value.trim().slice(0,24);saveProfile();toast('Saved')};
+  v.querySelectorAll('.lvl').forEach(b=>b.onclick=()=>{const k=b.dataset.l;if(k===profile.level)return;
+    confirmBox(`Switch to ${LEVELS[k].name}?`,'Your history stays. Your workouts will change to the new level.',`Switch to ${LEVELS[k].name} ${LEVELS[k].emoji}`,()=>{profile.level=k;saveProfile();store.del('jams_active');libLevel=null;render();toast(`${LEVELS[k].emoji} Now on ${LEVELS[k].name}`)})});
+  $('#quiz').onclick=()=>{ob={step:2,answers:[],name:profile.name};go('onboard')};
+  v.querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{profile.unit=b.dataset.u;saveProfile();renderMe(v)});
+  v.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{profile.rest=b.dataset.r;saveProfile();renderMe(v)});
+  $('#exp').onclick=exportBackup;
+  $('#imp').onchange=importBackup;
+  $('#reset').onclick=()=>confirmBox('Erase everything?','All workouts and settings on this device will be deleted. Download a backup first if you want to keep them.','Erase all',()=>{store.del(JOURNAL_KEY);store.del('jams_profile');store.del('jams_active');profile={name:'',level:null,unit:'lbs',rest:'auto'};ob={step:0,answers:[],name:''};go('today')},true);
+}
+function exportBackup(){
+  const data={app:'jams-fitness',version:2,exported:new Date().toISOString(),profile,journal:getJournal()};
+  const blob=new Blob([JSON.stringify(data,null,1)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`jams_fitness_backup_${isoLocal()}.json`;document.body.appendChild(a);a.click();a.remove();
+  toast('Backup downloaded');
+}
+function importBackup(e){
+  const f=e.target.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{try{
+    const d=JSON.parse(r.result);const incoming=d&&d.journal?d.journal:d; // supports old backups too
+    if(!incoming||typeof incoming!=='object'||Array.isArray(incoming))throw 0;
+    const j=getJournal();let added=0;
+    Object.keys(incoming).forEach(k=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(k)||!Array.isArray(incoming[k]))return;
+      const have=new Set((j[k]||[]).map(x=>String(x.id)));
+      incoming[k].forEach(en=>{if(en&&typeof en.exercise==='string'&&Array.isArray(en.sets)&&!have.has(String(en.id))){(j[k]=j[k]||[]).push(en);added++}})});
+    setJournal(j);toast(`Restored ${added} entries ✅`);
+  }catch(err){toast('That file is not a JAMS backup')}};
+  r.readAsText(f);
+}
 
-    // Render Saved Entries in Journal Tab
-    function renderJournal() {
-        const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
-        const container = document.getElementById('journal-logs-container');
-        container.innerHTML = '';
-
-        const dates = Object.keys(journal).sort((a, b) => new Date(b) - new Date(a));
-
-        if (dates.length === 0) {
-            container.innerHTML = '<p class="small text-muted">No logged sessions yet. Save an exercise in the Tracking tab to start building your log!</p>';
-            return;
-        }
-
-        dates.forEach(date => {
-            const group = document.createElement('div');
-            group.className = 'mb-4';
-            group.innerHTML = `<h6 class="border-bottom border-secondary pb-1 mb-2 fw-bold text-primary">${date}</h6>`;
-
-            journal[date].forEach(entry => {
-                const entryDiv = document.createElement('div');
-                entryDiv.className = 'journal-entry';
-
-                const setsFormatted = entry.sets.map((s, i) => 
-                    `<span class="set-badge">Set ${i+1}: <strong>${s.reps}</strong> reps @ <strong>${s.weight}</strong> lbs</span>`
-                ).join('');
-
-                entryDiv.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-center">
-                        <strong class="text-white" style="font-size: 0.95rem;">${entry.exercise}</strong>
-                        <div>
-                            <small class="text-muted me-2" style="font-size: 0.75rem;">${entry.timestamp}</small>
-                            <button class="btn btn-sm btn-outline-danger py-0 px-1" style="font-size: 0.7rem;" onclick="deleteJournalEntry('${date}', ${entry.id})">Delete</button>
-                        </div>
-                    </div>
-                    <div class="mt-1">${setsFormatted}</div>
-                `;
-                group.appendChild(entryDiv);
-            });
-
-            container.appendChild(group);
-        });
-    }
-
-    // Initialize Trends Tab
-    function initTrendsTab() {
-        const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
-        const select = document.getElementById('exercise-select');
-        select.innerHTML = '';
-
-        const exercises = new Set();
-        Object.keys(journal).forEach(date => {
-            journal[date].forEach(entry => {
-                exercises.add(entry.exercise);
-            });
-        });
-
-        if (exercises.size === 0) {
-            select.innerHTML = '<option value="">No recorded exercises yet</option>';
-            if (trendChartInstance) trendChartInstance.destroy();
-            return;
-        }
-
-        exercises.forEach(ex => {
-            const opt = document.createElement('option');
-            opt.value = ex;
-            opt.innerText = ex;
-            select.appendChild(opt);
-        });
-
-        updateTrendChart();
-    }
-
-    // Render Trend Chart
-    function updateTrendChart() {
-        const selectedExercise = document.getElementById('exercise-select').value;
-        if (!selectedExercise) return;
-
-        const journal = JSON.parse(localStorage.getItem('workout_journal')) || {};
-        const dates = Object.keys(journal).sort((a, b) => new Date(a) - new Date(b));
-
-        const chartLabels = [];
-        const chartData = [];
-
-        dates.forEach(date => {
-            let maxWeight = 0;
-            let found = false;
-
-            journal[date].forEach(entry => {
-                if (entry.exercise === selectedExercise) {
-                    entry.sets.forEach(s => {
-                        if (s.weight > maxWeight) maxWeight = s.weight;
-                    });
-                    found = true;
-                }
-            });
-
-            if (found) {
-                chartLabels.push(date);
-                chartData.push(maxWeight);
-            }
-        });
-
-        const ctx = document.getElementById('trendChart').getContext('2d');
-
-        if (trendChartInstance) {
-            trendChartInstance.destroy();
-        }
-
-        trendChartInstance = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: chartLabels,
-                datasets: [{
-                    label: `Max Weight Lifted (lbs)`,
-                    data: chartData,
-                    borderColor: '#0d6efd',
-                    backgroundColor: 'rgba(13, 110, 253, 0.15)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.3,
-                    pointBackgroundColor: '#0d6efd',
-                    pointRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        ticks: { color: '#aaa' },
-                        grid: { color: '#2b2b2b' }
-                    },
-                    y: {
-                        ticks: { color: '#aaa' },
-                        grid: { color: '#2b2b2b' },
-                        beginAtZero: true
-                    }
-                },
-                plugins: {
-                    legend: {
-                        labels: { color: '#fff' }
-                    }
-                }
-            }
-        });
-    }
-
-    // Export Backup File
-    function exportBackup() {
-        const data = localStorage.getItem('workout_journal');
-        if (!data) return alert('No workout history to export.');
-        
-        const blob = new Blob([data], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `jams_fitness_journal_${new Date().toISOString().split('T')[0]}.json`;
-        a.click();
-    }
+/* ---------- Start ---------- */
+render();
 </script>
-
 </body>
 </html>
