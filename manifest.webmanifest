@@ -1,0 +1,10 @@
+{
+  "name": "JAMS Fitness",
+  "short_name": "JAMS",
+  "description": "Workout plans for Beginner, Intermediate and Expert",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f5f7fb",
+  "theme_color": "#2563eb",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
