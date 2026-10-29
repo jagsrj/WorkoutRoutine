@@ -2,7 +2,9 @@
 
 Simple workout plans for every level. Pick your level, follow the plan and watch yourself get stronger. It's built to be easy enough for a 12-year-old.
 
-**Use it:** open `index.html` in any browser, or turn on GitHub Pages (Settings → Pages → Deploy from branch → `main` / root). On a phone, tap **Share → Add to Home Screen** to use it like an app.
+**Use it:** open `index.html` in any browser. On a phone, tap **Share → Add to Home Screen** to use it like an app.
+
+**Hosting:** deployed on Cloudflare Workers (`wrangler.jsonc`). Every push to `main` redeploys automatically. `.assetsignore` keeps `.git`, the README and the config off the live site.
 
 ## Features
 
