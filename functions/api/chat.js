@@ -3,6 +3,10 @@
 // Setup (one time): Cloudflare dashboard → this Pages project → Settings → Bindings
 //   → Add → Workers AI → Variable name: AI → Save, then redeploy.
 // Optional: add an environment variable MODEL to use a different Workers AI model.
+// Limits protect the free daily AI allowance: 20 questions per hour per person (IP)
+// and 300 per day for the whole site. Limits are shared across servers when the
+// STORE (KV) binding is set up (the same one cloud sync uses).
+import { overLimit, clientIp, json, sameOrigin } from '../_lib/limit.js';
 
 const DEFAULT_MODEL = '@cf/meta/llama-3.1-8b-instruct';
 const MAX_MSG_CHARS = 600;
@@ -24,20 +28,19 @@ Stay safe:
 - If someone sounds upset, unsafe, or talks about hurting themselves or not eating, respond kindly, do not give exercise advice, and encourage them to talk to a trusted adult right now. In Canada or the US they can call or text 988, or Kids Help Phone (Canada) at 1-800-668-6868.
 - Be honest. If you are not sure, say so and suggest asking a coach or doctor.`;
 
-const json = (obj, status = 200) =>
-  new Response(JSON.stringify(obj), {
-    status,
-    headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },
-  });
-
 const clean = (s, n) => String(s || '').replace(/[\u0000-\u001f]/g, ' ').slice(0, n);
+
+const PER_HOUR = 20, PER_DAY = 300;
 
 export async function onRequestPost({ request, env }) {
   // Only accept requests from this site's own pages.
-  const origin = request.headers.get('origin');
-  if (origin && new URL(origin).host !== new URL(request.url).host) return json({ error: 'forbidden' }, 403);
+  if (!sameOrigin(request)) return json({ error: 'forbidden' }, 403);
 
   if (!env.AI) return json({ error: 'not_configured' }, 503);
+
+  const hour = Math.floor(Date.now() / 3600000), day = new Date().toISOString().slice(0, 10);
+  if (await overLimit(env, `chat:${clientIp(request)}:${hour}`, PER_HOUR, 3700)) return json({ error: 'rate_limited' }, 429);
+  if (await overLimit(env, `chatday:${day}`, PER_DAY, 90000)) return json({ error: 'rate_limited' }, 429);
 
   let body;
   try { body = await request.json(); } catch { return json({ error: 'bad_request' }, 400); }
