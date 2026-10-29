@@ -144,7 +144,7 @@ input.txt:focus{outline:none;border-color:var(--lvl)}
 /* Modal & toast */
 .overlay{position:fixed;inset:0;background:rgba(2,6,23,.5);display:flex;align-items:flex-end;justify-content:center;z-index:50;padding:12px}
 .sheet{background:var(--card);border-radius:24px;padding:22px;max-width:520px;width:100%;margin-bottom:var(--safe-b)}
-.toast{position:fixed;left:50%;top:16px;transform:translate(-50%,-140%);background:#0f172a;color:#fff;padding:12px 18px;border-radius:14px;font-weight:700;z-index:60;transition:transform .25s;max-width:90vw;text-align:center}
+.toast{position:fixed;left:50%;top:16px;transform:translate(-50%,calc(-100% - 60px));background:#0f172a;color:#fff;padding:12px 18px;border-radius:14px;font-weight:700;z-index:60;transition:transform .25s;max-width:90vw;text-align:center}
 .toast.show{transform:translate(-50%,0)}
 .celebrate{position:fixed;inset:0;background:var(--bg);z-index:40;display:flex;align-items:center;justify-content:center;padding:24px;overflow:hidden}
 .confetti{position:absolute;top:-20px;width:10px;height:16px;border-radius:3px;animation:fall linear forwards}
@@ -155,6 +155,23 @@ input.txt:focus{outline:none;border-color:var(--lvl)}
 .empty .big-emoji{margin-bottom:8px}
 .center{text-align:center}
 .hide{display:none!important}
+.chat{display:flex;flex-direction:column;gap:10px;padding-bottom:8px}
+.msg{max-width:86%;padding:11px 14px;border-radius:18px;font-size:16px;line-height:1.45;word-wrap:break-word}
+.msg.bot{background:var(--card);border:1px solid var(--line);border-bottom-left-radius:6px;align-self:flex-start}
+.msg.me{background:var(--lvl);color:#fff;border-bottom-right-radius:6px;align-self:flex-end}
+.msg ul,.msg ol{margin:6px 0;padding-left:20px}.msg li{margin:3px 0}.msg p+p{margin-top:6px}
+.msg .src{display:block;margin-top:6px;font-size:12px;color:var(--muted)}
+.typing span{display:inline-block;width:7px;height:7px;margin:0 2px;border-radius:7px;background:var(--muted);animation:blink 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+.sugg{display:flex;flex-wrap:wrap;gap:8px}
+.sugg button{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:8px 13px;font-size:14.5px;font-weight:600;color:var(--text)}
+.composer{position:fixed;left:0;right:0;bottom:calc(62px + var(--safe-b));z-index:15;padding:10px 12px;background:color-mix(in srgb,var(--bg) 94%,transparent);backdrop-filter:blur(10px)}
+.composer form{display:flex;gap:8px;max-width:536px;margin:0 auto}
+.composer input{flex:1;height:52px;border-radius:26px;border:1.5px solid var(--line);background:var(--card);padding:0 18px;font-size:17px;min-width:0}
+.composer input:focus{outline:none;border-color:var(--lvl)}
+.composer button{width:52px;height:52px;border-radius:26px;border:0;background:var(--lvl);color:#fff;font-size:22px;flex:0 0 52px}
+.composer button:disabled{opacity:.5}
 </style>
 </head>
 <body data-level="beginner">
@@ -164,6 +181,7 @@ input.txt:focus{outline:none;border-color:var(--lvl)}
   <div class="in">
     <button class="tab" data-go="today"><span class="ic">🏠</span>Today</button>
     <button class="tab" data-go="library"><span class="ic">📚</span>Exercises</button>
+    <button class="tab" data-go="ask"><span class="ic">💬</span>Coach</button>
     <button class="tab" data-go="progress"><span class="ic">📈</span>Progress</button>
     <button class="tab" data-go="me"><span class="ic">🙂</span>Me</button>
   </div>
@@ -373,7 +391,7 @@ function render(){
   if(route!=='workout')hideTimer();
   const v=$('#view');
   if(onb) return renderOnboard(v);
-  ({today:renderToday,workout:renderWorkout,library:renderLibrary,progress:renderProgress,me:renderMe}[route]||renderToday)(v);
+  ({today:renderToday,workout:renderWorkout,library:renderLibrary,progress:renderProgress,me:renderMe,ask:renderAsk}[route]||renderToday)(v);
 }
 const logo=()=>`<div class="logo"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="var(--lvl)"/><path d="M14 27h6v10h-6zM44 27h6v10h-6zM20 23h5v18h-5zM39 23h5v18h-5zM25 30h14v4H25z" fill="#fff"/></svg>JAMS FITNESS</div>`;
 const topbar=(right='')=>`<div class="topbar">${logo()}${right}</div>`;
@@ -675,6 +693,128 @@ function drawChart(){
   <p style="margin-top:6px">${pts.length<2?'Do this exercise again to start your line! 📍':diff>0?`🎉 Up <b>${diff}</b> since you started. Keep going!`:diff===0?'Holding steady. Try to beat your best next time!':'Small dips are normal. Rest well and keep at it! 💪'}</p>`;
 }
 
+
+/* ---------- Coach chat ---------- */
+// Built-in answers: instant, free, work offline. [keywords, answer]. Multi-word keywords count double.
+const FAQ = [
+  [['level','which level','choose','pick','beginner','intermediate','expert','too easy','too hard'],
+   ()=>`You're on **${lvl().name}** ${lvl().emoji}. Quick guide:\n- 🌱 **Beginner**: new to exercise, fewer than 6 push-ups, or under 13.\n- 🔥 **Intermediate**: you've trained for 2–3 months and know dumbbells and machines.\n- 🏆 **Expert**: 6+ months of steady training and you know barbell lifts (adults, or teens with a coach).\nNot sure? Take the quiz in the **Me** tab 🧭`],
+  [['sore','soreness','ache','achy','stiff'],
+   ()=>`Feeling sore 1–2 days after a workout is normal 👍 It means your muscles are adapting.\n- Go for a walk, stretch gently, drink water and sleep well.\n- Soreness should fade in 2–3 days.\n- **Sharp pain is different.** If something hurts sharply, stop and tell an adult or doctor.`],
+  [['pain','hurt','hurts','injury','injured','sharp','dizzy','chest'],
+   ()=>`🛑 Please **stop exercising** and tell a parent, coach or doctor. Sharp pain, dizziness, chest pain or trouble breathing are signs to rest and get checked. Don't push through pain. Feeling sore the next day is OK, but pain while you move is not.`],
+  [['how often','how many days','days a week','times a week','every day','rest day','rest days','schedule'],
+   ()=>`Aim for **3–4 workouts a week** with rest days between hard days 📅\nThe plan: Mon Upper A · Tue Lower A · Wed walk or play · Thu Upper B · Fri Lower B · Sat bonus · Sun rest.\nMuscles get stronger while you **rest**, so rest days matter!`],
+  [['warm','warm up','warmup','warm-up','stretch','stretching','cool down'],
+   ()=>`🔥 Warm up for **5 minutes** before every workout:\n1. March or jog on the spot (1 min)\n2. Arm circles forwards and backwards (1 min)\n3. Jumping jacks (1 min)\n4. 10 bodyweight squats, then a few easy reps of your first exercise\nAfter your workout, stretch gently for a few minutes.`],
+  [['heavier','add weight','more weight','increase','progress','stronger','get stronger','plateau','stuck'],
+   ()=>`This app uses **double progression** 📈\n1. Each exercise has a rep range, like 8–12.\n2. Start where you can do the low number with good form.\n3. Each workout, try for a rep or two more.\n4. When you hit the **top number on every set**, add ${profile.unit==='kg'?'2.5 kg':'5 lbs'} (or a harder version).\nThe app shows a 🚀 tip when it's time!`],
+  [['kid','kids','child','children','young','old enough','age','teen','teenager','safe for','12 year','13 year','14 year'],
+   ()=>`Yes, exercise is great for kids and teens! 💪\n- Under 13: stick with **Beginner** bodyweight moves.\n- Under 18: use weights only with an adult or coach nearby.\n- Learn good form first and go slow.\n- Have fun, mix in sports and play, and get lots of sleep.`],
+  [['water','drink','hydrate','thirsty'],
+   ()=>`💧 Drink water before, during and after your workout. A few sips between sets is perfect. If you feel thirsty, dizzy or have a headache, take a break and drink.`],
+  [['eat','food','protein','snack','diet','meal','breakfast','calorie','calories','lose weight','weight loss','supplement'],
+   ()=>`🍎 Eating a mix of foods (fruits, veggies, grains, and protein like eggs, beans, fish or chicken) gives you energy to train. Drink water too. I can't give diet plans or calorie numbers. For that, please talk with a parent or a doctor.`],
+  [['sleep','tired','sleepy','energy'],
+   ()=>`😴 Sleep is when your muscles recover and grow. Kids and teens need about **8–10 hours**, adults 7–9. Feeling very tired? Take an extra rest day. That's part of training too!`],
+  [['breathe','breathing','breath'],
+   ()=>`🗣️ Breathe **out** when you push, lift or stand up, and breathe **in** when you lower. Never hold your breath for a long time.`],
+  [['missed','miss','skipped','skip','forgot','late'],
+   ()=>`No worries! 🙂 Just do the next workout in the plan. Missing one day won't undo your progress. Being consistent over weeks is what counts.`],
+  [['motivation','motivated','bored','lazy','don\'t feel like','dont feel like','give up'],
+   ()=>`You've got this! 🌟 Tips:\n- Just start with the warm-up. Once you begin, it gets easier.\n- Train with a friend or family member.\n- Watch your chart in **Progress** go up 📈\n- Put on your favourite music 🎵`],
+  [['what is a rep','what is a set','what are reps','what are sets','rep mean','set mean','reps mean','sets mean'],
+   ()=>`A **rep** is doing the move once (one squat = 1 rep). A **set** is a group of reps in a row. "3 sets × 10 reps" means: do 10 squats, rest, do 10 more, rest, and do 10 more. ✅`],
+  [['how do i use','use the app','use this app','timer','tick','log','save my','track','record'],
+   ()=>`Using the app is easy 📱\n1. On **Today**, tap **Start workout**.\n2. Do a set, type your reps (and weight), and tap ✓.\n3. A rest timer starts. When it beeps, do your next set.\n4. Tap **Finish workout** 🎉 and see your stats in **Progress**.`],
+];
+const EX_ALIASES = [
+  [['push-up','push up','pushup','push-ups','pushups'],['pushup','knee_pushup','incline_pushup']],
+  [['squat'],['back_squat','goblet_squat','squat']],[['plank shoulder tap','shoulder tap'],['shoulder_tap']],
+  [['side plank'],['side_plank']],[['plank'],['plank']],[['lunge'],['db_lunge','reverse_lunge']],
+  [['romanian','rdl'],['rdl','db_rdl']],[['deadlift'],['deadlift','rdl','db_rdl']],
+  [['incline bench','incline press'],['incline_bench','incline_db_press']],[['bench press','bench'],['bench_press']],
+  [['overhead press','shoulder press'],['ohp','db_press']],[['curl'],['barbell_curl','db_curl','backpack_curl']],
+  [['pulldown','pull down','lat pull'],['lat_pulldown']],[['pull-up','pull up','pullup','chin up'],['pullup']],
+  [['row'],['barbell_row','cable_row','backpack_row']],[['dip'],['dips','chair_dip']],
+  [['glute bridge','bridge'],['glute_bridge']],[['calf'],['calf_raise','calf_raise_bw']],[['dead bug'],['dead_bug']],
+  [['bird dog'],['bird_dog']],[['wall sit'],['wall_sit']],[['step up','step-up'],['step_up']],
+  [['lateral raise','side raise'],['lateral_raise']],[['pushdown','tricep'],['tricep_pushdown','chair_dip']],
+  [['leg press'],['leg_press']],[['leg extension'],['leg_extension']],[['hanging leg','leg raise'],['leg_raise','knee_raise']],
+  [['knee raise'],['knee_raise']],[['ab wheel','rollout'],['ab_wheel']],[['sit-up','situp','sit up'],['decline_situp']],
+  [['bulgarian','split squat'],['bulgarian']],
+];
+function exerciseAnswer(q){
+  for(const [keys,ids] of EX_ALIASES){
+    if(!keys.some(k=>q.includes(k)))continue;
+    const mine=new Set(Object.values(PLANS[profile.level]).flat().map(p=>p[0]));
+    const id=ids.find(i=>mine.has(i))||ids[0],ex=EX[id];
+    return `**${ex.e} ${ex.name}** (works: ${ex.m.join(', ')})\n${ex.steps.map((s,i)=>`${i+1}. ${s}`).join('\n')}\n💡 ${ex.tip}\nFind the video in the **Exercises** tab ▶`;
+  }
+  return null;
+}
+function faqMatch(q){
+  let best=null,score=0;
+  FAQ.forEach(([keys,ans])=>{let s=0;keys.forEach(k=>{if(new RegExp('(^|[^a-z])'+k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).test(q))s+=k.includes(' ')?2:1});if(s>score){score=s;best=ans}});
+  return {ans:best,score};
+}
+// Turn the small subset of markdown we use into safe HTML.
+function md(t){
+  const lines=esc(t).split('\n');let html='',list=null;
+  const inline=x=>x.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+  const close=()=>{if(list){html+=`</${list}>`;list=null}};
+  lines.forEach(l=>{const ul=l.match(/^\s*[-*•]\s+(.*)/),ol=l.match(/^\s*\d+[.)]\s+(.*)/);
+    if(ul||ol){const tag=ul?'ul':'ol';if(list!==tag){close();html+=`<${tag}>`;list=tag}html+=`<li>${inline((ul||ol)[1])}</li>`}
+    else{close();if(l.trim())html+=`<p>${inline(l)}</p>`}});
+  close();return html;
+}
+let chat=store.get('jams_chat',[]),chatBusy=false;
+const SUGGEST=['Which level should I choose?','How do I do a squat?','Is it OK to feel sore?','How do I warm up?','When should I add weight?','What is a rep and a set?'];
+function renderAsk(v){
+  const today=SCHEDULE[new Date().getDay()].k;
+  v.innerHTML=`${topbar(levelPill())}<div class="stack-lg" style="padding-bottom:80px">
+    <div><h1>Ask Coach 💬</h1><p class="muted" style="margin-top:4px">Questions about exercises, your plan or staying safe? Just ask!</p></div>
+    <div class="chat" id="chat">
+      <div class="msg bot">${md(`Hi${profile.name?' '+profile.name:''}! 👋 I'm Coach. Ask me how to do an exercise, which level to pick, or anything about your workouts.`)}</div>
+      ${chat.map(m=>`<div class="msg ${m.role==='user'?'me':'bot'}">${m.role==='user'?esc(m.content):md(m.content)}</div>`).join('')}
+    </div>
+    <div class="sugg" id="sugg">${(chat.length?SUGGEST.slice(0,3):SUGGEST).map(q=>`<button>${q}</button>`).join('')}</div>
+    ${chat.length?`<button class="link" id="clear" style="color:var(--muted)">🧹 Clear chat</button>`:''}
+    <p class="small muted center">Coach gives general fitness tips, not medical advice. Got pain or an injury? Tell an adult or doctor.</p>
+  </div>
+  <div class="composer"><form id="ask"><input id="q" maxlength="500" placeholder="Type your question…" autocomplete="off" enterkeyhint="send" aria-label="Your question"><button id="send" aria-label="Send">➤</button></form></div>`;
+  const scroll=()=>window.scrollTo(0,document.body.scrollHeight);scroll();
+  $('#ask').onsubmit=e=>{e.preventDefault();const q=$('#q').value.trim();if(q&&!chatBusy)ask(q,today)};
+  v.querySelectorAll('#sugg button').forEach(b=>b.onclick=()=>{if(!chatBusy)ask(b.textContent,today)});
+  if($('#clear'))$('#clear').onclick=()=>{chat=[];store.del('jams_chat');renderAsk(v)};
+}
+async function ask(q,today){
+  chat.push({role:'user',content:q});chatBusy=true;
+  const box=$('#chat');box.insertAdjacentHTML('beforeend',`<div class="msg me">${esc(q)}</div><div class="msg bot typing" id="typing"><span></span><span></span><span></span></div>`);
+  $('#q').value='';$('#send').disabled=true;$('#sugg').classList.add('hide');window.scrollTo(0,document.body.scrollHeight);
+  const lq=' '+q.toLowerCase()+' ';
+  const howTo=/how|form|technique|teach|explain|what is|show|do i do|correct/.test(lq)||lq.trim().split(/\s+/).length<=4;
+  const exA=howTo?exerciseAnswer(lq):null,faq=faqMatch(lq);
+  let reply=null;
+  if(exA)reply=exA;
+  else if(faq.score>=2)reply=faq.ans();
+  else{
+    try{
+      const W=today in WORKOUTS?WORKOUTS[today].name+': '+PLANS[profile.level][today].map(p=>EX[p[0]].name).join(', '):'rest day';
+      const ctrl=new AbortController();const t=setTimeout(()=>ctrl.abort(),20000);
+      const r=await fetch('api/chat',{method:'POST',headers:{'content-type':'application/json'},signal:ctrl.signal,
+        body:JSON.stringify({messages:chat.slice(-8),level:profile.level,today:W})});
+      clearTimeout(t);const d=await r.json().catch(()=>({}));
+      if(r.ok&&d.reply)reply=d.reply;
+    }catch(e){}
+    if(!reply)reply=faq.score>=1?faq.ans():`Hmm, I'm not sure about that one 🤔 I can help with:\n- How to do any exercise (try "how do I do a plank?")\n- Picking your level\n- Warming up, soreness, rest and sleep\n- When to add weight\nFor anything about health or pain, please ask a parent, coach or doctor.`;
+  }
+  chat.push({role:'assistant',content:reply});chat=chat.slice(-40);store.set('jams_chat',chat);chatBusy=false;
+  const ty=$('#typing');if(ty){ty.classList.remove('typing');ty.removeAttribute('id');ty.innerHTML=md(reply)}
+  if($('#send'))$('#send').disabled=false;
+  window.scrollTo(0,document.body.scrollHeight);
+}
+
 /* ---------- Me / Settings ---------- */
 function renderMe(v){
   v.innerHTML=`${topbar()}<div class="stack-lg">
@@ -713,7 +853,7 @@ function renderMe(v){
   v.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{profile.rest=b.dataset.r;saveProfile();renderMe(v)});
   $('#exp').onclick=exportBackup;
   $('#imp').onchange=importBackup;
-  $('#reset').onclick=()=>confirmBox('Erase everything?','All workouts and settings on this device will be deleted. Download a backup first if you want to keep them.','Erase all',()=>{store.del(JOURNAL_KEY);store.del('jams_profile');store.del('jams_active');profile={name:'',level:null,unit:'lbs',rest:'auto'};ob={step:0,answers:[],name:''};go('today')},true);
+  $('#reset').onclick=()=>confirmBox('Erase everything?','All workouts and settings on this device will be deleted. Download a backup first if you want to keep them.','Erase all',()=>{store.del(JOURNAL_KEY);store.del('jams_profile');store.del('jams_active');store.del('jams_chat');chat=[];profile={name:'',level:null,unit:'lbs',rest:'auto'};ob={step:0,answers:[],name:''};go('today')},true);
 }
 function exportBackup(){
   const data={app:'jams-fitness',version:2,exported:new Date().toISOString(),profile,journal:getJournal()};
