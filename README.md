@@ -4,7 +4,9 @@ Simple workout plans for every level. Pick your level, follow the plan and watch
 
 **Use it:** open `index.html` in any browser. On a phone, tap **Share → Add to Home Screen** to use it like an app.
 
-**Hosting:** deployed on Cloudflare Workers (`wrangler.jsonc`). Every push to `main` redeploys automatically. `.assetsignore` keeps `.git`, the README and the config off the live site.
+**Hosting:** Cloudflare Pages at https://workoutroutine-aeq.pages.dev. Every push to `main` redeploys automatically (no build command, output directory `/`).
+
+**Turning on AI answers in the Coach chat:** in the Cloudflare dashboard open the Pages project, then **Settings → Bindings → Add → Workers AI**, set the variable name to `AI`, save, and redeploy. Without it, Coach still answers from its built-in answers. The server code is in `functions/api/chat.js`.
 
 ## Features
 
@@ -18,6 +20,7 @@ Simple workout plans for every level. Pick your level, follow the plan and watch
 - **Smart progression:** when you hit the top of the rep range on every set, the app tells you to add weight or reps (double progression).
 - **Exercise library:** simple 3-step instructions, a tip and a video for every move.
 - **Progress:** total workouts, a week streak, a 12-week calendar, a chart for each exercise, and history you can delete from. It also suggests moving up a level when you're ready.
+- **Ask Coach chat:** built-in answers about exercises, levels, soreness, warm-ups and progression work instantly and offline. Other questions go to Cloudflare Workers AI with kid-safe, fitness-only rules.
 - **Settings:** lbs or kg, rest time, and back up or restore your data. Safety tips are included.
 - Works offline, has no sign-up and no tracking. Data stays on the device (localStorage).
 - Supports dark mode.
