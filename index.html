@@ -202,6 +202,36 @@ details.fold[open] summary::after{transform:rotate(180deg)}
 .ring-t{position:absolute;inset:0;display:grid;place-items:center;font-size:62px;font-weight:900;font-variant-numeric:tabular-nums}
 .code{font-family:ui-monospace,Menlo,monospace;font-size:21px;font-weight:800;letter-spacing:.05em;text-align:center;padding:14px;border-radius:14px;background:var(--bg);border:1.5px dashed var(--line);user-select:all;-webkit-user-select:all}
 .btn:disabled{opacity:.45}
+.sheet{max-height:92vh;overflow:auto}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pthumb{position:relative;padding:0;border:0;border-radius:12px;overflow:hidden;aspect-ratio:3/4;background:var(--bg)}
+.pthumb img{width:100%;height:100%;object-fit:cover;display:block}
+.pthumb span{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(0,0,0,.65));color:#fff;font-size:12px;font-weight:700;padding:16px 6px 5px}
+.pfull{width:100%;max-height:50vh;object-fit:contain;border-radius:14px;background:#000;display:block}
+.cmp{position:relative;width:100%;aspect-ratio:3/4;max-height:54vh;border-radius:14px;overflow:hidden;background:#000;touch-action:none;user-select:none;-webkit-user-select:none}
+.cmp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.cmp-a{position:absolute;inset:0}
+.cmp-h{position:absolute;top:0;bottom:0;width:4px;background:#fff;transform:translateX(-50%);box-shadow:0 0 8px rgba(0,0,0,.5)}
+.cmp-l,.cmp-r{position:absolute;top:10px;background:rgba(0,0,0,.55);color:#fff;font-size:13px;font-weight:800;padding:3px 10px;border-radius:99px}
+.cmp-l{left:10px}.cmp-r{right:10px}
+.range{width:100%;accent-color:var(--lvl);height:32px}
+.streakpill{background:#fff1e6;color:#c2410c}
+.streakpill.off{filter:grayscale(1);opacity:.6}
+@media (prefers-color-scheme:dark){.streakpill{background:#3a2214;color:#fdba74}}
+.card.streak{background:linear-gradient(135deg,#fff7ed,#ffedd5);border-color:#fed7aa}
+@media (prefers-color-scheme:dark){.card.streak{background:linear-gradient(135deg,#2a1a10,#3a2214);border-color:#5a3418}}
+.flame{font-size:44px;line-height:1;animation:flick 1.6s ease-in-out infinite;transform-origin:50% 90%}
+.flame.off{filter:grayscale(1);opacity:.4;animation:none}
+@keyframes flick{0%,100%{transform:scale(1) rotate(-2deg)}50%{transform:scale(1.08) rotate(2deg)}}
+@media (prefers-reduced-motion:reduce){.flame{animation:none}}
+.dots7{display:flex;align-items:center;gap:6px;margin-top:8px}
+.dots7 i{width:22px;height:8px;border-radius:8px;background:rgba(194,65,12,.18)}
+.dots7 i.on{background:#ea580c}
+.dots7 span{margin-left:4px}
+.logo{white-space:nowrap}
+.pill{white-space:nowrap}
+.pname{max-width:96px;overflow:hidden;text-overflow:ellipsis;display:inline-block;vertical-align:bottom}
+@media (max-width:380px){.logo{font-size:0;gap:0}.logo svg{font-size:16px}}
 </style>
 </head>
 <body data-level="beginner">
@@ -618,8 +648,17 @@ function render(){
 }
 const logo=()=>`<div class="logo"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="var(--lvl)"/><path d="M14 27h6v10h-6zM44 27h6v10h-6zM20 23h5v18h-5zM39 23h5v18h-5zM25 30h14v4H25z" fill="#fff"/></svg>JAMS FITNESS</div>`;
 const topbar=(right='')=>`<div class="topbar">${logo()}${right}</div>`;
-const levelPill=()=>`<button class="pill" data-who aria-label="Switch person">${profile.avatar||'🙂'} ${esc(profile.name||'Me')} · ${lvl().emoji}</button>`;
-document.addEventListener('click',e=>{if(e.target.closest('[data-who]'))whoSheet();else if(e.target.closest('[data-go-me]'))go('me')});
+const levelPill=()=>{const n=weekStreak();return `<div class="row" style="gap:6px"><button class="pill streakpill ${n?'':'off'}" data-go="progress" aria-label="${n}-week streak">🔥 ${n}</button><button class="pill" data-who aria-label="Switch person"><span class="pname">${profile.avatar||'🙂'} ${esc(profile.name||'Me')}</span></button></div>`};
+function streakCard(){
+  const n=weekStreak(),best=Math.max(n,badgeStats().bestStreak),j=getJournal(),ws=weekStart(new Date());
+  const thisWeek=workoutDates(j).filter(d=>parseIso(d)>=ws).length,goal=3;
+  const msg=thisWeek?(thisWeek>=goal?'This week is done. Amazing! 🎉':`This week counts! ${goal-thisWeek} more to hit your goal of ${goal}.`)
+    :n?'Work out this week to keep your streak alive!':'Do one workout this week to start a streak!';
+  return `<div class="card streak"><div class="row"><div class="flame ${n?'':'off'}">🔥</div><div style="flex:1"><div class="row between"><b style="font-size:20px">${n?n+'-week streak':'No streak yet'}</b>${best>n?`<span class="small muted">Best: ${best}</span>`:''}</div>
+    <p class="small muted" style="margin-top:2px">${msg}</p>
+    <div class="dots7">${Array.from({length:goal},(_,i)=>`<i class="${i<thisWeek?'on':''}"></i>`).join('')}<span class="small muted">${thisWeek}/${goal} this week</span></div></div></div></div>`;
+}
+document.addEventListener('click',e=>{if(e.target.closest('.streakpill'))go('progress');else if(e.target.closest('[data-who]'))whoSheet();else if(e.target.closest('[data-go-me]'))go('me')});
 
 function whoSheet(){
   sheet(`<h2>Who's working out? 🙋</h2>
@@ -763,14 +802,17 @@ function renderToday(v){
   <div class="stack-lg">
     <div><h1>${hello()}${profile.name?', '+esc(profile.name):''}! ${profile.avatar||'👋'}</h1><p class="muted" style="margin-top:4px">${now.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'})}</p></div>
     ${heroHtml}
+    ${streakCard()}
     <div><h3 style="margin-bottom:10px">This week</h3><div class="week">${strip}</div></div>
     <button class="card row" data-go="progress" style="width:100%;text-align:left"><span class="big-emoji">🏅</span><div style="flex:1"><b>${plural(earned,'badge')} earned</b><p class="muted small">${earned<BADGES.length?'Keep going to unlock more!':'You got them all. Amazing!'}</p></div><span class="muted">›</span></button>
     <details class="card fold"><summary><b>${isWork?'Missed a day? Do a different workout':'Want to train anyway?'}</b></summary><div class="stack" style="margin-top:12px">${others}</div></details>
+    <div id="photoNudge"></div>
     ${tipOfDay()}
   </div>`;
   v.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>startWorkout(b.dataset.start));
-  v.querySelectorAll('button[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+  v.querySelectorAll('button[data-go]:not(.streakpill)').forEach(b=>b.onclick=()=>go(b.dataset.go));
   if($('#warmonly'))$('#warmonly').onclick=()=>runWarmup();
+  renderPhotoNudge();
 }
 const TIPS=['💧 Drink water before, during and after your workout.','🔥 Warm up for 5 minutes first. Try the guided warm-up!','🐢 Slow and controlled beats fast and sloppy.','😴 Sleep is when your muscles get stronger. Aim for 8–10 hours if you are a kid or teen.','🛑 Sore muscles are normal. Sharp pain is not. Stop and tell an adult.','🎯 Good form first. Add weight or reps only when the moves look and feel right.','🗣️ Breathe out when you push or lift. Never hold your breath.'];
 function tipOfDay(){const t=TIPS[new Date().getDate()%TIPS.length];return `<div class="card"><p class="small muted" style="font-weight:700">TIP OF THE DAY</p><p style="margin-top:4px">${t}</p></div>`}
@@ -984,9 +1026,11 @@ function renderProgress(v){
     <div class="card stack"><h3>How am I improving?</h3>
       ${names.length?`<select class="sel" id="exsel">${names.map(n=>`<option ${n===chartEx?'selected':''}>${esc(n)}</option>`).join('')}</select><div id="chart"></div>`:`<div class="empty"><div class="big-emoji">🌱</div><p class="muted">Finish your first workout to see your progress chart here.</p></div>`}
     </div>
+    <div id="photos"></div>
     <div class="stack"><h3>History</h3>${historyHtml(j,dates)}</div>
   </div>`;
   if(names.length){drawChart();$('#exsel').onchange=e=>{chartEx=e.target.value;drawChart()}}
+  renderPhotos();
   v.querySelectorAll('[data-b]').forEach(b=>b.onclick=()=>{const B=BADGES.find(x=>x.id===b.dataset.b);toast(`${earned.has(B.id)?B.e+' Earned: ':'🔒 To unlock: '}${B.d}`)});
   v.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const [d,id]=b.dataset.del.split('|');
     confirmBox('Delete this entry?','This removes it from your history for good.','Delete',()=>{const jj=getJournal();jj[d]=(jj[d]||[]).filter(e=>String(e.id)!==id);if(!jj[d].length)delete jj[d];setJournal(jj);addTomb(id);renderProgress(v);toast('Deleted');syncNow(true)},true)});
@@ -1216,6 +1260,126 @@ async function ask(q,today){
 }
 
 
+
+/* ---------- Progress photos ----------
+   Stored only on this device (IndexedDB), never synced or uploaded. Off by default; each person turns it on. */
+const PH={db:null};
+function phDB(){
+  if(PH.db)return PH.db;
+  PH.db=new Promise((res,rej)=>{const r=indexedDB.open('jams_photos',1);
+    r.onupgradeneeded=()=>{const s=r.result.createObjectStore('photos',{keyPath:'id'});s.createIndex('pid','pid')};
+    r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+  return PH.db;
+}
+async function phTx(mode,fn){const db=await phDB();return new Promise((res,rej)=>{const t=db.transaction('photos',mode),s=t.objectStore('photos');let out;Promise.resolve(fn(s)).then(v=>out=v);t.oncomplete=()=>res(out);t.onerror=()=>rej(t.error)})}
+const reqP=r=>new Promise((res,rej)=>{r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+async function photosFor(pid=profile.id){try{return (await phTx('readonly',s=>reqP(s.index('pid').getAll(pid)))).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.id-b.id)}catch(e){return []}}
+const putPhoto=p=>phTx('readwrite',s=>{s.put(p)});
+const delPhoto=id=>phTx('readwrite',s=>{s.delete(id)});
+async function delPhotosFor(pid){const list=await photosFor(pid);await phTx('readwrite',s=>{list.forEach(p=>s.delete(p.id))})}
+const clearPhotos=()=>phTx('readwrite',s=>{s.clear()}).catch(()=>{});
+// Shrink to max 1280px JPEG so photos stay small.
+async function shrink(file){
+  const url=URL.createObjectURL(file);
+  try{
+    const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url});
+    const k=Math.min(1,1280/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement('canvas');
+    c.width=Math.round(img.naturalWidth*k);c.height=Math.round(img.naturalHeight*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    return await new Promise(res=>c.toBlob(res,'image/jpeg',.82));
+  }finally{URL.revokeObjectURL(url)}
+}
+const urls=new Map();
+const blobUrl=p=>{if(!urls.has(p.id))urls.set(p.id,URL.createObjectURL(p.blob));return urls.get(p.id)};
+const daysSince=d=>Math.floor((new Date()-parseIso(d))/864e5);
+const ageText=n=>n===0?'today':n===1?'1 day ago':n<14?`${n} days ago`:n<60?`${Math.round(n/7)} weeks ago`:`${Math.round(n/30)} months ago`;
+
+async function renderPhotos(){
+  const box=$('#photos');if(!box)return;
+  if(!profile.photos){box.innerHTML='';return}
+  const list=await photosFor();if(!$('#photos'))return;
+  box.innerHTML=`<div class="card stack"><div class="row between"><h3>📸 Progress photos</h3><span class="small muted" style="font-weight:700;white-space:nowrap">🔒 Private</span></div>
+    ${list.length?`<div class="pgrid">${list.slice().reverse().map(p=>`<button class="pthumb" data-ph="${p.id}"><img src="${blobUrl(p)}" alt="Progress photo from ${niceDate(p.date)}" loading="lazy"><span>${parseIso(p.date).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'2-digit'})}</span></button>`).join('')}</div>`
+      :`<div class="empty"><div class="big-emoji">📷</div><p class="muted">Take your first photo today. In a few weeks you'll be able to see how far you've come!</p></div>`}
+    <label class="btn secondary" style="cursor:pointer">📷 Add a photo<input type="file" id="phadd" accept="image/*" hidden></label>
+    ${list.length>=2?`<button class="btn" id="phcmp">↔️ Compare before & after</button>`:''}
+  </div>`;
+  $('#phadd').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)addPhotoSheet(f)};
+  box.querySelectorAll('[data-ph]').forEach(b=>b.onclick=()=>viewPhoto(list.find(p=>String(p.id)===b.dataset.ph),list));
+  if($('#phcmp'))$('#phcmp').onclick=()=>compareSheet(list);
+}
+async function addPhotoSheet(file){
+  let blob;try{blob=await shrink(file)}catch(e){toast("Couldn't open that picture");return}
+  if(!blob){toast("Couldn't open that picture");return}
+  const prev=URL.createObjectURL(blob);
+  sheet(`<h2>New progress photo</h2><img src="${prev}" class="pfull" alt="">
+    <div class="row" style="gap:10px"><div style="flex:1"><label class="small muted" style="font-weight:700">DATE</label><input type="date" id="pd" class="num" value="${isoLocal()}" max="${isoLocal()}" style="font-size:16px"></div>
+    <div style="flex:1"><label class="small muted" style="font-weight:700">WEIGHT (optional)</label><input type="number" inputmode="decimal" step="0.1" min="0" id="pw" class="num" placeholder="${profile.unit}" style="font-size:16px"></div></div>
+    <p class="small muted">💡 For the best comparisons: same spot, same light, same pose, same time of day.</p>
+    <button class="btn" id="psave">Save photo</button><button class="btn ghost" id="cancel">Cancel</button>`,()=>{
+    $('#cancel').onclick=()=>{URL.revokeObjectURL(prev);closeLayer()};
+    $('#psave').onclick=async()=>{
+      $('#psave').disabled=true;
+      try{await putPhoto({id:Date.now(),pid:profile.id,date:$('#pd').value||isoLocal(),w:parseFloat($('#pw').value)||null,unit:profile.unit,blob});
+        URL.revokeObjectURL(prev);closeLayer();toast('📸 Photo saved');renderPhotos();
+      }catch(e){$('#psave').disabled=false;toast('Not enough space on this phone to save the photo')}
+    };
+  });
+}
+function photoLine(p){return `${niceDate(p.date)} · ${ageText(daysSince(p.date))}${p.w?` · ${round1(toUnit(p.w,p.unit))} ${profile.unit}`:''}`}
+function viewPhoto(p,list){
+  if(!p)return;
+  sheet(`<img src="${blobUrl(p)}" class="pfull" alt="Progress photo"><p style="font-weight:700">${photoLine(p)}</p>
+    <div class="row" style="gap:10px"><button class="btn secondary" id="psh">⬇️ Save</button><button class="btn danger" id="pdel">🗑️ Delete</button></div>
+    <button class="btn ghost" id="cancel">Close</button>`,()=>{
+    $('#cancel').onclick=closeLayer;
+    $('#psh').onclick=async()=>{
+      const f=new File([p.blob],`progress_${p.date}.jpg`,{type:'image/jpeg'});
+      try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f]});return}}catch(e){if(e&&e.name==='AbortError')return}
+      const a=document.createElement('a');a.href=blobUrl(p);a.download=f.name;document.body.appendChild(a);a.click();a.remove();
+    };
+    $('#pdel').onclick=()=>confirmBox('Delete this photo?','It will be gone for good.','Delete',async()=>{await delPhoto(p.id);URL.revokeObjectURL(urls.get(p.id));urls.delete(p.id);toast('Deleted');renderPhotos()},true);
+  });
+}
+function compareSheet(list){
+  let a=list[0],b=list[list.length-1];
+  const opts=sel=>list.map(p=>`<option value="${p.id}" ${p.id===sel.id?'selected':''}>${niceDate(p.date)}</option>`).join('');
+  const draw=()=>{
+    const gap=Math.round((parseIso(b.date)-parseIso(a.date))/864e5);
+    const dw=a.w&&b.w?round1(toUnit(b.w,b.unit)-toUnit(a.w,a.unit)):null;
+    sheet(`<h2>Before & after ↔️</h2>
+      <div class="row" style="gap:8px"><select class="sel" id="ca">${opts(a)}</select><select class="sel" id="cb">${opts(b)}</select></div>
+      <div class="cmp" id="cmp"><img src="${blobUrl(b)}" alt="After"><div class="cmp-a" id="cma"><img src="${blobUrl(a)}" alt="Before"></div><div class="cmp-h" id="cmh"></div>
+        <span class="cmp-l">Before</span><span class="cmp-r">After</span></div>
+      <input type="range" id="cr" min="0" max="100" value="50" aria-label="Slide to compare" class="range">
+      <p class="center" style="font-weight:700">${gap>0?`${ageText(gap).replace(' ago','')} apart`:'Same day'}${dw!==null?` · ${dw>0?'+':''}${dw} ${profile.unit}`:''}</p>
+      <p class="small muted center">Drag the slider to compare. Progress isn't only about looks. Strength and energy count too! 💪</p>
+      <button class="btn ghost" id="cancel">Close</button>`,()=>{
+      $('#cancel').onclick=closeLayer;
+      const set=v=>{$('#cma').style.clipPath=`inset(0 ${100-v}% 0 0)`;$('#cmh').style.left=v+'%'};set(50);
+      $('#cr').oninput=e=>set(e.target.value);
+      const cmp=$('#cmp');const drag=e=>{const r=cmp.getBoundingClientRect(),x=((e.touches?e.touches[0].clientX:e.clientX)-r.left)/r.width*100;const v=Math.max(0,Math.min(100,x));$('#cr').value=v;set(v)};
+      cmp.addEventListener('pointerdown',e=>{drag(e);cmp.setPointerCapture(e.pointerId)});cmp.addEventListener('pointermove',e=>{if(e.buttons)drag(e)});
+      $('#ca').onchange=e=>{a=list.find(p=>String(p.id)===e.target.value);draw()};
+      $('#cb').onchange=e=>{b=list.find(p=>String(p.id)===e.target.value);draw()};
+    });
+  };
+  draw();
+}
+async function renderPhotoNudge(){
+  const box=$('#photoNudge');if(!box||!profile.photos)return;
+  const list=await photosFor();if(!$('#photoNudge'))return;
+  const last=list[list.length-1],n=last?daysSince(last.date):null;
+  if(last&&n<28)return;
+  box.innerHTML=`<button class="card row" id="nudge" style="width:100%;text-align:left"><span class="big-emoji">📸</span><div style="flex:1"><b>${last?'Time for a progress photo?':'Take your first progress photo'}</b><p class="muted small">${last?`Your last one was ${ageText(n)}.`:'Then compare in a few weeks.'}</p></div><span class="muted">›</span></button>`;
+  $('#nudge').onclick=()=>{go('progress');setTimeout(()=>{const el=$('#photos');if(el)el.scrollIntoView({behavior:'smooth'})},250)};
+}
+function photosCard(){
+  return `<div class="card stack"><h3>📸 Progress photos</h3>
+    <p class="small muted">Take photos every few weeks and compare them side by side. Photos stay <b>only on this phone</b>. They're never uploaded or synced, and only ${esc(profile.name||'this person')} can see them here.</p>
+    <div class="seg" id="phon"><button class="${profile.photos?'':'on'}" data-ph="0">Off</button><button class="${profile.photos?'on':''}" data-ph="1">On</button></div>
+    ${profile.photos?`<p class="small muted">💡 On iPhone, add this app to your Home Screen (Share → Add to Home Screen) so your photos are kept safely. Save copies of photos you want to keep forever.</p>`:''}</div>`;
+}
+
 /* ---------- Me / Settings ---------- */
 function renderMe(v){
   const others=DB.list.filter(p=>p.id!==profile.id);
@@ -1242,6 +1406,8 @@ function renderMe(v){
     </div>
 
     ${syncCard()}
+
+    ${photosCard()}
 
     <details class="card how" style="padding:4px 18px"><summary>📖 How this plan works</summary>
       <p style="margin:4px 0 10px"><b>The week:</b> Mon Upper A · Tue Lower A · Wed active rest · Thu Upper B · Fri Lower B · Sat bonus · Sun rest.</p>
@@ -1274,12 +1440,14 @@ function renderMe(v){
   $('#exp').onclick=exportBackup;
   $('#imp').onchange=importBackup;
   bindSync(v);
+  v.querySelectorAll('#phon [data-ph]').forEach(b=>b.onclick=()=>{const on=b.dataset.ph==='1';if(on===!!profile.photos)return;profile.photos=on;saveProfile();
+    if(on){try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}toast('📸 Photos on! Find them in Progress')}else toast('Photos hidden. They stay saved on this phone');renderMe(v)});
   if($('#rmp'))$('#rmp').onclick=()=>confirmBox(`Remove ${esc(profile.name||'this person')}?`,`Their workouts and badges will be deleted from this phone${syncCfg.code?' and from your synced devices':''}. Download a backup first if you want to keep them.`,'Remove',()=>{
-    const p=profile;['workout_journal','jams_active','jams_chat','jams_tomb'].forEach(k=>store.del(pKey(k,p)));
+    const p=profile;delPhotosFor(p.id).catch(()=>{});['workout_journal','jams_active','jams_chat','jams_tomb'].forEach(k=>store.del(pKey(k,p)));
     DB.list=DB.list.filter(x=>x.id!==p.id);DB.deleted.push(p.id);if(DB.legacyId===p.id)DB.legacyId=null;saveDB();
     switchProfile(DB.list[0].id);syncNow(true)},true);
   $('#reset').onclick=()=>confirmBox('Erase everything?','All people, workouts and settings on this phone will be deleted. Synced copies stay in the cloud.','Erase all',()=>{
-    DB.list.forEach(p=>['workout_journal','jams_active','jams_chat','jams_tomb'].forEach(k=>store.del(pKey(k,p))));
+    clearPhotos();DB.list.forEach(p=>['workout_journal','jams_active','jams_chat','jams_tomb'].forEach(k=>store.del(pKey(k,p))));
     ['workout_journal','jams_active','jams_chat','jams_profile','jams_profiles','jams_sync','jams_tomb'].forEach(k=>store.del(k));
     DB={current:null,list:[],deleted:[]};profile=Object.assign({},DEFAULT_P);syncCfg={code:null,last:0};chat=[];ob={step:0,answers:[],name:'',avatar:'🙂'};go('today')},true);
 }
