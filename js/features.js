@@ -24,6 +24,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-say]');if(
 
 /* ---------- Plans: level plan, my workouts, sport plans ---------- */
 function startCustom(kind,id){
+  setEditing=null;
   const src=kind==='r'?(profile.routines||[]).find(r=>r.id===id):SPORTS.find(s=>s.id===id);if(!src)return;
   const plan=src.items.filter(p=>EX[p[0]]).map(p=>[p[0],+p[1]||3,+p[2]||8,+p[3]||+p[2]||12]);
   if(!plan.length){toast('This workout has no exercises yet');return}

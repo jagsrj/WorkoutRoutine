@@ -107,6 +107,12 @@ details.how li{margin:6px 0}
 .check{height:50px;width:56px;border-radius:14px;border:2px solid var(--line);background:var(--card);font-size:24px;color:var(--muted);align-self:end}
 .set.isdone .check{background:var(--ok);border-color:var(--ok);color:#fff}
 .set.isdone .num{border-color:color-mix(in srgb,var(--ok) 45%,var(--line))}
+.set .num:disabled{opacity:1;color:var(--text);-webkit-text-fill-color:var(--text);background:color-mix(in srgb,var(--ok) 8%,var(--card));cursor:default}
+.set.isdone .check{display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.set.isdone .check small{font-size:11px;font-weight:700;margin-top:2px}
+.set .undone{display:block;font-size:12px;padding:4px 0;min-height:32px;color:var(--muted);text-align:left}
+.set.editing .num{border-color:var(--lvl);border-width:2px}
+.set.editing .check.save{background:var(--lvl);border-color:var(--lvl);color:#fff;font-size:15px;font-weight:800}
 .progress{height:10px;background:var(--line);border-radius:99px;overflow:hidden}
 .progress>i{display:block;height:100%;background:var(--lvl-text);border-radius:99px;transition:width .3s}
 /* Level cards */
@@ -316,10 +322,10 @@ a.btn{text-decoration:none}
 .toggle input{width:26px;height:26px;accent-color:var(--lvl)}
 .wrows{display:flex;flex-direction:column}
 .wrow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:10px 2px;min-height:52px;color:var(--text);font-size:15px}
-.wi{font-size:22px;width:30px;text-align:center;flex:0 0 30px}
-.wt{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}
-.wt b{font-weight:700}
-.wv{font-weight:800;font-size:14px;color:var(--lvl-text);white-space:nowrap}
+.wrow .wi{font-size:22px;width:30px;text-align:center;flex:0 0 30px}
+.wrow .wt{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}
+.wrow .wt b{font-weight:700}
+.wrow .wv{font-weight:800;font-size:14px;color:var(--lvl-text);white-space:nowrap}
 .mini{display:block;height:6px;background:var(--line);border-radius:6px;overflow:hidden}
 .mini i{display:block;height:100%;background:var(--lvl-text);border-radius:6px}
 </style>
