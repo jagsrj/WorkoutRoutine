@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 Disallow: /api/
-Sitemap: https://workoutroutine-aeq.pages.dev/sitemap.xml
+Sitemap: https://kinfit.pages.dev/sitemap.xml
