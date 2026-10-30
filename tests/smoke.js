@@ -50,6 +50,27 @@ const check = (ok, what) => { console.log(`${ok ? '✅' : '❌'} ${what}`); if (
     await page.click('[data-go="ask"]'); await page.click('#sugg button:nth-child(2)');
     await page.waitForFunction(() => !document.querySelector('#typing'));
     check((await page.locator('.msg.bot').last().textContent()).includes('Squat'), 'Coach explains a squat');
+    // Security: booby-trapped saved data must never run as code
+    const bad = '<img src=x onerror="window.__pwned=1">';
+    await page.evaluate(b => {
+      const d = JSON.parse(localStorage.getItem('jams_profiles'));
+      const p = d.list[0];
+      p.avatar = b; p.name = 'Evil' + b;
+      p.customEx = { c_evil: { name: 'Hack' + b, e: b, m: [b], steps: [b, '"><svg onload="window.__pwned=2">'], tip: b } };
+      p.routines = [{ id: 'revil', name: 'R' + b, e: b, items: [['c_evil', 3, 8, 12]] }];
+      p.fives = [{ from: b, av: b, at: Date.now() }];
+      localStorage.setItem('jams_profiles', JSON.stringify(d));
+      const j = JSON.parse(localStorage.getItem('workout_journal') || '{}');
+      j['2026-01-01'] = [{ id: 'x"><img src=x onerror="window.__pwned=3">', exercise: 'Ex' + b, sets: [{ reps: 5, weight: 0 }], timestamp: b }];
+      localStorage.setItem('workout_journal', JSON.stringify(j));
+    }, bad);
+    await page.reload(); await page.waitForTimeout(300);
+    for (const tab of ['today', 'library', 'progress', 'me', 'ask']) { await page.click(`[data-go="${tab}"]`); await page.waitForTimeout(150); }
+    await page.click('[data-go="library"]'); await page.click('[data-lt="mine"]'); await page.locator('details.how').first().evaluate(d => d.open = true);
+    await page.click('[data-go="progress"]');
+    const pwned = await page.evaluate(() => window.__pwned);
+    const injected = await page.evaluate(() => document.querySelectorAll('img[src="x"], svg[onload]').length);
+    check(!pwned && injected === 0, 'Booby-trapped saved data cannot run code');
   } catch (e) { console.error(e); failures++; }
   check(errors.length === 0, 'No JavaScript errors' + (errors.length ? ': ' + errors.join(' | ') : ''));
   await browser.close(); server.close();
