@@ -6,7 +6,7 @@ Simple workout plans for every level. Pick your level, follow the plan and watch
 
 **Use it:** open `index.html` in any browser. On a phone, tap **Share → Add to Home Screen** to use it like an app.
 
-**Hosting:** Cloudflare Pages at https://workoutroutine-aeq.pages.dev. Every push to `main` redeploys automatically (no build command, output directory `/`).
+**Hosting:** Cloudflare Pages at https://kinfit.pages.dev (project `kinfit`; build command `exit 0`, output directory `/`, bindings `STORE` = KV `jams-store` and `AI` = Workers AI). Every push to `main` redeploys automatically. The old address https://workoutroutine-aeq.pages.dev still works and shows a "KinFit has moved" banner; its data can be moved with the recovery code.
 
 **One-time Cloudflare settings** (Pages project → Settings → Bindings):
 

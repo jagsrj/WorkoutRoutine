@@ -88,3 +88,30 @@ function showNet(){
 addEventListener('online',()=>{showNet();if(syncCfg.code)syncNow(true)});
 addEventListener('offline',showNet);
 showNet();
+
+/* ---------- Old address: "KinFit has moved" ---------- */
+const NEW_HOME='https://kinfit.pages.dev/';
+const onOldHost=()=>/(^|\.)workoutroutine-aeq\.pages\.dev$/.test(location.hostname);
+function movedCard(){
+  if(!onOldHost())return '';
+  return `<div class="card stack moved"><b>🚚 KinFit has a new home</b>
+    <p class="small">Open <b>kinfit.pages.dev</b> and add it to your Home Screen. This old address will stop working later.</p>
+    <button class="btn" id="mvhow">Move my workouts</button></div>`;
+}
+function movedSheet(){
+  const on=!!syncCfg.code;
+  sheet(`<h2>🚚 Move to kinfit.pages.dev</h2>
+    <p class="muted">Your phone treats the new address as a different website, so your data moves with your <b>recovery code</b>.</p>
+    <ol class="small" style="padding-left:20px;margin:0">
+      <li>${on?'✅ Cloud backup is on here. Your recovery code is in <b>Me → Backup &amp; sync</b>.':'Here, turn on <b>Me → Backup &amp; sync</b> and save the recovery code.'}</li>
+      <li>Open <b>kinfit.pages.dev</b>, tap <b>“Used KinFit before? Restore with your recovery code”</b> and type the code.</li>
+      <li>Add it to your Home Screen (Share → Add to Home Screen) and remove the old icon.</li></ol>
+    <p class="small muted">📸 Progress photos stay on this phone at the old address. Open each one you want to keep in Progress and share or save it to your Photos first.</p>
+    ${on?'':'<button class="btn secondary" id="mvsync">Turn on backup &amp; sync</button>'}
+    <a class="btn" href="${NEW_HOME}" style="text-decoration:none;display:flex;align-items:center;justify-content:center">Open kinfit.pages.dev ↗</a>
+    <button class="btn ghost" id="cancel">Close</button>`,()=>{
+    $('#cancel').onclick=closeLayer;
+    if($('#mvsync'))$('#mvsync').onclick=()=>{closeLayer();go('me')};
+  });
+}
+document.addEventListener('click',e=>{if(e.target.closest('#mvhow'))movedSheet()});

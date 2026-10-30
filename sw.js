@@ -1,7 +1,7 @@
 // KinFit service worker (bump CACHE when adding or renaming files): lets the app open without internet.
 // Everything loads fresh from the network when online (so updates show right away)
 // and falls back to the saved copy when offline. /api/ calls are never cached.
-const CACHE = 'jams-v18';
+const CACHE = 'jams-v19';
 // Cloudflare serves the app at ./ (index.html redirects there), so the page is cached under ./
 // The app's code is bundled into app.js by scripts/build.js; errors.js stays separate.
 const JS = ['js/errors.js', 'app.js'];
