@@ -112,7 +112,7 @@ function renderLibrary(v){
   let body='';
   if(libTab==='plan'){
     const plan=PLANS[libLevel];
-    body=`${stretchCard()}<div class="seg">${Object.keys(LEVELS).map(k=>`<button class="${k===libLevel?'on':''}" data-l="${k}">${LEVELS[k].emoji} ${LEVELS[k].name}</button>`).join('')}</div>
+    body=`${intervalCard()}${stretchCard()}<div class="seg">${Object.keys(LEVELS).map(k=>`<button class="${k===libLevel?'on':''}" data-l="${k}">${LEVELS[k].emoji} ${LEVELS[k].name}</button>`).join('')}</div>
     <p class="small muted">🧰 ${LEVELS[libLevel].equipment}</p>
     ${Object.keys(WORKOUTS).map(w=>`<div class="stack"><h2 class="h3">${WORKOUTS[w].e} ${WORKOUTS[w].name} <span class="muted small">· ${WORKOUTS[w].sub}</span></h2>
       ${plan[w].map(p=>exCard(p[0],repsText(p,EX[p[0]]))).join('')}</div>`).join('')}`;
@@ -407,6 +407,7 @@ function parentCard(){
   return `<div class="card stack"><h2 class="h3">🔒 Parent controls</h2>
     <p class="small muted">${pinIsSet()?'Parent lock is <b>on</b>. A PIN is needed to change levels, remove people, change sync, body tracking or Coach settings, or erase data.':'Set a 4-digit PIN so kids can\'t change levels, remove people or erase data.'}</p>
     <div class="row between"><span><b>Coach AI answers</b><br><span class="small muted">Off = Coach only uses its built-in answers</span></span><div class="seg" style="width:120px"><button class="${profile.coachAI===false?'on':''}" data-cai="0">Off</button><button class="${profile.coachAI===false?'':'on'}" data-cai="1">On</button></div></div>
+    <div class="row between"><span><b>Child profile</b><br><span class="small muted">Coach uses simpler, kid-safe answers for ${esc(profile.name||'this person')}</span></span><div class="seg" style="width:120px"><button class="${profile.kid?'':'on'}" data-kidp="0">Off</button><button class="${profile.kid?'on':''}" data-kidp="1">On</button></div></div>
     <button class="btn secondary" id="pinset">${pinIsSet()?'Change PIN':'Set a parent PIN'}</button>
     ${pinIsSet()?'<button class="link" id="pinoff" style="padding:0;color:var(--muted)">Turn off parent lock</button>':''}</div>`;
 }

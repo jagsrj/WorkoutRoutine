@@ -78,6 +78,9 @@ Redeploy after adding bindings. Coach allows 20 AI questions per hour per person
 - Today shows one compact "This week" card. Tap **Customize** to hide rows you don't need (plan, challenge, goals, family, badges, tip).
 - During a workout, reps and weight use a big − / + picker with quick-pick numbers instead of typing. A new weight carries forward to the next sets.
 - Deleting a workout, activity, measurement, goal or photo shows a 5-second **Undo** bar.
+- A banner says when you're offline (workouts still save and sync later).
+- **Interval timer** (Workouts → Plan): work/rest/rounds with beeps and an optional spoken countdown; add exercises to make a circuit. Finished sessions are logged as an activity.
+- **Child profiles:** when adding someone you choose "Me" or "My child". Child profiles get kid-safe Coach answers (no diet or weight-loss advice) and a prompt to set a parent PIN. Change it in Me → Parent controls.
 
 ## Compatibility
 
@@ -95,4 +98,4 @@ This app gives general fitness guidance, not medical advice. Under-18s should li
 - Keep your recovery code private, and turn on two-factor login for your Cloudflare and GitHub accounts.
 
 ## Code layout
-`index.html` (page and styles) loads `js/errors.js`, then `data`, `store`, `screens`, `sync`, `coach`, `photos`, `features`, `extras` and `me`, in that order. Server functions are in `functions/api/`. Tests are in `tests/smoke.js` (plus a manual iPhone checklist in `TESTING.md`) and include unit checks for sync merging, data cleaning, 1RM maths and plan phases.
+`index.html` (page and styles) loads `js/errors.js`, then `app.js`. **`app.js` is generated:** edit the files in `js/` (`data`, `store`, `screens`, `sync`, `coach`, `photos`, `features`, `extras`, `smart`, `more`, `me`, joined in that order), then run `node scripts/build.js`. The test workflow fails if `app.js` is out of date. Server functions are in `functions/api/`. Tests are in `tests/smoke.js` (plus a manual iPhone checklist in `TESTING.md`) and include unit checks for sync merging, data cleaning, 1RM maths and plan phases.

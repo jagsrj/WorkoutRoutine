@@ -25,6 +25,7 @@ function sanitizeProfile(p){
     goals:(Array.isArray(p.goals)?p.goals:[]).slice(-20).filter(g=>g&&['lift','reps','workouts','minutes'].includes(g.type)&&ISO_RE.test(String(g.start))&&ISO_RE.test(String(g.by))).map(g=>({id:cleanText(g.id,30)||newPid(),type:g.type,ex:cleanText(g.ex,60),target:cleanNum(g.target,1e6),start:g.start,by:g.by,done:ISO_RE.test(String(g.done))?g.done:null}))};
   if(ISO_RE.test(String(p.planStart)))o.planStart=p.planStart;
   if(p.coachAI===false)o.coachAI=false;
+  if(p.kid===true)o.kid=true;
   o.customEx={};Object.entries(p.customEx&&typeof p.customEx==='object'?p.customEx:{}).slice(0,100).forEach(([k,v])=>{if(!/^c_[a-z0-9]{1,40}$/.test(k)||!v||typeof v!=='object')return;
     const name=cleanText(v.name,40);if(!name)return;
     o.customEx[k]={name,e:cleanEmoji(v.e,'⭐'),m:(Array.isArray(v.m)?v.m:[]).slice(0,6).map(x=>cleanText(x,20)).filter(Boolean),weight:!!v.weight,time:!!v.time,

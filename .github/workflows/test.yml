@@ -12,6 +12,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - run: node scripts/build.js --check
       - run: npm install --no-save playwright@1
       - run: npx playwright install --with-deps chromium
       - run: node tests/smoke.js

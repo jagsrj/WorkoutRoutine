@@ -296,6 +296,10 @@ a.btn{text-decoration:none}
 .pkbig{width:76px;height:76px;flex:0 0 76px;border-radius:22px;border:0;background:var(--lvl-soft);color:var(--lvl-text);font-size:42px;font-weight:800;line-height:1}
 .pkbig:active{transform:scale(.95)}
 .num.pkv{width:140px;height:76px;font-size:38px}
+.net{position:fixed;left:0;right:0;top:0;z-index:60;background:#334155;color:#fff;text-align:center;font-size:14px;font-weight:600;padding:calc(8px + env(safe-area-inset-top,0px)) 14px 8px;transform:translateY(-100%);visibility:hidden;transition:transform .25s,visibility .25s}
+.net.show{transform:none;visibility:visible}.net.ok{background:#15803d}
+.recov{background:var(--lvl-soft);border-radius:12px;padding:10px 12px;margin:0}
+.ivrow{display:flex;align-items:center;justify-content:space-between;gap:12px}.ivrow .numbtn{width:110px}
 .undo{position:fixed;left:12px;right:12px;bottom:calc(76px + var(--safe-b));max-width:536px;margin:0 auto;background:#0f172a;color:#fff;border-radius:16px;padding:10px 12px 10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;z-index:35;font-weight:600;transform:translateY(calc(100% + 160px));visibility:hidden;transition:transform .25s,visibility .25s}
 .undo.show{transform:none;visibility:visible}
 .undo button{border:0;background:#fff;color:#0f172a;font-weight:800;border-radius:10px;padding:10px 16px;min-height:44px}
@@ -324,6 +328,7 @@ a.btn{text-decoration:none}
   </div>
 </nav>
 
+<div class="net" id="net" role="status" aria-live="polite"></div>
 <div class="timer" id="timer" role="status" aria-live="polite">
   <div><div class="small" style="opacity:.75;font-weight:700">Rest time 😮‍💨</div><div class="t" id="timer-t">1:00</div></div>
   <div style="flex:1"></div>
@@ -334,15 +339,6 @@ a.btn{text-decoration:none}
 <div id="layer"></div>
 
 <script src="js/errors.js"></script>
-<script src="js/data.js"></script>
-<script src="js/store.js"></script>
-<script src="js/screens.js"></script>
-<script src="js/sync.js"></script>
-<script src="js/coach.js"></script>
-<script src="js/photos.js"></script>
-<script src="js/features.js"></script>
-<script src="js/extras.js"></script>
-<script src="js/smart.js"></script>
-<script src="js/me.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
