@@ -114,15 +114,15 @@ function renderLibrary(v){
     const plan=PLANS[libLevel];
     body=`${stretchCard()}<div class="seg">${Object.keys(LEVELS).map(k=>`<button class="${k===libLevel?'on':''}" data-l="${k}">${LEVELS[k].emoji} ${LEVELS[k].name}</button>`).join('')}</div>
     <p class="small muted">🧰 ${LEVELS[libLevel].equipment}</p>
-    ${Object.keys(WORKOUTS).map(w=>`<div class="stack"><h3>${WORKOUTS[w].e} ${WORKOUTS[w].name} <span class="muted small">· ${WORKOUTS[w].sub}</span></h3>
+    ${Object.keys(WORKOUTS).map(w=>`<div class="stack"><h2 class="h3">${WORKOUTS[w].e} ${WORKOUTS[w].name} <span class="muted small">· ${WORKOUTS[w].sub}</span></h2>
       ${plan[w].map(p=>exCard(p[0],repsText(p,EX[p[0]]))).join('')}</div>`).join('')}`;
   }else if(libTab==='mine'){
     const rs=profile.routines||[],cx=Object.keys(profile.customEx||{});
-    body=`<div class="stack"><h3>My workouts</h3>
+    body=`<div class="stack"><h2 class="h3">My workouts</h2>
       ${rs.length?rs.map(r=>`<div class="card row" style="padding:14px"><span class="ex-emoji">${r.e}</span><div style="flex:1"><b>${esc(r.name)}</b><p class="small muted">${plural(r.items.length,'exercise')}</p></div><button class="btn sm ghost" data-redit="${r.id}" aria-label="Edit">✏️</button><button class="btn sm" data-rstart="${r.id}">▶</button></div>`).join('')
         :`<div class="card empty"><div class="big-emoji">📝</div><p class="muted">Build your own workout from any exercises. Great for leg day, sports practice or a quick 10 minutes.</p></div>`}
       <button class="btn" id="rnew">＋ Create a workout</button><button class="btn secondary" id="rbuild">✨ Build one for me</button></div>
-    <div class="stack"><h3>My exercises</h3>
+    <div class="stack"><h2 class="h3">My exercises</h2>
       ${cx.length?cx.map(k=>exCard(k,'',true)).join(''):`<p class="small muted">Can't find a move in the library? Add your own, with your own steps.</p>`}
       <button class="btn secondary" id="xnew">＋ Create an exercise</button></div>`;
   }else if(libTab==='sports'){
@@ -210,7 +210,7 @@ function muscleMap(){
   const st=muscleStats(),m=muscleMode;
   const val=k=>m==='sets'?(st.sets[k]||0):m==='load'?Math.round(st.load[k]||0):Math.round((st.best[k]||{}).er||0);
   const max=Math.max(1,...Object.keys(MUSCLE_NAMES).map(val));
-  const fill=k=>{const n=val(k);if(!n)return 'fill="var(--line)"';const f=n/max;return `fill="var(--lvl)" fill-opacity="${f>.66?1:f>.33?.7:.4}"`};
+  const fill=k=>{const n=val(k);if(!n)return 'fill="var(--line)"';const f=n/max;return `fill="var(--lvl-text)" fill-opacity="${f>.66?1:f>.33?.7:.4}"`};
   const unit=profile.unit,fmt=n=>n.toLocaleString();
   const tip=k=>`${MUSCLE_NAMES[k]}: ${m==='sets'?val(k)+' sets this week':m==='load'?fmt(val(k))+' '+unit+' this week':val(k)?'strongest est. 1-rep max '+val(k)+' '+unit:'no weighted lifts yet'}`;
   const E=(k,x,y,rx,ry)=>`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" ${fill(k)}><title>${tip(k)}</title></ellipse>`;
@@ -224,7 +224,7 @@ function muscleMap(){
   const note=m==='sets'?'How many sets each muscle did this week.'
     :m==='load'?`Weight × reps for every set this week. Each muscle counts the full weight of the exercises that use it (so a bench press adds to chest, shoulders and triceps).`
     :'Each muscle\'s strongest lift ever, as an estimated 1-rep max: the most it could lift once. A score to watch grow, not a weight to try!';
-  return `<div class="card stack" id="mmcard"><h3>💪 Muscle power</h3>
+  return `<div class="card stack" id="mmcard"><h2 class="h3">💪 Muscle power</h2>
     <div class="seg">${[['sets','Sets'],['load',`${unit} lifted`],['best','Strength']].map(o=>`<button class="${o[0]===m?'on':''}" data-mm="${o[0]}">${o[1]}</button>`).join('')}</div>
     <svg viewBox="0 0 200 182" class="mmap" role="img" aria-label="Body map of muscles">${body(50,true)}${body(150,false)}<text x="50" y="181" text-anchor="middle" font-size="9" fill="var(--muted)">FRONT</text><text x="150" y="181" text-anchor="middle" font-size="9" fill="var(--muted)">BACK</text></svg>
     ${rows.length?`<div class="stack" style="gap:8px">${rows.map(([k,n])=>`<div><div class="row between small"><b>${MUSCLE_NAMES[k]}</b><span>${m==='sets'?plural(n,'set'):fmt(n)+' '+unit}${m==='best'?` <span class="muted">· ${esc(st.best[k].ex)}</span>`:''}</span></div><div class="famBar"><i style="width:${n/max*100}%"></i></div></div>`).join('')}</div>`
@@ -284,7 +284,8 @@ function activitySheet(edit){
       (jj[st.date]=jj[st.date]||[]).push(entry);setJournal(jj);closeLayer();toast(e?'Saved ✅':`${st.e} ${min} minutes logged!`);
       if(!e){say(`Nice! ${min} minutes of ${st.act.toLowerCase()} logged.`);const nb=newBadges();if(nb.length)setTimeout(()=>toast(`🏅 New badge: ${nb[0].e} ${nb[0].n}!`),1200)}
       syncNow(true);render()};
-    if($('#adel'))$('#adel').onclick=()=>{const jj=getJournal();jj[edit.d]=(jj[edit.d]||[]).filter(x=>String(x.id)!==String(e.id));if(!jj[edit.d].length)delete jj[edit.d];setJournal(jj);addTomb(e.id);closeLayer();toast('Deleted');syncNow(true);render()};
+    if($('#adel'))$('#adel').onclick=()=>{const jj=getJournal();jj[edit.d]=(jj[edit.d]||[]).filter(x=>String(x.id)!==String(e.id));if(!jj[edit.d].length)delete jj[edit.d];setJournal(jj);closeLayer();render();
+      undoable(`${e.exercise} deleted`,()=>{const j2=getJournal();(j2[edit.d]=j2[edit.d]||[]).push(e);setJournal(j2);render()},()=>{addTomb(e.id);syncNow(true)})};
   });
   draw();
 }
@@ -301,7 +302,7 @@ function bodyCard(){
   const conv=(x,from,to)=>from===to?x:to==='cm'?x*2.54:x/2.54;
   const w=B.filter(b=>b.w).map(b=>({d:b.d,v:round1(toUnit(b.w,b.unit))})),wa=B.filter(b=>b.waist).map(b=>({d:b.d,v:round1(conv(b.waist,b.lu||'in',lu))}));
   const delta=a=>a.length>1?round1(a[a.length-1].v-a[0].v):null,dw=delta(w),dwa=delta(wa);
-  return `<div class="card stack"><div class="row between"><h3>⚖️ Body measurements</h3><span class="small muted" style="font-weight:700">🔒 Private</span></div>
+  return `<div class="card stack"><div class="row between"><h2 class="h3">⚖️ Body measurements</h2><span class="small muted" style="font-weight:700">🔒 Private</span></div>
     ${B.length?`<div class="stats" style="grid-template-columns:1fr 1fr"><div class="stat"><b>${w.length?w[w.length-1].v:'–'}</b><span>${profile.unit}${dw!==null?` (${dw>0?'+':''}${dw})`:''}</span></div><div class="stat"><b>${wa.length?wa[wa.length-1].v:'–'}</b><span>waist ${lu}${dwa!==null?` (${dwa>0?'+':''}${dwa})`:''}</span></div></div>
       ${w.length>1?miniChart(w,'Body weight ('+profile.unit+')'):''}
       <details class="how"><summary>All entries</summary>${B.slice().reverse().map(b=>`<div class="row between" style="padding:6px 0"><span>${niceDate(b.d)}</span><span>${b.w?round1(toUnit(b.w,b.unit))+' '+profile.unit:''}${b.w&&b.waist?' · ':''}${b.waist?round1(conv(b.waist,b.lu||'in',lu))+' '+lu:''}<button class="xbtn" data-bdel="${b.id}" aria-label="Delete">🗑️</button></span></div>`).join('')}</details>`
@@ -325,7 +326,7 @@ function miniChart(pts,label){
   const W=340,H=150,L=36,R=12,T=12,B=24,vals=pts.map(p=>p.v),mx=Math.max(...vals),mn=Math.min(...vals),pad=(mx-mn)*.2||1,hi=mx+pad,lo=Math.max(0,mn-pad);
   const x=i=>L+i*(W-L-R)/Math.max(1,pts.length-1),y=v=>T+(H-T-B)*(1-(v-lo)/(hi-lo));
   const path=vals.map((v,i)=>`${i?'L':'M'}${x(i)},${y(v)}`).join('');
-  return `<p class="small muted" style="font-weight:700">${label}</p><svg class="chart" viewBox="0 0 ${W} ${H}">${[lo,(lo+hi)/2,hi].map(v=>`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${Math.round(v)}</text>`).join('')}<path d="${path}" fill="none" stroke="var(--lvl)" stroke-width="3" stroke-linejoin="round"/>${vals.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="4" fill="var(--card)" stroke="var(--lvl)" stroke-width="2.5"/>`).join('')}<text x="${x(0)}" y="${H-6}" font-size="11" fill="var(--muted)" text-anchor="start">${parseIso(pts[0].d).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</text><text x="${x(pts.length-1)}" y="${H-6}" font-size="11" fill="var(--muted)" text-anchor="end">${parseIso(pts[pts.length-1].d).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</text></svg>`;
+  return `<p class="small muted" style="font-weight:700">${label}</p><svg class="chart" viewBox="0 0 ${W} ${H}">${[lo,(lo+hi)/2,hi].map(v=>`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${Math.round(v)}</text>`).join('')}<path d="${path}" fill="none" stroke="var(--lvl-text)" stroke-width="3" stroke-linejoin="round"/>${vals.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="4" fill="var(--card)" stroke="var(--lvl-text)" stroke-width="2.5"/>`).join('')}<text x="${x(0)}" y="${H-6}" font-size="11" fill="var(--muted)" text-anchor="start">${parseIso(pts[0].d).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</text><text x="${x(pts.length-1)}" y="${H-6}" font-size="11" fill="var(--muted)" text-anchor="end">${parseIso(pts[pts.length-1].d).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</text></svg>`;
 }
 
 /* ---------- Family challenge & high-fives ---------- */
@@ -334,7 +335,7 @@ function familyCard(){
   const ws=weekStart(new Date());
   const rows=DB.list.map(p=>{const j=getJournal(p);const n=workoutDates(j).filter(d=>parseIso(d)>=ws).length;return {p,n}}).sort((a,b)=>b.n-a.n);
   const top=rows[0].n;
-  return `<div class="card stack"><div class="row between"><h3>👨‍👩‍👧 Family challenge</h3><span class="small muted" style="font-weight:700">This week</span></div>
+  return `<div class="card stack"><div class="row between"><h2 class="h3">👨‍👩‍👧 Family challenge</h2><span class="small muted" style="font-weight:700">This week</span></div>
     <p class="small muted">Most active days this week wins the crown 👑</p>
     ${rows.map(({p,n},i)=>`<div class="row fam"><span class="av">${esc(p.avatar||'🙂')}</span><div style="flex:1"><b>${esc(p.name||'No name')}</b>${n&&n===top?' 👑':''}<div class="famBar"><i style="width:${top?n/Math.max(top,1)*100:0}%"></i></div></div><b style="min-width:42px;text-align:right">${n} ${n===1?'day':'days'}</b>${p.id!==profile.id?`<button class="btn sm secondary" data-five="${p.id}" aria-label="Send a high-five">🙌</button>`:'<span style="width:52px"></span>'}</div>`).join('')}
   </div>`;
@@ -364,9 +365,9 @@ function historySummary(){
 function remindersCard(){
   const r=store.get('jams_remind',{days:['MO','TU','TH','FR'],t:'17:00'});
   const D=[['MO','M'],['TU','T'],['WE','W'],['TH','T'],['FR','F'],['SA','S'],['SU','S']];
-  return `<div class="card stack"><h3>⏰ Workout reminders</h3><p class="small muted">Add a repeating reminder to your phone's calendar. You'll get a notification at workout time.</p>
+  return `<div class="card stack"><h2 class="h3">⏰ Workout reminders</h2><p class="small muted">Add a repeating reminder to your phone's calendar. You'll get a notification at workout time.</p>
     <div class="daypick">${D.map(([k,l])=>`<button class="${r.days.includes(k)?'on':''}" data-rd="${k}" aria-label="${k}">${l}</button>`).join('')}</div>
-    <div class="row" style="gap:10px"><label class="small muted" style="font-weight:700">TIME</label><input class="num" id="rt" type="time" value="${r.t}" style="flex:1;font-size:17px"></div>
+    <div class="row" style="gap:10px"><label class="small muted" style="font-weight:700">TIME</label><input class="num" id="rt" type="time" aria-label="Reminder time" value="${r.t}" style="flex:1;font-size:17px"></div>
     <a class="btn secondary" id="rcal" href="#" style="text-decoration:none">📅 Add to my calendar</a></div>`;
 }
 function bindReminders(v){
@@ -403,7 +404,7 @@ function pinSheet(after){
   });
 }
 function parentCard(){
-  return `<div class="card stack"><h3>🔒 Parent controls</h3>
+  return `<div class="card stack"><h2 class="h3">🔒 Parent controls</h2>
     <p class="small muted">${pinIsSet()?'Parent lock is <b>on</b>. A PIN is needed to change levels, remove people, change sync, body tracking or Coach settings, or erase data.':'Set a 4-digit PIN so kids can\'t change levels, remove people or erase data.'}</p>
     <div class="row between"><span><b>Coach AI answers</b><br><span class="small muted">Off = Coach only uses its built-in answers</span></span><div class="seg" style="width:120px"><button class="${profile.coachAI===false?'on':''}" data-cai="0">Off</button><button class="${profile.coachAI===false?'':'on'}" data-cai="1">On</button></div></div>
     <button class="btn secondary" id="pinset">${pinIsSet()?'Change PIN':'Set a parent PIN'}</button>

@@ -70,6 +70,15 @@ Redeploy after adding bindings. Coach allows 20 AI questions per hour per person
 - Works offline, has no sign-up and no tracking. Data stays on the device (localStorage).
 - Supports dark mode.
 
+## Ease of use and accessibility
+
+- Text and colours meet WCAG AA contrast in light and dark mode (checked with axe-core on every screen).
+- Buttons and links are at least 40–44 px tall, so they are easy to tap with sweaty fingers.
+- Pop-up sheets are announced as dialogs to screen readers, and focus moves to their title.
+- Today shows one compact "This week" card. Tap **Customize** to hide rows you don't need (plan, challenge, goals, family, badges, tip).
+- During a workout, reps and weight use a big − / + picker with quick-pick numbers instead of typing. A new weight carries forward to the next sets.
+- Deleting a workout, activity, measurement, goal or photo shows a 5-second **Undo** bar.
+
 ## Compatibility
 
 History saved by the earlier version (the `workout_journal` key) is kept and shows up in Progress, and old backup files can be restored.

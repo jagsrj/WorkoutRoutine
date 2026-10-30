@@ -143,7 +143,7 @@ function applyDisplay(){
 }
 function displayCard(){
   const z=store.get('jams_text','1'),t=store.get('jams_theme','auto');
-  return `<div class="card stack"><h3>👀 Display</h3>
+  return `<div class="card stack"><h2 class="h3">👀 Display</h2>
     <p class="small muted" style="font-weight:700">TEXT SIZE</p><div class="seg">${[['1','A'],['1.15','A+'],['1.3','A++']].map(x=>`<button class="${z===x[0]?'on':''}" data-zoom="${x[0]}" style="font-size:${14*x[0]}px">${x[1]}</button>`).join('')}</div>
     <p class="small muted" style="font-weight:700">THEME</p><div class="seg">${[['auto','📱 Auto'],['light','☀️ Light'],['dark','🌙 Dark']].map(x=>`<button class="${t===x[0]?'on':''}" data-theme-set="${x[0]}">${x[1]}</button>`).join('')}</div></div>`;
 }
@@ -167,12 +167,12 @@ function renderReport(v){
   <div class="report stack-lg">
     <div class="row between"><div>${logo()}<h1 style="margin-top:10px">${label} report</h1><p class="muted">${esc(profile.avatar)} ${esc(profile.name||'')} · ${lvl().emoji} ${lvl().name}</p></div></div>
     <div class="stats"><div class="stat"><b>${days.length}</b><span>active days</span></div><div class="stat"><b>${sets}</b><span>sets</span></div><div class="stat"><b>${mins}</b><span>activity min</span></div></div>
-    <div class="card stack"><h3>📅 Active days per week</h3>${weeks.map(([d,n])=>`<div class="row" style="gap:10px"><span class="small" style="width:70px">${d.toLocaleDateString(undefined,{month:'short',day:'numeric'})}</span><div class="famBar" style="flex:1;height:14px"><i style="width:${n/7*100}%"></i></div><b class="small" style="width:22px;text-align:right">${n}</b></div>`).join('')}</div>
-    <div class="card stack"><h3>💪 Most trained</h3>${top.length?top.map(([n,c])=>`<div class="row between"><span>${esc(n)}</span><b>${plural(c,'set')}</b></div>`).join(''):'<p class="muted small">No strength workouts this month.</p>'}</div>
-    <div class="card stack"><h3>🏆 Records set this month</h3>${prs.length?prs.map(([n,r])=>`<div class="row between"><span>${esc(n)}</span><b>${r.w?round1(r.w)+' '+profile.unit+' × '+r.wr:r.reps+' reps'}</b></div>`).join(''):'<p class="muted small">No new records this month. Keep pushing!</p>'}</div>
-    ${acts.length?`<div class="card stack"><h3>🏃 Activities</h3>${Object.entries(acts.reduce((m,e)=>(m[e.exercise]=(m[e.exercise]||0)+(e.minutes||0),m),{})).map(([n,m])=>`<div class="row between"><span>${esc(n)}</span><b>${m} min</b></div>`).join('')}</div>`:''}
-    ${B.length>1?`<div class="card stack"><h3>⚖️ Body weight</h3><p>${round1(toUnit(B[0].w,B[0].unit))} → <b>${round1(toUnit(B[B.length-1].w,B[B.length-1].unit))} ${profile.unit}</b></p></div>`:''}
-    <div class="card stack"><h3>🏅 Badges so far</h3><p>${BADGES.filter(b=>earnedBadges().includes(b.id)).map(b=>b.e+' '+b.n).join(' · ')||'None yet'}</p></div>
+    <div class="card stack"><h2 class="h3">📅 Active days per week</h2>${weeks.map(([d,n])=>`<div class="row" style="gap:10px"><span class="small" style="width:70px">${d.toLocaleDateString(undefined,{month:'short',day:'numeric'})}</span><div class="famBar" style="flex:1;height:14px"><i style="width:${n/7*100}%"></i></div><b class="small" style="width:22px;text-align:right">${n}</b></div>`).join('')}</div>
+    <div class="card stack"><h2 class="h3">💪 Most trained</h2>${top.length?top.map(([n,c])=>`<div class="row between"><span>${esc(n)}</span><b>${plural(c,'set')}</b></div>`).join(''):'<p class="muted small">No strength workouts this month.</p>'}</div>
+    <div class="card stack"><h2 class="h3">🏆 Records set this month</h2>${prs.length?prs.map(([n,r])=>`<div class="row between"><span>${esc(n)}</span><b>${r.w?round1(r.w)+' '+profile.unit+' × '+r.wr:r.reps+' reps'}</b></div>`).join(''):'<p class="muted small">No new records this month. Keep pushing!</p>'}</div>
+    ${acts.length?`<div class="card stack"><h2 class="h3">🏃 Activities</h2>${Object.entries(acts.reduce((m,e)=>(m[e.exercise]=(m[e.exercise]||0)+(e.minutes||0),m),{})).map(([n,m])=>`<div class="row between"><span>${esc(n)}</span><b>${m} min</b></div>`).join('')}</div>`:''}
+    ${B.length>1?`<div class="card stack"><h2 class="h3">⚖️ Body weight</h2><p>${round1(toUnit(B[0].w,B[0].unit))} → <b>${round1(toUnit(B[B.length-1].w,B[B.length-1].unit))} ${profile.unit}</b></p></div>`:''}
+    <div class="card stack"><h2 class="h3">🏅 Badges so far</h2><p>${BADGES.filter(b=>earnedBadges().includes(b.id)).map(b=>b.e+' '+b.n).join(' · ')||'None yet'}</p></div>
     <p class="small muted center">Made with KinFit · ${location.host}</p>
     <button class="btn noprint" id="rprint">🖨️ Print or save as PDF</button>
     <p class="small muted center noprint">On iPhone: tap Print, then pinch out on the preview and tap Share → Save to Files.</p>
@@ -184,7 +184,7 @@ function renderReport(v){
 
 /* ---------- Feedback ---------- */
 function feedbackCard(){
-  return `<div class="card stack"><h3>💬 Feedback</h3><p class="small muted">Found a problem or have an idea? We read everything.</p><button class="btn secondary" id="fbopen">Send feedback</button></div>`;
+  return `<div class="card stack"><h2 class="h3">💬 Feedback</h2><p class="small muted">Found a problem or have an idea? We read everything.</p><button class="btn secondary" id="fbopen">Send feedback</button></div>`;
 }
 function feedbackSheet(){
   let t='idea';
@@ -220,4 +220,59 @@ async function restoreHistorySheet(){
         const r2=await fetch('api/sync',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({code:syncCfg.code,op:'put',data:localPayload()})});if(!r2.ok)throw 0;
         toast('📦 Backup restored');go('today')}catch(e){toast("Couldn't restore. Please try again")}},true));
   });
+}
+
+/* ---------- Today: one compact "This week" card, and optional rows ---------- */
+const TODAY_ROWS={phase:'📅 6-month plan',challenge:'🏆 Monthly challenge',goal:'🎯 Goals',family:'👨‍👩‍👧 Family challenge',badges:'🏅 Badges',tip:'💡 Tip of the day'};
+const todayHidden=k=>(profile.todayHide||[]).includes(k);
+function weekRow(icon,title,value,pct,go='progress'){
+  return `<button class="wrow" data-go="${go}"><span class="wi" aria-hidden="true">${icon}</span><span class="wt"><b>${title}</b>${pct!=null?`<span class="mini" aria-hidden="true"><i style="width:${Math.max(0,Math.min(100,pct))}%"></i></span>`:''}</span><span class="wv">${value}</span></button>`;
+}
+function weekCard(strip,earned){
+  const rows=[];
+  const info=phaseInfo();
+  if(info&&!todayHidden('phase'))rows.push(info.done?weekRow('🎓','6-month plan complete!','',null,'me'):weekRow(info.ph.e,`Week ${info.w} of 24 · ${info.ph.name}${info.recovery?' (recovery week)':''}`,`${Math.round(info.w/24*100)}%`,info.w/24*100,'me'));
+  if(!todayHidden('challenge')){const c=currentChallenge(),n=challengeProgress(c);rows.push(weekRow(c.e,`${c.name}: ${c.target} ${c.what.split(' (')[0]}`,n>=c.target?'🏆':`${n}/${c.target}`,n/c.target*100))}
+  const g=(profile.goals||[]).find(x=>!x.done);
+  if(g&&!todayHidden('goal')){const n=goalProgress(g);rows.push(weekRow('🎯',esc(goalTitle(g)),`${Math.min(100,Math.round(n/g.target*100))}%`,n/g.target*100))}
+  if(DB.list.length>1&&!todayHidden('family')){const ws=weekStart(new Date());const r=DB.list.map(p=>({p,n:workoutDates(getJournal(p)).filter(d=>parseIso(d)>=ws).length})).sort((a,b)=>b.n-a.n);
+    rows.push(weekRow('👑',r[0].n?`Family leader: ${esc(r[0].p.name||'')} ${esc(r[0].p.avatar||'')}`:'Family challenge: who\'ll lead this week?',r[0].n?plural(r[0].n,'day'):''))}
+  if(!todayHidden('badges'))rows.push(weekRow('🏅',`${plural(earned,'badge')} earned`,`${earned}/${BADGES.length}`,null));
+  return `<div class="card stack"><div class="row between"><h2 class="h3">This week</h2><button class="link small" id="tcust">Customize</button></div>
+    <div class="week">${strip}</div>${rows.length?`<div class="wrows">${rows.join('')}</div>`:''}</div>`;
+}
+function customizeToday(){
+  sheet(`<h2>Customize Today</h2><p class="small muted">Choose what shows on your Today screen.</p>
+    <div class="stack">${Object.entries(TODAY_ROWS).map(([k,l])=>`<label class="toggle"><span>${l}</span><input type="checkbox" data-tk="${k}" ${todayHidden(k)?'':'checked'}></label>`).join('')}</div>
+    <button class="btn" id="tdone">Done</button>`,()=>{
+    $('#tdone').onclick=()=>{profile.todayHide=[...document.querySelectorAll('[data-tk]')].filter(x=>!x.checked).map(x=>x.dataset.tk);saveProfile();closeLayer();render()};
+  });
+}
+
+/* ---------- Number picker: big − / + buttons instead of typing mid-workout ---------- */
+function pickNumber({title,value,step=1,min=0,max=9999,quick=[],unit=''},done){
+  sheet(`<h2>${title}</h2>
+    <div class="picker"><button class="pkbig" id="pkm" aria-label="Minus ${step}">−</button><input class="num pkv" id="pkin" type="number" inputmode="decimal" min="${min}" step="${step}" value="${value===''||value==null?'':esc(value)}" aria-label="${esc(title)}"><button class="pkbig" id="pkp" aria-label="Plus ${step}">+</button></div>
+    ${unit?`<p class="small muted center">${unit}</p>`:''}
+    ${quick.length?`<div class="chips" style="justify-content:center">${[...new Set(quick.map(String))].filter(q=>q!==''&&q!=='undefined'&&q!=='0').map(q=>`<button data-pq="${esc(q)}">${esc(q)}</button>`).join('')}</div>`:''}
+    <button class="btn" id="pkok">Done</button>`,()=>{
+    const inp=$('#pkin'),cur=()=>parseFloat(inp.value)||0,clamp=v=>round1(Math.max(min,Math.min(max,v)));
+    const finish=()=>{closeLayer();done(inp.value===''?'':String(clamp(cur())))};
+    $('#pkm').onclick=()=>{inp.value=clamp(cur()-step)};$('#pkp').onclick=()=>{inp.value=clamp(cur()+step)};
+    document.querySelectorAll('[data-pq]').forEach(b=>b.onclick=()=>{inp.value=clamp(parseFloat(b.dataset.pq));finish()});
+    $('#pkok').onclick=finish;inp.onkeydown=e=>{if(e.key==='Enter')finish()};
+  });
+}
+
+/* ---------- Undo bar (instead of "are you sure?" for small deletes) ---------- */
+let undoTimer=null,undoCommit=null;
+function undoable(msg,undo,commit){
+  if(undoTimer){clearTimeout(undoTimer);undoCommit&&undoCommit()}
+  let el=$('#undo');
+  if(!el){el=document.createElement('div');el.id='undo';el.className='undo';el.setAttribute('role','status');el.setAttribute('aria-live','polite');document.body.appendChild(el)}
+  el.innerHTML=`<span>${esc(msg)}</span><button id="undob">Undo</button>`;el.classList.add('show');
+  undoCommit=commit;
+  const end=()=>{el.classList.remove('show');undoTimer=null;undoCommit=null};
+  $('#undob').onclick=()=>{clearTimeout(undoTimer);end();undo();toast('↩️ Undone')};
+  undoTimer=setTimeout(()=>{const c=undoCommit;end();c&&c()},5000);
 }

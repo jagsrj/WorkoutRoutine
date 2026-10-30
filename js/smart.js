@@ -138,7 +138,7 @@ function goalProgress(g){
 const goalTitle=g=>g.type==='lift'?`${g.ex}: ${g.target} ${profile.unit}`:g.type==='reps'?`${g.ex}: ${g.target} ${EX[exByName(g.ex)]&&EX[exByName(g.ex)].time?'seconds':'reps'} in one set`:g.type==='workouts'?`${g.target} active days`:`${g.target} active minutes`;
 function goalsCard(){
   const G=profile.goals||[];
-  return `<div class="card stack"><div class="row between"><h3>🎯 Goals</h3><button class="btn sm secondary" id="goalnew">＋ New goal</button></div>
+  return `<div class="card stack"><div class="row between"><h2 class="h3">🎯 Goals</h2><button class="btn sm secondary" id="goalnew">＋ New goal</button></div>
     ${G.length?G.map(g=>{const n=goalProgress(g),pct=Math.min(100,n/g.target*100),left=Math.ceil((parseIso(g.by)-parseIso(isoLocal()))/864e5);
       return `<div><div class="row between"><b class="small">${esc(goalTitle(g))}</b><button class="xbtn" data-gdel="${esc(g.id)}" aria-label="Delete goal">✕</button></div>
       <div class="progress"><i style="width:${pct}%"></i></div>
@@ -176,7 +176,8 @@ function goalSheet(){
 }
 function bindGoals(v){
   if($('#goalnew'))$('#goalnew').onclick=goalSheet;
-  v.querySelectorAll('[data-gdel]').forEach(b=>b.onclick=()=>confirmBox('Delete this goal?','','Delete',()=>{profile.goals=(profile.goals||[]).filter(g=>g.id!==b.dataset.gdel);saveProfile();syncNow(true);render()},true));
+  v.querySelectorAll('[data-gdel]').forEach(b=>b.onclick=()=>{const before=(profile.goals||[]).slice();profile.goals=before.filter(g=>g.id!==b.dataset.gdel);saveProfile();render();
+    undoable('Goal deleted',()=>{profile.goals=before;saveProfile();render()},()=>syncNow(true))});
 }
 function goalPeek(){
   const g=(profile.goals||[]).find(x=>!x.done);if(!g)return '';

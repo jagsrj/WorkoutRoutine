@@ -5,20 +5,20 @@ function renderMe(v){
   v.innerHTML=`${topbar(levelPill())}<div class="stack-lg">
     <div class="row"><div class="ex-emoji" style="width:64px;height:64px;font-size:34px">${esc(profile.avatar||'🙂')}</div><div style="flex:1"><h1>${profile.name?esc(profile.name):'My profile'}</h1><p class="muted">${lvl().emoji} ${lvl().name} level</p></div></div>
 
-    <div class="card stack"><h3>👨‍👩‍👧 People on this phone</h3>
+    <div class="card stack"><h2 class="h3">👨‍👩‍👧 People on this phone</h2>
       <p class="small muted">Everyone gets their own level, workouts and badges.</p>
-      <div class="stack">${DB.list.map(p=>`<button class="who ${p.id===profile.id?'sel':''}" data-pid="${p.id}"><span class="av">${esc(p.avatar||'🙂')}</span><span style="flex:1;text-align:left"><b>${esc(p.name||'No name')}</b><br><span class="small muted">${(LEVELS[p.level]||LEVELS.beginner).emoji} ${(LEVELS[p.level]||LEVELS.beginner).name}</span></span>${p.id===profile.id?'<b style="color:var(--lvl)">You ✓</b>':'<span class="small muted">Switch ›</span>'}</button>`).join('')}</div>
+      <div class="stack">${DB.list.map(p=>`<button class="who ${p.id===profile.id?'sel':''}" data-pid="${p.id}"><span class="av">${esc(p.avatar||'🙂')}</span><span style="flex:1;text-align:left"><b>${esc(p.name||'No name')}</b><br><span class="small muted">${(LEVELS[p.level]||LEVELS.beginner).emoji} ${(LEVELS[p.level]||LEVELS.beginner).name}</span></span>${p.id===profile.id?'<b style="color:var(--lvl-text)">You ✓</b>':'<span class="small muted">Switch ›</span>'}</button>`).join('')}</div>
       <button class="btn secondary" id="addp">＋ Add a person</button>
     </div>
 
-    <div class="card stack"><h3>Name & buddy</h3><input class="txt" id="nm" maxlength="24" placeholder="Your name" value="${esc(profile.name)}">
+    <div class="card stack"><h2 class="h3">Name & buddy</h2><input class="txt" id="nm" maxlength="24" placeholder="Your name" value="${esc(profile.name)}">
       <div class="avatars">${AVATARS.map(a=>`<button class="${a===profile.avatar?'sel':''}" data-a="${a}">${a}</button>`).join('')}</div></div>
 
-    <div class="stack"><div class="row between"><h3>Your level</h3><button class="link" id="quiz">🧭 Retake the quiz</button></div>
-      ${Object.keys(LEVELS).map(k=>`<button class="lvl ${k===profile.level?'sel':''}" data-l="${k}" style="--c:${LEVELS[k].color}">${levelInner(k)}<p class="small" style="margin-top:8px;font-weight:800;color:var(--c)">${k===profile.level?'✓ Your current level':'Tap to switch'}</p></button>`).join('')}
+    <div class="stack"><div class="row between"><h2 class="h3">Your level</h2><button class="link" id="quiz">🧭 Retake the quiz</button></div>
+      ${Object.keys(LEVELS).map(k=>`<button class="lvl ${k===profile.level?'sel':''}" data-l="${k}" style="--c:${LEVELS[k].color};--cd:${LEVELS[k].dark}">${levelInner(k)}<p class="small" style="margin-top:8px;font-weight:800;color:var(--cc,var(--c))">${k===profile.level?'✓ Your current level':'Tap to switch'}</p></button>`).join('')}
     </div>
 
-    <div class="card stack"><h3>Settings</h3>
+    <div class="card stack"><h2 class="h3">Settings</h2>
       <p class="small muted" style="font-weight:700">WEIGHT UNITS</p><div class="seg" id="unit">${['lbs','kg'].map(u=>`<button class="${profile.unit===u?'on':''}" data-u="${u}">${u}</button>`).join('')}</div>
       <p class="small muted" style="font-weight:700">REST BETWEEN SETS</p><div class="seg" id="rest">${[['auto','Auto'],['45','45s'],['60','60s'],['90','90s'],['120','2m']].map(r=>`<button class="${String(profile.rest)===r[0]?'on':''}" data-r="${r[0]}">${r[1]}</button>`).join('')}</div>
       <p class="small muted">Auto = ${lvl().rest}s for ${lvl().name}.</p>
@@ -52,12 +52,12 @@ function renderMe(v){
       <li>Use a spotter or safety bars for bench press and squats.</li><li>Drink water, eat well, sleep lots. Rest days matter!</li>
       <li>Have a health condition or injury? Check with a doctor before starting.</li></ol></details>
 
-    <div class="card stack"><h3>${esc(profile.name||'Your')}${profile.name?"'s":''} data</h3><p class="small muted">Download a backup file to keep a copy, or to move to a phone without sync.</p>
+    <div class="card stack"><h2 class="h3">${esc(profile.name||'Your')}${profile.name?"'s":''} data</h2><p class="small muted">Download a backup file to keep a copy, or to move to a phone without sync.</p>
       <button class="btn secondary" id="exp">⬇️ Download backup</button>
       <label class="btn secondary" style="cursor:pointer">⬆️ Restore from backup<input type="file" id="imp" accept="application/json,.json" hidden></label>
       ${others.length?`<button class="btn danger" id="rmp">Remove ${esc(profile.name||'this person')} from this phone</button>`:''}
       <button class="btn danger" id="reset">Erase everything on this phone</button></div>
-    <p class="small muted center">KinFit · Made for every level 💙<br><a href="privacy.html" style="color:var(--lvl)">Privacy policy</a></p>
+    <p class="small muted center">KinFit · Made for every level 💙<br><a href="privacy.html" class="footlink">Privacy policy</a></p>
   </div>`;
   v.querySelectorAll('[data-pid]').forEach(b=>b.onclick=()=>{if(b.dataset.pid!==profile.id)switchProfile(b.dataset.pid)});
   $('#addp').onclick=addPerson;
@@ -93,12 +93,12 @@ function renderMe(v){
     DB={current:null,list:[],deleted:[]};profile=Object.assign({},DEFAULT_P);syncCfg={code:null,last:0};chat=[];ob={step:0,answers:[],name:'',avatar:'🙂'};go('today')},true),'A parent PIN is needed to erase everything.');
 }
 function syncCard(){
-  if(!syncCfg.code)return `<div class="card stack"><h3>☁️ Backup & sync is off</h3>
+  if(!syncCfg.code)return `<div class="card stack"><h2 class="h3">☁️ Backup & sync is off</h2>
     <p class="small muted">Turn it on so clearing your browser or losing your phone never wipes your workouts. It also lets you use the app on more than one device. No account needed, just a private recovery code.</p>
     <button class="btn secondary" id="syncon">Turn on backup & sync</button>
-    <button class="link" id="syncjoin" style="padding:0">I have a recovery code</button></div>`;
+    <button class="link" id="syncjoin">I have a recovery code</button></div>`;
   const ago=syncCfg.last?Math.round((Date.now()-syncCfg.last)/60000):null;
-  return `<div class="card stack"><h3>☁️ Backup & sync is on</h3>
+  return `<div class="card stack"><h2 class="h3">☁️ Backup & sync is on</h2>
     <p class="small muted">Your recovery code. Use it to get everything back after clearing your browser, or to connect another device:</p>
     <div class="code">${syncCfg.code}</div>
     ${syncCfg.saved?'<p class="small" style="color:var(--ok);font-weight:700">✅ Saved to your passwords</p>':''}
@@ -217,7 +217,7 @@ if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostnam
 
 function planCard(){
   const info=phaseInfo();
-  return `<div class="card stack"><h3>📅 Your 6-month plan</h3>
+  return `<div class="card stack"><h2 class="h3">📅 Your 6-month plan</h2>
     <p class="small muted">${info?(info.done?'Finished! 🎓 Start a new round whenever you like.':`Week ${info.w} of 24 · ${info.ph.e} ${info.ph.name}${info.recovery?' (recovery week)':''}`):'Starts with your first workout.'}</p>
     <ol class="small" style="margin:0;padding-left:20px"><li><b>Weeks 1–8 Foundation:</b> learn perfect form.</li><li><b>Weeks 9–16 Build:</b> an extra set to build muscle.</li><li><b>Weeks 17–24 Strength:</b> heavier, fewer reps.</li><li>Every 4th week is a lighter <b>recovery week</b>.</li></ol>
     <div class="row" style="gap:8px"><button class="btn sm secondary" id="planreset" style="flex:1">Start again</button><button class="btn sm ghost" id="tourag" style="flex:1">Show me around</button></div></div>`;
