@@ -80,6 +80,7 @@ Redeploy after adding bindings. Coach allows 20 AI questions per hour per person
 - Deleting a workout, activity, measurement, goal or photo shows a 5-second **Undo** bar.
 - A banner says when you're offline (workouts still save and sync later).
 - **Interval timer** (Workouts → Plan): work/rest/rounds with beeps and an optional spoken countdown; add exercises to make a circuit. Finished sessions are logged as an activity.
+- **Daily habits** (Today): water, sleep, stretching, screen-free time, reading and more, or make your own. Tap to tick off, see a 🔥 streak for each, and a 7-day view in Progress. Hide it with Customize. Habit ticks sync day by day.
 - **Child profiles:** when adding someone you choose "Me" or "My child". Child profiles get kid-safe Coach answers (no diet or weight-loss advice) and a prompt to set a parent PIN. Change it in Me → Parent controls.
 
 ## Compatibility
