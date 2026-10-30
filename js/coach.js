@@ -121,7 +121,7 @@ async function ask(q,today){
       const W=today in WORKOUTS?WORKOUTS[today].name+': '+PLANS[profile.level][today].map(p=>EX[p[0]].name).join(', '):'rest day';
       const ctrl=new AbortController();const t=setTimeout(()=>ctrl.abort(),20000);
       const r=await fetch('api/chat',{method:'POST',headers:{'content-type':'application/json'},signal:ctrl.signal,
-        body:JSON.stringify({messages:chat.slice(-8),level:profile.level,today:W,history:historySummary()})});
+        body:JSON.stringify({messages:chat.slice(-8),level:profile.level,kid:isKid(),today:W,history:historySummary()})});
       clearTimeout(t);const d=await r.json().catch(()=>({}));
       if(r.ok&&d.reply)reply=d.reply;else if(r.status===429)limited=true;
     }catch(e){}

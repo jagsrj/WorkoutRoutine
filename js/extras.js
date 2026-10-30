@@ -29,16 +29,6 @@ function phasePlan(plan){
     if(info.recovery)q[1]=Math.max(2,q[1]-1);
     return q});
 }
-function phaseCard(){
-  const info=phaseInfo();
-  if(!info)return '';
-  if(info.done)return `<div class="card row"><span class="big-emoji">🎓</span><div style="flex:1"><b>You finished the 6-month plan!</b><p class="small muted">Amazing. Start a new round in Me → Your plan, or try the next level.</p></div></div>`;
-  const pct=Math.round(info.w/24*100);
-  return `<div class="card stack phase"><div class="row between"><b>${info.ph.e} Week ${info.w} of 24 · ${info.ph.name}</b><span class="small muted">Phase ${info.ph.n}/3</span></div>
-    <div class="progress"><i style="width:${pct}%"></i></div>
-    <p class="small muted">${info.recovery?'😌 <b>Recovery week:</b> one less set on every exercise so your body can recharge. Next week you\'ll be stronger!':info.ph.about}</p></div>`;
-}
-
 /* ---------- Share cards (image for WhatsApp, Messages...) ---------- */
 async function shareImage(opts){
   const W=1080,H=1350,c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');
@@ -131,7 +121,7 @@ function startTour(){
         <p>${TOUR[i].t}</p><div class="row between" style="margin-top:12px"><button class="link" id="tskip" style="color:var(--muted)">Skip tour</button><span class="small muted">${i+1} / ${TOUR.length}</span><button class="btn sm" id="tnext">${i===TOUR.length-1?'Done 🎉':'Next'}</button></div></div></div>`;
       $('#tnext').onclick=()=>{i++;step()};$('#tskip').onclick=finish},250);
   };
-  const finish=()=>{closeLayer();profile.toured=true;saveProfile();window.scrollTo(0,0)};
+  const finish=()=>{closeLayer();profile.toured=true;saveProfile();window.scrollTo(0,0);if(profile.kid)kidSetupPrompt()};
   step();
 }
 
@@ -239,7 +229,8 @@ function weekCard(strip,earned){
     rows.push(weekRow('👑',r[0].n?`Family leader: ${esc(r[0].p.name||'')} ${esc(r[0].p.avatar||'')}`:'Family challenge: who\'ll lead this week?',r[0].n?plural(r[0].n,'day'):''))}
   if(!todayHidden('badges'))rows.push(weekRow('🏅',`${plural(earned,'badge')} earned`,`${earned}/${BADGES.length}`,null));
   return `<div class="card stack"><div class="row between"><h2 class="h3">This week</h2><button class="link small" id="tcust">Customize</button></div>
-    <div class="week">${strip}</div>${rows.length?`<div class="wrows">${rows.join('')}</div>`:''}</div>`;
+    <div class="week">${strip}</div>${rows.length?`<div class="wrows">${rows.join('')}</div>`:''}
+    ${info&&info.recovery&&!info.done&&!todayHidden('phase')?`<p class="small recov">😌 <b>Recovery week:</b> one less set on every exercise so your body can recharge. Next week you'll be stronger!</p>`:''}</div>`;
 }
 function customizeToday(){
   sheet(`<h2>Customize Today</h2><p class="small muted">Choose what shows on your Today screen.</p>

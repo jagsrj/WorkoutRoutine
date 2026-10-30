@@ -51,7 +51,7 @@ async function buildWithCoach(q){
       const t0=askTimes();t0.push(Date.now());store.set('jams_ask_times',t0);
       const ctrl=new AbortController(),tm=setTimeout(()=>ctrl.abort(),20000);
       const r=await fetch('api/chat',{method:'POST',headers:{'content-type':'application/json'},signal:ctrl.signal,
-        body:JSON.stringify({mode:'build',request:q,level:profile.level,messages:[{role:'user',content:q}],catalog:pool.map(id=>`${id}=${EX[id].name}${EX[id].time?' [time]':''}`).join('; ')})});
+        body:JSON.stringify({mode:'build',request:q,level:profile.level,kid:isKid(),messages:[{role:'user',content:q}],catalog:pool.map(id=>`${id}=${EX[id].name}${EX[id].time?' [time]':''}`).join('; ')})});
       clearTimeout(tm);const d=await r.json().catch(()=>({}));
       const p=d&&d.plan;
       if(r.ok&&p&&Array.isArray(p.items)){

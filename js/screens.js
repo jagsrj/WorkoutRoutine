@@ -26,11 +26,13 @@ function renderOnboard(v){
   }
   if(s===1){
     v.innerHTML=`${topbar(cancel)}<div class="stack-lg" style="padding-top:20px">
-      <div><h1>${ob.mode==='add'?'Who is joining? 👋':'What should we call you? 👋'}</h1><p class="muted" style="margin-top:8px">A first name or nickname is perfect.</p></div>
+      <div><p class="small muted" style="font-weight:700;margin-bottom:8px">WHO IS THIS FOR?</p><div class="seg"><button class="${ob.kid?'':'on'}" data-kid="0" aria-pressed="${!ob.kid}">🙋 Me</button><button class="${ob.kid?'on':''}" data-kid="1" aria-pressed="${!!ob.kid}">🧒 My child</button></div></div>
+      <div><h1>${ob.kid?"What's your child's name? 👋":ob.mode==='add'?'Who is joining? 👋':'What should we call you? 👋'}</h1><p class="muted" style="margin-top:8px">${ob.kid?'A first name or nickname is perfect. You\'ll answer a few questions for them next.':'A first name or nickname is perfect.'}</p></div>
       <input class="txt" id="nm" maxlength="24" placeholder="Name" value="${esc(ob.name)}" autocomplete="off">
       <div><p class="small muted" style="font-weight:700;margin-bottom:8px">PICK A BUDDY</p><div class="avatars">${AVATARS.map(a=>`<button class="${a===ob.avatar?'sel':''}" data-a="${a}">${a}</button>`).join('')}</div></div>
       <button class="btn" id="next">Next</button></div>`;
     v.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{ob.avatar=b.dataset.a;ob.name=$('#nm').value;renderOnboard(v)});
+    v.querySelectorAll('[data-kid]').forEach(b=>b.onclick=()=>{ob.kid=b.dataset.kid==='1';ob.name=$('#nm').value;renderOnboard(v)});
     const next=()=>{ob.name=$('#nm').value.trim();ob.answers=[];ob.step=ob.skipQuiz?99:2;render()};
     $('#next').onclick=next;$('#nm').onkeydown=e=>{if(e.key==='Enter')next()};
     if($('#cancelob'))$('#cancelob').onclick=()=>go('me');
@@ -41,7 +43,7 @@ function renderOnboard(v){
     v.innerHTML=`${topbar(`<button class="link" id="back">← Back</button>`)}
     <div class="stack-lg">
       <div class="dots">${QUIZ.map((_,k)=>`<i class="${k<=i?'on':''}"></i>`).join('')}</div>
-      <div><p class="muted small" style="font-weight:700">QUESTION ${i+1} OF ${QUIZ.length}</p><h1 style="margin-top:6px">${Q.q}</h1>${Q.note?`<p class="muted small" style="margin-top:8px">${Q.note}</p>`:''}</div>
+      <div><p class="muted small" style="font-weight:700">QUESTION ${i+1} OF ${QUIZ.length}${ob.kid?` · ANSWER FOR ${esc((ob.name||'YOUR CHILD').toUpperCase())}`:''}</p><h1 style="margin-top:6px">${Q.q}</h1>${Q.note?`<p class="muted small" style="margin-top:8px">${Q.note}</p>`:''}</div>
       <div class="stack">${Q.a.map((a,k)=>`<button class="opt ${ob.answers[i]===k?'sel':''}" data-k="${k}"><span class="e">${a[0]}</span>${a[1]}</button>`).join('')}</div>
     </div>`;
     v.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ob.answers[i]=+b.dataset.k;b.classList.add('sel');setTimeout(()=>{ob.step++;render()},180)});
@@ -86,7 +88,7 @@ function finishOnboard(level){
   if(ob.mode==='retake'&&profile.id){profile.level=level;saveProfile();store.del(pKey('jams_active'))}
   else{
     const id=newPid();if(!DB.list.length&&!DB.legacyId)DB.legacyId=id; // first person adopts any older history
-    profile=Object.assign({},DEFAULT_P,{id,name:ob.name,avatar:ob.avatar||'🙂',level,unit:profile.unit||'lbs'});
+    profile=Object.assign({},DEFAULT_P,{id,name:ob.name,avatar:ob.avatar||'🙂',level,unit:profile.unit||'lbs'},ob.kid?{kid:true}:{});
     DB.current=id;saveProfile();chat=store.get(pKey('jams_chat'),[]);libLevel=null;chartEx=null;
     if(!syncCfg.code)autoBackup();
   }

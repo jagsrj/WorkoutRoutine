@@ -80,6 +80,7 @@ function renderMe(v){
     if(on){try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}toast('📸 Photos on! Find them in Progress')}else toast('Body tracking hidden. Your photos stay saved on this phone');renderMe(v)},'A parent PIN is needed to change body tracking.')});
   v.querySelectorAll('[data-voice]').forEach(b=>b.onclick=()=>{voiceOn=b.dataset.voice==='1';store.set('jams_voice',voiceOn);if(voiceOn)say('Voice coach on');renderMe(v)});
   bindReminders(v);
+  v.querySelectorAll('[data-kidp]').forEach(b=>b.onclick=()=>{const on=b.dataset.kidp==='1';if(on===!!profile.kid)return;requirePin(()=>{if(on)profile.kid=true;else delete profile.kid;saveProfile();toast(on?'🧒 Child profile on':'Child profile off');renderMe(v)},'A parent PIN is needed to change this.')});
   $('#pinset').onclick=()=>requirePin(()=>pinSheet(()=>renderMe(v)),'Enter the current PIN to change it.');
   if($('#pinoff'))$('#pinoff').onclick=()=>requirePin(()=>{store.del('jams_pin');unlockedUntil=0;toast('Parent lock is off');renderMe(v)},'Enter the PIN to turn off the parent lock.');
   v.querySelectorAll('[data-cai]').forEach(b=>b.onclick=()=>{const on=b.dataset.cai==='1';if(on===(profile.coachAI!==false))return;requirePin(()=>{profile.coachAI=on;saveProfile();toast(on?'Coach AI answers on':'Coach AI answers off');renderMe(v)},'A parent PIN is needed to change Coach settings.')});
