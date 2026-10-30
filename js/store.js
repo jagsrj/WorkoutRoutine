@@ -20,6 +20,7 @@ function sanitizeProfile(p){
     unit:p.unit==='kg'?'kg':'lbs',rest:['auto','45','60','90','120'].includes(String(p.rest))?String(p.rest):'auto',
     warmups:cleanNum(p.warmups,1e5),questions:cleanNum(p.questions,1e6),updated:cleanNum(p.updated,1e14),fivesSeen:cleanNum(p.fivesSeen,1e14),
     badges:(Array.isArray(p.badges)?p.badges:[]).filter(b=>BADGES.some(x=>x.id===b)),photos:!!p.photos,toured:!!p.toured,
+    todayHide:(Array.isArray(p.todayHide)?p.todayHide:[]).filter(k=>['phase','challenge','goal','family','badges','tip'].includes(k)),
     chDone:(Array.isArray(p.chDone)?p.chDone:[]).slice(-60).map(x=>cleanText(x,30)).filter(x=>/^\d{4}-\d{2}-[a-z]+$/.test(x)),
     goals:(Array.isArray(p.goals)?p.goals:[]).slice(-20).filter(g=>g&&['lift','reps','workouts','minutes'].includes(g.type)&&ISO_RE.test(String(g.start))&&ISO_RE.test(String(g.by))).map(g=>({id:cleanText(g.id,30)||newPid(),type:g.type,ex:cleanText(g.ex,60),target:cleanNum(g.target,1e6),start:g.start,by:g.by,done:ISO_RE.test(String(g.done))?g.done:null}))};
   if(ISO_RE.test(String(p.planStart)))o.planStart=p.planStart;
@@ -85,7 +86,10 @@ const plural=(n,w)=>`${n} ${w}${n===1?'':'s'}`;
 
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),2400)}
 function sheet(html,onMount){
-  $('#layer').innerHTML=`<div class="overlay" id="ov"><div class="sheet stack">${html}</div></div>`;
+  const back=document.activeElement;
+  $('#layer').innerHTML=`<div class="overlay" id="ov"><div class="sheet stack" role="dialog" aria-modal="true">${html}</div></div>`;
+  const first=$('#ov .sheet').querySelector('h2');if(first){first.tabIndex=-1;first.focus({preventScroll:true})}
+  sheet.back=back;
   $('#ov').onclick=e=>{if(e.target.id==='ov')closeLayer()};
   if(onMount)onMount($('#ov .sheet'));
 }
@@ -150,7 +154,7 @@ function render(){
   if(onb) return renderOnboard(v);
   ({today:renderToday,workout:renderWorkout,library:renderLibrary,progress:renderProgress,me:renderMe,ask:renderAsk,report:renderReport}[route]||renderToday)(v);
 }
-const logo=()=>`<div class="logo"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="var(--lvl)"/><path d="M14 27h6v10h-6zM44 27h6v10h-6zM20 23h5v18h-5zM39 23h5v18h-5zM25 30h14v4H25z" fill="#fff"/></svg>KINFIT</div>`;
+const logo=()=>`<div class="logo"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="var(--lvl-text)"/><path d="M14 27h6v10h-6zM44 27h6v10h-6zM20 23h5v18h-5zM39 23h5v18h-5zM25 30h14v4H25z" fill="#fff"/></svg>KINFIT</div>`;
 const topbar=(right='')=>`<div class="topbar">${logo()}${right}</div>`;
 const levelPill=()=>{const n=weekStreak();return `<div class="row" style="gap:6px"><button class="pill streakpill ${n?'':'off'}" data-go="progress" aria-label="${n}-week streak">🔥 ${n}</button><button class="pill" data-who aria-label="Switch person"><span class="pname">${esc(profile.avatar||'🙂')} ${esc(profile.name||'Me')}</span></button></div>`};
 function streakCard(){
@@ -166,7 +170,7 @@ document.addEventListener('click',e=>{if(e.target.closest('.streakpill'))go('pro
 
 function whoSheet(){
   sheet(`<h2>Who's working out? 🙋</h2>
-    <div class="stack">${DB.list.map(p=>`<button class="who ${p.id===profile.id?'sel':''}" data-pid="${p.id}"><span class="av">${esc(p.avatar||'🙂')}</span><span style="flex:1;text-align:left"><b>${esc(p.name||'No name')}</b><br><span class="small muted">${(LEVELS[p.level]||LEVELS.beginner).emoji} ${(LEVELS[p.level]||LEVELS.beginner).name}</span></span>${p.id===profile.id?'<b style="color:var(--lvl)">✓</b>':''}</button>`).join('')}</div>
+    <div class="stack">${DB.list.map(p=>`<button class="who ${p.id===profile.id?'sel':''}" data-pid="${p.id}"><span class="av">${esc(p.avatar||'🙂')}</span><span style="flex:1;text-align:left"><b>${esc(p.name||'No name')}</b><br><span class="small muted">${(LEVELS[p.level]||LEVELS.beginner).emoji} ${(LEVELS[p.level]||LEVELS.beginner).name}</span></span>${p.id===profile.id?'<b style="color:var(--lvl-text)">✓</b>':''}</button>`).join('')}</div>
     <button class="btn secondary" id="addp">＋ Add a person</button>`,()=>{
     document.querySelectorAll('[data-pid]').forEach(b=>b.onclick=()=>{closeLayer();switchProfile(b.dataset.pid)});
     $('#addp').onclick=()=>{closeLayer();addPerson()};

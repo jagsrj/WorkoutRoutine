@@ -16,7 +16,7 @@ function renderOnboard(v){
       </div>
       <button class="btn" id="start">Let's go! 🚀</button>
       <button class="btn ghost" id="pick">I already know my level</button>
-      <p class="small muted center">🔒 Your workouts stay on your phone. <a href="privacy.html" style="color:var(--lvl)">Privacy</a> · <a href="about.html" style="color:var(--lvl)">About</a></p>
+      <p class="small muted center">🔒 Your workouts stay on your phone. <a href="privacy.html" style="color:var(--lvl-text)">Privacy</a> · <a href="about.html" style="color:var(--lvl-text)">About</a></p>
       <button class="link" id="joinsync" style="width:100%">☁️ Used KinFit before? Restore with your recovery code</button>
     </div>`;
     $('#joinsync').onclick=()=>joinSheet();
@@ -64,7 +64,7 @@ function renderOnboard(v){
   }
   v.innerHTML=`${topbar(`<button class="link" id="back">← Back</button>`)}<div class="stack-lg">
     <div><h1>Pick a level</h1><p class="muted" style="margin-top:8px">Not sure? Choose <b>Beginner</b>. You can move up anytime.</p></div>
-    <div class="stack">${Object.keys(LEVELS).map(k=>`<button class="lvl" data-l="${k}" style="--c:${LEVELS[k].color}">${levelInner(k)}${ob.rec===k?'<p class="small" style="margin-top:8px;font-weight:700;color:var(--c)">⭐ Recommended for you</p>':''}</button>`).join('')}</div></div>`;
+    <div class="stack">${Object.keys(LEVELS).map(k=>`<button class="lvl" data-l="${k}" style="--c:${LEVELS[k].color};--cd:${LEVELS[k].dark}">${levelInner(k)}${ob.rec===k?'<p class="small" style="margin-top:8px;font-weight:700;color:var(--cc,var(--c))">⭐ Recommended for you</p>':''}</button>`).join('')}</div></div>`;
   v.querySelectorAll('.lvl').forEach(b=>b.onclick=()=>finishOnboard(b.dataset.l));
   $('#back').onclick=()=>{ob.step=ob.rec?2+QUIZ.length:1;render()};
 }
@@ -81,7 +81,7 @@ function scoreQuiz(){
 function levelInner(k){const L=LEVELS[k];return `<div class="t"><span style="font-size:28px">${L.emoji}</span>${L.name}</div>
   <p style="margin-top:4px;font-weight:600">${L.tagline}</p><p class="muted small" style="margin-top:2px">🧰 ${L.equipment}</p>
   <p class="small" style="margin-top:10px;font-weight:700">Choose this if:</p><ul>${L.who.map(w=>`<li>${w}</li>`).join('')}</ul>`}
-function levelCard(k,sel){return `<div class="lvl ${sel?'sel':''}" style="--c:${LEVELS[k].color}">${levelInner(k)}</div>`}
+function levelCard(k,sel){return `<div class="lvl ${sel?'sel':''}" style="--c:${LEVELS[k].color};--cd:${LEVELS[k].dark}">${levelInner(k)}</div>`}
 function finishOnboard(level){
   if(ob.mode==='retake'&&profile.id){profile.level=level;saveProfile();store.del(pKey('jams_active'))}
   else{
@@ -130,16 +130,11 @@ function renderToday(v){
     ${heroHtml}
     ${backupCard()}
     ${streakCard()}
-    ${challengeCard()}
-    ${goalPeek()}
-    ${phaseCard()}
-    ${familyCard()}
-    <button class="card row" id="logact" style="width:100%;text-align:left"><span class="big-emoji">🏃</span><div style="flex:1"><b>Log a sport or activity</b><p class="muted small">Walks, runs, cricket, soccer… they all count!</p></div><span class="muted" style="font-size:22px">＋</span></button>
-    <div><h3 style="margin-bottom:10px">This week</h3><div class="week">${strip}</div></div>
-    <button class="card row" data-go="progress" style="width:100%;text-align:left"><span class="big-emoji">🏅</span><div style="flex:1"><b>${plural(earned,'badge')} earned</b><p class="muted small">${earned<BADGES.length?'Keep going to unlock more!':'You got them all. Amazing!'}</p></div><span class="muted">›</span></button>
+    ${weekCard(strip,earned)}
+    <button class="card row" id="logact" style="width:100%;text-align:left;padding:14px"><span class="big-emoji">🏃</span><div style="flex:1"><b>Log a sport or activity</b><p class="muted small">Walks, runs, cricket, soccer… they all count!</p></div><span class="muted" style="font-size:22px" aria-hidden="true">＋</span></button>
     <details class="card fold"><summary><b>${isWork?'Missed a day? Do a different workout':'Want to train anyway?'}</b></summary><div class="stack" style="margin-top:12px">${others}${(profile.routines||[]).map(r=>`<button class="card row" data-start="r:${r.id}" style="width:100%;text-align:left;padding:14px"><span class="ex-emoji">${r.e}</span><div style="flex:1"><b>${esc(r.name)}</b><p class="muted small">⭐ My workout · ${plural(r.items.length,'exercise')}</p></div><span class="muted">›</span></button>`).join('')}<button class="link" id="morew">Build your own or train for a sport ›</button></div></details>
     <div id="photoNudge"></div>
-    ${tipOfDay()}
+    ${todayHidden('tip')?'':tipOfDay()}
   </div>`;
   v.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>startWorkout(b.dataset.start));
   v.querySelectorAll('button[data-go]:not(.streakpill)').forEach(b=>b.onclick=()=>go(b.dataset.go));
@@ -147,6 +142,8 @@ function renderToday(v){
   renderPhotoNudge();
   bindFamily(v);
   if($('#logact'))$('#logact').onclick=()=>activitySheet();
+  if($('#tcust'))$('#tcust').onclick=customizeToday;
+  v.querySelectorAll('.wrow[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
   if($('#fiveok'))$('#fiveok').onclick=()=>{profile.fivesSeen=Date.now();saveProfile();render()};
   if($('#morew'))$('#morew').onclick=()=>{libTab='mine';go('library')};
   bindBackup();
@@ -168,7 +165,7 @@ function runSequence(steps,opts={}){
       <div class="row between"><button class="link" id="rx">✕ ${opts.closeText||'Close'}</button><span class="small muted" style="font-weight:700">${steps.length>1?`STEP ${st.i+1} OF ${steps.length}`:''}</span></div>
       <div class="runner-fig">${s.ready?'<div style="font-size:84px">⏱️</div>':s.fig?figSvg(s.fig,'fig big'):`<div style="font-size:84px">${s.e||'💪'}</div>`}</div>
       <div><h1>${esc(s.n)}</h1>${s.tip?`<p class="muted" style="margin-top:6px">${esc(s.tip)}</p>`:''}</div>
-      <div class="ring"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="${R}" stroke="var(--line)" stroke-width="14" fill="none"/><circle id="arc" cx="100" cy="100" r="${R}" stroke="var(--lvl)" stroke-width="14" fill="none" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-frac)}" transform="rotate(-90 100 100)"/></svg><div class="ring-t" id="rt">${Math.ceil(st.left)}</div></div>
+      <div class="ring"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="${R}" stroke="var(--line)" stroke-width="14" fill="none"/><circle id="arc" cx="100" cy="100" r="${R}" stroke="var(--lvl-text)" stroke-width="14" fill="none" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-frac)}" transform="rotate(-90 100 100)"/></svg><div class="ring-t" id="rt">${Math.ceil(st.left)}</div></div>
       <div class="row" style="justify-content:center;gap:12px">
         ${steps.length>1?`<button class="btn sm ghost" id="rprev" ${st.i?'':'disabled'}>⏮</button>`:''}
         <button class="btn sm" id="rpause" style="min-width:120px">${st.paused?'▶ Go':'⏸ Pause'}</button>
@@ -238,8 +235,8 @@ function renderWorkout(v){
       <div class="sets">${it.sets.map((s,k)=>`
         <div class="set ${cols} ${s.done?'isdone':''}">
           <div class="n">Set ${k+1}</div>
-          <div><label>${ex.time?'Seconds':'Reps'}</label><input class="num" inputmode="numeric" type="number" min="0" placeholder="${p[2]===p[3]?p[2]:p[2]+'-'+p[3]}" value="${s.reps}" data-i="${i}" data-k="${k}" data-f="reps"></div>
-          ${ex.weight?`<div><label>Weight (${profile.unit})${ex.bar?`<button class="plate-btn" data-plate="${i},${k}" aria-label="Plate calculator">🧮</button>`:''}</label><input class="num" inputmode="decimal" type="number" min="0" step="0.5" placeholder="${profile.unit}" value="${s.weight}" data-i="${i}" data-k="${k}" data-f="weight"></div>`:''}
+          <div><label aria-hidden="true">${ex.time?'Seconds':'Reps'}</label><button class="num numbtn" data-pick="${i},${k},reps" aria-label="Set ${k+1} ${ex.time?'seconds':'reps'}: ${s.reps!==''?esc(s.reps):'not set'}. Tap to change">${s.reps!==''?esc(s.reps):`<span class="ph">${p[2]===p[3]?p[2]:p[2]+'–'+p[3]}</span>`}</button></div>
+          ${ex.weight?`<div><label><span aria-hidden="true">Weight (${profile.unit})</span>${ex.bar?`<button class="plate-btn" data-plate="${i},${k}" aria-label="Plate calculator">🧮</button>`:''}</label><button class="num numbtn" data-pick="${i},${k},weight" aria-label="Set ${k+1} weight: ${s.weight!==''?esc(s.weight)+' '+profile.unit:'not set'}. Tap to change">${s.weight!==''?esc(s.weight):`<span class="ph">${profile.unit}</span>`}</button></div>`:''}
           ${ex.time?`<button class="check go" data-time="${i},${k}" aria-label="Start ${esc(ex.name)} timer">⏱</button>`:''}
           <button class="check" data-check="${i},${k}" aria-label="Mark set ${k+1} done">✓</button>
         </div>`).join('')}</div>
@@ -252,7 +249,14 @@ function renderWorkout(v){
   const save=()=>store.set(pKey('jams_active'),a);
   const rerender=()=>{const y=scrollY;renderWorkout(v);scrollTo(0,y)};
   const markDone=(i,k)=>{const allDone=a.items.every(it=>it.sets.every(x=>x.done));if(allDone){hideTimer();toast('All sets done! Tap Finish 🎉');say('All sets done. Amazing work! Tap finish.')}else{nextSay=nextUp(a);say(`Nice! Rest ${restSecs()} seconds.`);startTimer(restSecs())}};
-  v.querySelectorAll('input.num[data-f]').forEach(inp=>inp.oninput=()=>{a.items[inp.dataset.i].sets[inp.dataset.k][inp.dataset.f]=inp.value;save()});
+  v.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{
+    const [i,k,f]=b.dataset.pick.split(','),it=a.items[+i],s=it.sets[+k],p=it.p||plan[+i],ex=EX[it.id],prev=it.sets[+k-1];
+    if(f==='reps')return pickNumber({title:`${esc(ex.name)} · set ${+k+1}`,value:s.reps!==''?s.reps:p[2],step:ex.time?5:1,max:ex.time?900:300,
+      quick:[p[2],Math.round((p[2]+p[3])/2),p[3],prev&&prev.reps],unit:(ex.time?'seconds':'reps')+(ex.per?' '+ex.per:'')},val=>{s.reps=val;save();rerender()});
+    const st=profile.unit==='kg'?2.5:5,old=s.weight,w=parseFloat(s.weight)||0;
+    pickNumber({title:`${esc(ex.name)} · set ${+k+1} weight`,value:s.weight,step:st,max:3000,quick:[prev&&prev.weight,w?round1(w-st):'',w?round1(w+st):''],unit:profile.unit},val=>{
+      s.weight=val;it.sets.forEach((x,j)=>{if(j>+k&&!x.done&&(x.weight===''||x.weight===old))x.weight=val});save();rerender()});
+  });
   $('#wdate').onchange=e=>{a.date=e.target.value||isoLocal();save()};
   const warmDone=()=>{a.warm=true;save();rerender()};
   if($('#warm'))$('#warm').onclick=()=>runWarmup(warmDone);
@@ -306,7 +310,7 @@ function finishWorkout(a){
   celebrate(sets,mins,vol,nb,prs);
   syncNow(true);
 }
-function badgeRow(list){return list.length?`<div class="card stack"><h3>🎉 New ${list.length>1?'badges':'badge'}!</h3><div class="badges">${list.map(b=>`<div class="badge-i on"><span>${b.e}</span><b>${b.n}</b></div>`).join('')}</div></div>`:''}
+function badgeRow(list){return list.length?`<div class="card stack"><h2 class="h3">🎉 New ${list.length>1?'badges':'badge'}!</h2><div class="badges">${list.map(b=>`<div class="badge-i on"><span>${b.e}</span><b>${b.n}</b></div>`).join('')}</div></div>`:''}
 function showNewBadges(){const nb=newBadges();if(nb.length)sheet(`${badgeRow(nb)}<button class="btn" id="ok">Awesome!</button>`,()=>$('#ok').onclick=closeLayer)}
 function celebrate(sets,mins,vol,badges,prs=[]){
   const colors=['#16a34a','#ea580c','#7c3aed','#2563eb','#eab308','#ec4899'];
@@ -315,7 +319,7 @@ function celebrate(sets,mins,vol,badges,prs=[]){
   $('#layer').innerHTML=`<div class="celebrate">${conf}<div class="stack-lg center" style="max-width:420px;width:100%;position:relative">
     <div style="font-size:84px">🏆</div><h1>${praise}${profile.name?'<br>'+esc(profile.name)+'!':''}</h1>
     <div class="stats"><div class="stat"><b>${sets}</b><span>sets</span></div><div class="stat"><b>${mins}</b><span>${mins===1?'minute':'minutes'}</span></div><div class="stat"><b>${weekStreak()}</b><span>week streak 🔥</span></div></div>
-    ${prs.length?`<div class="card stack" style="text-align:left"><h3>🏆 New personal ${prs.length>1?'records':'record'}!</h3>${prs.map(p=>`<p>⭐ ${esc(p)}</p>`).join('')}</div>`:''}
+    ${prs.length?`<div class="card stack" style="text-align:left"><h2 class="h3">🏆 New personal ${prs.length>1?'records':'record'}!</h2>${prs.map(p=>`<p>⭐ ${esc(p)}</p>`).join('')}</div>`:''}
     ${badgeRow(badges)}
     ${vol>0?`<p class="muted">You moved <b>${Math.round(vol).toLocaleString()} ${profile.unit}</b> in total! 💪</p>`:'<p class="muted">Every rep makes you stronger. See you next time!</p>'}
     <div class="row" style="gap:8px"><button class="btn secondary" id="cshare" style="flex:1">📤 Share</button><button class="btn secondary" id="ccool" style="flex:1">🧘 Cool-down</button></div>
@@ -353,9 +357,9 @@ function renderProgress(v){
   if(!names.includes(chartEx))chartEx=names[0]||null;
   const lvlCount=dates.filter(d=>j[d].some(e=>e.level===profile.level)).length;
   const nextLvl=profile.level==='beginner'?'intermediate':profile.level==='intermediate'?'expert':null;
-  const levelUp=nextLvl&&lvlCount>=24?`<div class="card stack" style="border:2px solid ${LEVELS[nextLvl].color}"><h3>🎖️ Ready to level up?</h3><p class="muted">You've done ${lvlCount} workouts on ${lvl().name}. If the workouts feel easy and your form is solid, try <b>${LEVELS[nextLvl].name}</b>.</p><button class="btn sm" style="background:${LEVELS[nextLvl].color}" data-go-me>See levels</button></div>`:'';
+  const levelUp=nextLvl&&lvlCount>=24?`<div class="card stack" style="border:2px solid ${LEVELS[nextLvl].color}"><h2 class="h3">🎖️ Ready to level up?</h2><p class="muted">You've done ${lvlCount} workouts on ${lvl().name}. If the workouts feel easy and your form is solid, try <b>${LEVELS[nextLvl].name}</b>.</p><button class="btn sm" style="background:${LEVELS[nextLvl].color}" data-go-me>See levels</button></div>`:'';
   const ws=weekStart(new Date()),set=new Set(dates);
-  let heat='';for(let w=11;w>=0;w--){let col='';for(let d=0;d<7;d++){const dt=new Date(ws);dt.setDate(ws.getDate()-w*7+d);const on=set.has(isoLocal(dt)),fut=dt>new Date();col+=`<i style="display:block;width:100%;aspect-ratio:1;border-radius:4px;background:${on?'var(--lvl)':fut?'transparent':'var(--line)'}"></i>`}heat+=`<div style="display:grid;gap:3px">${col}</div>`}
+  let heat='';for(let w=11;w>=0;w--){let col='';for(let d=0;d<7;d++){const dt=new Date(ws);dt.setDate(ws.getDate()-w*7+d);const on=set.has(isoLocal(dt)),fut=dt>new Date();col+=`<i style="display:block;width:100%;aspect-ratio:1;border-radius:4px;background:${on?'var(--lvl-text)':fut?'transparent':'var(--line)'}"></i>`}heat+=`<div style="display:grid;gap:3px">${col}</div>`}
   const earned=new Set(earnedBadges());
   v.innerHTML=`${topbar(levelPill())}<div class="stack-lg">
     <div><h1>Your progress 📈</h1></div>
@@ -366,18 +370,18 @@ function renderProgress(v){
     ${levelUp}
     ${familyCard()}
     ${activityCard()}
-    <div class="card stack"><div class="row between"><h3>Badges 🏅</h3><span class="small muted" style="font-weight:700">${earned.size} / ${BADGES.length}</span></div>
+    <div class="card stack"><div class="row between"><h2 class="h3">Badges 🏅</h2><span class="small muted" style="font-weight:700">${earned.size} / ${BADGES.length}</span></div>
       <div class="badges">${BADGES.map(b=>`<button class="badge-i ${earned.has(b.id)?'on':''}" data-b="${b.id}"><span>${earned.has(b.id)?b.e:'🔒'}</span><b>${b.n}</b></button>`).join('')}</div>
       <p class="small muted">Tap a badge to see how to earn it.</p></div>
     ${muscleMap()}
-    <div class="card stack"><h3>Last 12 weeks</h3><div style="display:grid;grid-template-columns:repeat(12,1fr);gap:3px">${heat}</div><p class="small muted">Each square is a day. Coloured = you worked out. Aim for 3–4 a week!</p></div>
-    <div class="card stack"><h3>How am I improving?</h3>
+    <div class="card stack"><h2 class="h3">Last 12 weeks</h2><div style="display:grid;grid-template-columns:repeat(12,1fr);gap:3px">${heat}</div><p class="small muted">Each square is a day. Coloured = you worked out. Aim for 3–4 a week!</p></div>
+    <div class="card stack"><h2 class="h3">How am I improving?</h2>
       ${names.length?`<select class="sel" id="exsel">${names.map(n=>`<option ${n===chartEx?'selected':''}>${esc(n)}</option>`).join('')}</select><div id="chart"></div>`:`<div class="empty"><div class="big-emoji">🌱</div><p class="muted">Finish your first workout to see your progress chart here.</p></div>`}
     </div>
     ${recordsCard()}
     ${bodyCard()}
     <div id="photos"></div>
-    <div class="stack"><h3>History</h3>${historyHtml(j,dates)}</div>
+    <div class="stack"><h2 class="h3">History</h2>${historyHtml(j,dates)}</div>
   </div>`;
   if(names.length){drawChart();$('#exsel').onchange=e=>{chartEx=e.target.value;drawChart()}}
   renderPhotos();
@@ -387,15 +391,18 @@ function renderProgress(v){
   $('#shareprog').onclick=shareProgress;
   if($('#logact'))$('#logact').onclick=()=>activitySheet();
   if($('#badd'))$('#badd').onclick=bodySheet;
-  v.querySelectorAll('[data-bdel]').forEach(b=>b.onclick=()=>confirmBox('Delete this measurement?','It will be removed for good.','Delete',()=>{profile.body=(profile.body||[]).filter(x=>x.id!==b.dataset.bdel);saveProfile();syncNow(true);renderProgress(v)},true));
+  v.querySelectorAll('[data-bdel]').forEach(b=>b.onclick=()=>{const before=(profile.body||[]).slice();profile.body=before.filter(x=>x.id!==b.dataset.bdel);saveProfile();renderProgress(v);
+    undoable('Measurement deleted',()=>{profile.body=before;saveProfile();renderProgress(v)},()=>syncNow(true))});
   v.querySelectorAll('[data-b]').forEach(b=>b.onclick=()=>{const B=BADGES.find(x=>x.id===b.dataset.b);toast(`${earned.has(B.id)?B.e+' Earned: ':'🔒 To unlock: '}${B.d}`)});
   v.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const [d,id]=b.dataset.del.split('|');
-    confirmBox('Delete this entry?','This removes it from your history for good.','Delete',()=>{const jj=getJournal();jj[d]=(jj[d]||[]).filter(e=>String(e.id)!==id);if(!jj[d].length)delete jj[d];setJournal(jj);addTomb(id);renderProgress(v);toast('Deleted');syncNow(true)},true)});
+    const jj=getJournal(),entry=(jj[d]||[]).find(e=>String(e.id)===id);if(!entry)return;
+    jj[d]=jj[d].filter(e=>String(e.id)!==id);if(!jj[d].length)delete jj[d];setJournal(jj);renderProgress(v);
+    undoable(`${entry.exercise} deleted`,()=>{const j2=getJournal();(j2[d]=j2[d]||[]).push(entry);setJournal(j2);renderProgress(v)},()=>{addTomb(id);syncNow(true)})});
   v.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{const [d,id]=b.dataset.edit.split('|');editEntry(d,id,()=>renderProgress(v))});
 }
 function historyHtml(j,dates){
   if(!dates.length)return `<div class="card empty"><div class="big-emoji">📒</div><p class="muted">No workouts yet. Your history will show up here.</p></div>`;
-  return dates.slice().reverse().slice(0,30).map(d=>`<div><p class="small" style="font-weight:800;color:var(--lvl);margin-top:6px">${niceDate(d)}</p>
+  return dates.slice().reverse().slice(0,30).map(d=>`<div><p class="small" style="font-weight:800;color:var(--lvl-text);margin-top:6px">${niceDate(d)}</p>
     ${j[d].map(e=>`<div class="hist"><div class="row between"><b>${esc(e.exercise)}</b><span style="white-space:nowrap"><span class="small muted">${esc(e.timestamp||'')}</span><button class="xbtn" data-edit="${d}|${esc(e.id)}" aria-label="Edit">✏️</button><button class="xbtn" data-del="${d}|${esc(e.id)}" aria-label="Delete">🗑️</button></span></div>
       <div>${e.kind==='activity'?`<span class="badge">⏱ <b>${e.minutes}</b> min</span>${e.distance?`<span class="badge">📍 <b>${e.distance}</b> ${e.dunit||''}</span>`:''}`:''}${e.effort?`<span class="badge">${EFF[e.effort]}</span>`:''}${(e.sets||[]).map((s,i)=>`<span class="badge">${i+1}: <b>${Number(s.reps)||0}</b>${s.weight?` × <b>${round1(toUnit(Number(s.weight),e.unit))}</b> ${profile.unit}`:''}</span>`).join('')}</div></div>`).join('')}</div>`).join('')
     +(dates.length>30?`<p class="small muted center">Showing the latest 30 days. Download a backup to keep everything.</p>`:'');
@@ -435,12 +442,12 @@ function drawChart(){
   const x=i=>pts.length===1?(L+W-R)/2:L+i*(W-L-R)/(pts.length-1),y=v=>T+(H-T-B)*(1-(v-min)/(max-min));
   const grid=[0,.5,1].map(f=>{const v=min+(max-min)*f;return `<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${Math.round(v)}</text>`}).join('');
   const path=vals.map((v,i)=>`${i?'L':'M'}${x(i)},${y(v)}`).join('');
-  const area=pts.length>1?`<path d="${path}L${x(vals.length-1)},${y(0)}L${x(0)},${y(0)}Z" fill="var(--lvl)" opacity=".12"/>`:'';
-  const dots=vals.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="4.5" fill="var(--card)" stroke="var(--lvl)" stroke-width="2.5"><title>${niceDate(pts[i].d)}: ${v}</title></circle>`).join('');
+  const area=pts.length>1?`<path d="${path}L${x(vals.length-1)},${y(0)}L${x(0)},${y(0)}Z" fill="var(--lvl-text)" opacity=".12"/>`:'';
+  const dots=vals.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="4.5" fill="var(--card)" stroke="var(--lvl-text)" stroke-width="2.5"><title>${niceDate(pts[i].d)}: ${v}</title></circle>`).join('');
   const lbl=i=>`<text x="${x(i)}" y="${H-8}" text-anchor="middle" font-size="11" fill="var(--muted)">${parseIso(pts[i].d).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</text>`;
   const diff=round1(vals[vals.length-1]-vals[0]);
   $('#chart').innerHTML=`${useW?`<div class="seg" style="margin-bottom:8px">${[['w','Heaviest'],['e','Est. 1RM'],['v','Volume']].map(o=>`<button class="${o[0]===m?'on':''}" data-cm="${o[0]}">${o[1]}</button>`).join('')}</div>`:''}
-  <p class="small muted" style="font-weight:700">${label}</p><svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${label} over time">${grid}${area}<path d="${path}" fill="none" stroke="var(--lvl)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>${dots}${lbl(0)}${pts.length>1?lbl(pts.length-1):''}</svg>
+  <p class="small muted" style="font-weight:700">${label}</p><svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${label} over time">${grid}${area}<path d="${path}" fill="none" stroke="var(--lvl-text)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>${dots}${lbl(0)}${pts.length>1?lbl(pts.length-1):''}</svg>
   <p style="margin-top:6px">${pts.length<2?'Do this exercise again to start your line! 📍':diff>0?`🎉 Up <b>${diff}</b> since you started. Keep going!`:diff===0?'Holding steady. Try to beat your best next time!':'Small dips are normal. Rest well and keep at it! 💪'}</p>
   ${m==='e'?'<p class="small muted">Estimated from your best set. It is a guess at the most you could lift once, not a target to try.</p>':''}`;
   document.querySelectorAll('[data-cm]').forEach(b=>b.onclick=()=>{chartMetric=b.dataset.cm;drawChart()});

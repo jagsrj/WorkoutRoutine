@@ -2,19 +2,19 @@
 /* ---------- Levels ---------- */
 const LEVELS = {
   beginner: {
-    name:'Beginner', emoji:'🌱', color:'#16a34a', rest:60,
+    name:'Beginner', emoji:'🌱', color:'#15803d', dark:'#4ade80', rest:60,
     tagline:'No equipment. Learn the moves.',
     equipment:'Just you, a wall, a sturdy chair and a backpack',
     who:['You are new to exercise, or coming back after a long break','You can do fewer than 6 push-ups','You want to work out at home','You are under 13 (always start here!)'],
   },
   intermediate: {
-    name:'Intermediate', emoji:'🔥', color:'#ea580c', rest:90,
+    name:'Intermediate', emoji:'🔥', color:'#c2410c', dark:'#fb923c', rest:90,
     tagline:'Dumbbells & machines. Build real strength.',
     equipment:'Dumbbells, cable machines, a bench',
     who:['You have exercised regularly for at least 2–3 months','You can do 6–20 push-ups with good form','You know how to use basic gym machines','You finished the Beginner plan and it feels easy'],
   },
   expert: {
-    name:'Expert', emoji:'🏆', color:'#7c3aed', rest:120,
+    name:'Expert', emoji:'🏆', color:'#6d28d9', dark:'#a78bfa', rest:120,
     tagline:'Barbells. Heavy lifts. Big goals.',
     equipment:'Barbell, squat rack, pull-up bar, full gym',
     who:['You have trained 3+ times a week for 6+ months','You can do 20+ push-ups and some pull-ups','You know how to squat, bench and deadlift safely','Adults only — or teens with a coach watching'],
@@ -217,9 +217,9 @@ function figSvg(id,cls='fig'){
       case 'disc':case 'wheel':props+=at(pr.at,0,0,'circle',`r="6" fill="var(--fig-prop)" stroke="var(--fig-dark)" stroke-width="2.5"`,'cx','cy');break;
     }
   });
-  const back=`<g stroke="var(--lvl)" stroke-width="5" stroke-linecap="round" opacity=".38">${line('s','e2')}${line('e2','w2')}${line('p','k2')}${line('k2','f2')}</g>`;
-  const front=`<g stroke="var(--lvl)" stroke-width="5.5" stroke-linecap="round">${line('s','h')}${line('s','p')}${line('p','k')}${line('k','f')}${line('s','e')}${line('e','w')}</g>`;
-  const head=at('h',0,0,'circle','r="7" fill="var(--lvl)"','cx','cy');
+  const back=`<g stroke="var(--lvl-text)" stroke-width="5" stroke-linecap="round" opacity=".38">${line('s','e2')}${line('e2','w2')}${line('p','k2')}${line('k2','f2')}</g>`;
+  const front=`<g stroke="var(--lvl-text)" stroke-width="5.5" stroke-linecap="round">${line('s','h')}${line('s','p')}${line('p','k')}${line('k','f')}${line('s','e')}${line('e','w')}</g>`;
+  const head=at('h',0,0,'circle','r="7" fill="var(--lvl-text)"','cx','cy');
   return `<svg class="${cls}" viewBox="0 -10 120 116" role="img" aria-label="Animated drawing of the exercise"><line x1="0" y1="101.5" x2="120" y2="101.5" stroke="var(--line)" stroke-width="3"/>${props}${back}${front}${head}</svg>`;
 }
 

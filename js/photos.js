@@ -35,7 +35,7 @@ async function renderPhotos(){
   const box=$('#photos');if(!box)return;
   if(!profile.photos){box.innerHTML='';return}
   const list=await photosFor();if(!$('#photos'))return;
-  box.innerHTML=`<div class="card stack"><div class="row between"><h3>📸 Progress photos</h3><span class="small muted" style="font-weight:700;white-space:nowrap">🔒 Private</span></div>
+  box.innerHTML=`<div class="card stack"><div class="row between"><h2 class="h3">📸 Progress photos</h2><span class="small muted" style="font-weight:700;white-space:nowrap">🔒 Private</span></div>
     ${list.length?`<div class="pgrid">${list.slice().reverse().map(p=>`<button class="pthumb" data-ph="${p.id}"><img src="${blobUrl(p)}" alt="Progress photo from ${niceDate(p.date)}" loading="lazy"><span>${parseIso(p.date).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'2-digit'})}</span></button>`).join('')}</div>`
       :`<div class="empty"><div class="big-emoji">📷</div><p class="muted">Take your first photo today. In a few weeks you'll be able to see how far you've come!</p></div>`}
     <label class="btn secondary" style="cursor:pointer">📷 Add a photo<input type="file" id="phadd" accept="image/*" hidden></label>
@@ -75,7 +75,8 @@ function viewPhoto(p,list){
       try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f]});return}}catch(e){if(e&&e.name==='AbortError')return}
       const a=document.createElement('a');a.href=blobUrl(p);a.download=f.name;document.body.appendChild(a);a.click();a.remove();
     };
-    $('#pdel').onclick=()=>confirmBox('Delete this photo?','It will be gone for good.','Delete',async()=>{await delPhoto(p.id);URL.revokeObjectURL(urls.get(p.id));urls.delete(p.id);toast('Deleted');renderPhotos()},true);
+    $('#pdel').onclick=async()=>{closeLayer();await delPhoto(p.id);renderPhotos();
+      undoable('Photo deleted',async()=>{await putPhoto(p);renderPhotos()},()=>{URL.revokeObjectURL(urls.get(p.id));urls.delete(p.id)})};
   });
 }
 function compareSheet(list){
@@ -112,7 +113,7 @@ async function renderPhotoNudge(){
   $('#nudge').onclick=()=>{go('progress');setTimeout(()=>{const el=$('#photos');if(el)el.scrollIntoView({behavior:'smooth'})},250)};
 }
 function photosCard(){
-  return `<div class="card stack"><h3>📸 Body tracking</h3>
+  return `<div class="card stack"><h2 class="h3">📸 Body tracking</h2>
     <p class="small muted">Progress photos and body measurements (weight, waist). Photos stay <b>only on this phone</b> and are never uploaded or synced. Measurements sync with your other devices if sync is on.</p>
     <div class="seg" id="phon"><button class="${profile.photos?'':'on'}" data-ph="0">Off</button><button class="${profile.photos?'on':''}" data-ph="1">On</button></div>
     ${profile.photos?`<p class="small muted">💡 On iPhone, add this app to your Home Screen (Share → Add to Home Screen) so your photos are kept safely. Save copies of photos you want to keep forever.</p>`:''}</div>`;
