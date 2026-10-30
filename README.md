@@ -81,6 +81,8 @@ Redeploy after adding bindings. Coach allows 20 AI questions per hour per person
 - A banner says when you're offline (workouts still save and sync later).
 - **Interval timer** (Workouts → Plan): work/rest/rounds with beeps and an optional spoken countdown; add exercises to make a circuit. Finished sessions are logged as an activity.
 - **Daily habits** (Today): water, sleep, stretching, screen-free time, reading and more, or make your own. Tap to tick off, see a 🔥 streak for each, and a 7-day view in Progress. Hide it with Customize. Habit ticks sync day by day.
+- **My equipment** (Me): tick what you have (or pick *Ironax home gym*, *Dumbbells only*, *Full gym*). Each exercise shows the version for your equipment, e.g. leg press on a Smith machine plate, lat pulldown on a functional trainer, Smith or dumbbell versions of barbell lifts. Exercises you can't do show a note to swap them.
+- **Your own videos:** in any exercise's *How to do it*, paste a YouTube link (watch, youtu.be or Shorts). ▶ Watch then opens your video instead of a search.
 - **Child profiles:** when adding someone you choose "Me" or "My child". Child profiles get kid-safe Coach answers (no diet or weight-loss advice) and a prompt to set a parent PIN. Change it in Me → Parent controls.
 
 ## Compatibility

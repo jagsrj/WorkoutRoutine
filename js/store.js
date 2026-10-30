@@ -36,6 +36,8 @@ function sanitizeProfile(p){
   o.habits=(Array.isArray(p.habits)?p.habits:[]).filter(h=>h&&/^[a-z0-9_]{1,30}$/.test(String(h.id))).slice(0,8)
     .map(h=>({id:String(h.id),e:cleanEmoji(h.e,'⭐'),n:cleanText(h.n,24)||'Habit',t:Math.max(1,Math.min(20,Math.round(cleanNum(h.t,20))||1)),...(h.unit?{unit:cleanText(h.unit,12)}:{})}));
   o.hlog=cleanHabitLog(p.hlog);
+  if(Array.isArray(p.gear))o.gear=[...new Set(p.gear)].filter(k=>['db','cable','smith','smithlp','barbell','ez','bench','pullbar','machines'].includes(k));
+  o.videos={};Object.entries(p.videos&&typeof p.videos==='object'?p.videos:{}).slice(0,200).forEach(([k,v])=>{if(/^[a-z0-9_]{1,48}$/i.test(k)&&/^[A-Za-z0-9_-]{11}$/.test(String(v)))o.videos[k]=String(v)});
   o.customEx={};Object.entries(p.customEx&&typeof p.customEx==='object'?p.customEx:{}).slice(0,100).forEach(([k,v])=>{if(!/^c_[a-z0-9]{1,40}$/.test(k)||!v||typeof v!=='object')return;
     const name=cleanText(v.name,40);if(!name)return;
     o.customEx[k]={name,e:cleanEmoji(v.e,'⭐'),m:(Array.isArray(v.m)?v.m:[]).slice(0,6).map(x=>cleanText(x,20)).filter(Boolean),weight:!!v.weight,time:!!v.time,
@@ -155,7 +157,7 @@ function go(r,arg){route=r;routeArg=arg;self.__r=r;render();window.scrollTo(0,0)
 document.getElementById('tabbar').addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)go(b.dataset.go)});
 
 function render(){
-  loadCustom();
+  loadCustom();applyGear();
   document.body.dataset.level=profile.level||'beginner';
   const onb=!profile.id||!profile.level||route==='onboard';
   $('#tabbar').classList.toggle('hide',onb||route==='workout');

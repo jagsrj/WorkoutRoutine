@@ -166,7 +166,7 @@ function runSequence(steps,opts={}){
     const s=steps[st.i],total=s.s,frac=Math.max(0,st.left)/total,R=88,C=2*Math.PI*R;
     $('#layer').innerHTML=`<div class="runner"><div class="runner-in stack-lg center">
       <div class="row between"><button class="link" id="rx">✕ ${opts.closeText||'Close'}</button><span class="small muted" style="font-weight:700">${steps.length>1?`STEP ${st.i+1} OF ${steps.length}`:''}</span></div>
-      <div class="runner-fig">${s.ready?'<div style="font-size:84px">⏱️</div>':s.fig?figSvg(s.fig,'fig big'):`<div style="font-size:84px">${s.e||'💪'}</div>`}</div>
+      <div class="runner-fig">${s.ready?'<div style="font-size:84px">⏱️</div>':(s.fig&&figSvg(s.fig,'fig big'))||`<div style="font-size:84px">${s.e||'💪'}</div>`}</div>
       <div><h1>${esc(s.n)}</h1>${s.tip?`<p class="muted" style="margin-top:6px">${esc(s.tip)}</p>`:''}</div>
       <div class="ring"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="${R}" stroke="var(--line)" stroke-width="14" fill="none"/><circle id="arc" cx="100" cy="100" r="${R}" stroke="var(--lvl-text)" stroke-width="14" fill="none" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-frac)}" transform="rotate(-90 100 100)"/></svg><div class="ring-t" id="rt">${Math.ceil(st.left)}</div></div>
       <div class="row" style="justify-content:center;gap:12px">
@@ -218,8 +218,9 @@ function progressHint(p,ex){
   if(ex.weight)return `<div class="hint">🚀 You hit ${p[3]} reps on every set last time. Add ${profile.unit==='kg'?'2.5 kg':'5 lbs'} today!</div>`;
   return `<div class="hint">🚀 Crushed it last time! Try ${ex.time?'5 more seconds':'2 more reps'} per set${ex.time?'':' or a harder version'}.</div>`;
 }
-const howTo=id=>{const ex=EX[id];return `<details class="how"><summary>How to do it</summary><div class="figbox">${figSvg(id,'fig big')}</div><ol>${ex.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol><div class="tip">💡 ${esc(ex.tip)}</div>
-  <a class="btn sm secondary" style="margin-bottom:12px;text-decoration:none;display:inline-flex" href="${ex.video||YTS(ex.name)}" target="_blank" rel="noopener">▶ Watch a video</a> <button class="btn sm secondary" style="margin-bottom:12px;display:inline-flex" data-say="${id}">🔊 Read aloud</button></details>`};
+const howTo=id=>{const ex=EX[id];return `${gearNote(ex)}<details class="how"><summary>How to do it</summary>${(f=>f?`<div class="figbox">${f}</div>`:'')(figSvg(id,'fig big'))}<ol>${ex.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol><div class="tip">💡 ${esc(ex.tip)}</div>
+  <a class="btn sm secondary" style="margin-bottom:12px;text-decoration:none;display:inline-flex" href="${ex.video||YTS(ex.name)}" target="_blank" rel="noopener">▶ ${ex.ownVideo?'Watch my video':'Watch a video'}</a> <button class="btn sm secondary" style="margin-bottom:12px;display:inline-flex" data-say="${id}">🔊 Read aloud</button>
+  <button class="link small" style="display:block" data-myvid="${id}">🔗 ${ex.ownVideo?'Change my video':'Use my own YouTube video'}</button></details>`};
 function renderWorkout(v){
   const a=store.get(pKey('jams_active'),null);if(!a){go('today');return}
   const W=WORKOUTS[a.key]||{name:a.title,e:a.emoji},plan=a.plan||PLANS[a.level][a.key];
