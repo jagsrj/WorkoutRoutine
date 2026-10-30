@@ -1,4 +1,4 @@
-/* JAMS Fitness · error reporting. Loaded first so problems on people's phones are reported
+/* KinFit · error reporting. Loaded first so problems on people's phones are reported
    (message, file, line, screen, app version, device type only, with no personal data). */
 const APP_VERSION='2026.10.30';
 (()=>{let n=0;

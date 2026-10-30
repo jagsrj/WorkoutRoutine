@@ -1,4 +1,4 @@
-/* JAMS Fitness · Onboarding, Today, guided timer, workout, rest timer and Progress screens. */
+/* KinFit · Onboarding, Today, guided timer, workout, rest timer and Progress screens. */
 /* ---------- Onboarding ---------- */
 let ob={step:0,answers:[],name:'',avatar:'🙂'};
 function renderOnboard(v){
@@ -17,7 +17,7 @@ function renderOnboard(v){
       <button class="btn" id="start">Let's go! 🚀</button>
       <button class="btn ghost" id="pick">I already know my level</button>
       <p class="small muted center">🔒 Your workouts stay on your phone. <a href="privacy.html" style="color:var(--lvl)">Privacy</a> · <a href="about.html" style="color:var(--lvl)">About</a></p>
-      <button class="link" id="joinsync" style="width:100%">☁️ Used JAMS before? Restore with your recovery code</button>
+      <button class="link" id="joinsync" style="width:100%">☁️ Used KinFit before? Restore with your recovery code</button>
     </div>`;
     $('#joinsync').onclick=()=>joinSheet();
     $('#start').onclick=()=>{ob.step=1;render()};

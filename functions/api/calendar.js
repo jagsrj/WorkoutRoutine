@@ -24,13 +24,13 @@ export function onRequestGet({ request }) {
   const site = url.origin;
   const title = `💪 Workout time${name ? ' for ' + name : ''}`;
   const ics = [
-    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//JAMS Fitness//Reminders//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//KinFit//Reminders//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
     'BEGIN:VEVENT',
     `UID:jams-${days.join('')}-${t}-${Date.now()}@jams-fitness`,
     `DTSTAMP:${stamp}`, `DTSTART:${local}`, 'DURATION:PT45M',
     `RRULE:FREQ=WEEKLY;BYDAY=${days.join(',')}`,
     `SUMMARY:${title}`,
-    `DESCRIPTION:Open JAMS Fitness: ${site}`, `URL:${site}`,
+    `DESCRIPTION:Open KinFit: ${site}`, `URL:${site}`,
     'BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${title}`, 'TRIGGER:PT0M', 'END:VALARM',
     'END:VEVENT', 'END:VCALENDAR', '',
   ].join('\r\n');

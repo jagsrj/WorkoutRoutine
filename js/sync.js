@@ -1,4 +1,4 @@
-/* JAMS Fitness · Backup & sync between devices. */
+/* KinFit · Backup & sync between devices. */
 /* ---------- Cloud sync (optional) ----------
    A private sync code links devices. Data is merged, never overwritten. */
 let syncCfg=store.get('jams_sync',{code:null,last:0});

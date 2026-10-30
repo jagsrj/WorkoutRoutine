@@ -1,4 +1,4 @@
-/* JAMS Fitness · Ask Coach chat. */
+/* KinFit · Ask Coach chat. */
 /* ---------- Coach chat ---------- */
 // Built-in answers: instant, free, work offline. [keywords, answer]. Multi-word keywords count double.
 const FAQ = [

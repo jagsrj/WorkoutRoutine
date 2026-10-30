@@ -14,7 +14,7 @@ const MODELS = ['@cf/meta/llama-3.1-8b-instruct-fast', '@cf/meta/llama-3.3-70b-i
 const MAX_MSG_CHARS = 600;
 const MAX_HISTORY = 8;
 
-const SYSTEM = `You are "Coach", the friendly helper inside JAMS Fitness, a workout app that kids (as young as 12), teens and adults use.
+const SYSTEM = `You are "Coach", the friendly helper inside KinFit, a workout app that kids (as young as 12), teens and adults use.
 
 How to answer:
 - Use simple words a 12-year-old understands. Short sentences. Be warm and encouraging.

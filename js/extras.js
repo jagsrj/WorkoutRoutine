@@ -1,4 +1,4 @@
-/* JAMS Fitness · 6-month phases, share cards, stretching, tour, display settings, monthly report, feedback, backup history. */
+/* KinFit · 6-month phases, share cards, stretching, tour, display settings, monthly report, feedback, backup history. */
 /* =========================================================
    System upgrades: share cards, tour, 6-month phases, stretching,
    display settings, monthly report, feedback, backup history.
@@ -54,10 +54,10 @@ async function shareImage(opts){
   st.forEach(([v,l],i)=>{const x=x0+i*(bw+gap);g.fillStyle='rgba(255,255,255,.14)';g.beginPath();g.roundRect?g.roundRect(x,590,bw,200,32):g.rect(x,590,bw,200);g.fill();
     g.textAlign='center';g.fillStyle='#fff';g.font=font('900',84);g.fillText(String(v),x+bw/2,700);g.font=font('600',34);g.fillStyle='rgba(255,255,255,.85)';g.fillText(l,x+bw/2,758)});
   let y=880;(opts.lines||[]).slice(0,4).forEach(t=>{center(t.length>44?t.slice(0,43)+'…':t,y,'700',42);y+=66});
-  center('JAMS FITNESS',H-110,'900',44);center(location.host,H-58,'600',30,'rgba(255,255,255,.7)');
+  center('KINFIT',H-110,'900',44);center(location.host,H-58,'600',30,'rgba(255,255,255,.7)');
   const blob=await new Promise(r=>c.toBlob(r,'image/png'));
   const file=new File([blob],'jams-fitness.png',{type:'image/png'});
-  try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],text:opts.text||'My workout on JAMS Fitness 💪'});return}}catch(e){if(e&&e.name==='AbortError')return}
+  try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],text:opts.text||'My workout on KinFit 💪'});return}}catch(e){if(e&&e.name==='AbortError')return}
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='jams-fitness.png';document.body.appendChild(a);a.click();a.remove();toast('Image saved');
 }
 let lastDone=null;
@@ -65,13 +65,13 @@ function shareWorkout(){
   const d=lastDone||{};
   shareImage({big:d.prs&&d.prs.length?'🏆':'💪',title:`${profile.name||'I'} ${profile.name?'crushed':'crushed'} it!`,sub:`${d.e||'💪'} ${d.title||'Workout'} done`,
     stats:[[d.sets||0,'sets'],[d.mins||0,'minutes'],[weekStreak(),'week streak']],
-    lines:[...(d.prs||[]).map(p=>'⭐ New record: '+p),...(d.badges||[]).map(b=>`${b.e} Badge: ${b.n}`)],text:`${profile.name||'I'} just finished ${d.title||'a workout'} on JAMS Fitness 💪`});
+    lines:[...(d.prs||[]).map(p=>'⭐ New record: '+p),...(d.badges||[]).map(b=>`${b.e} Badge: ${b.n}`)],text:`${profile.name||'I'} just finished ${d.title||'a workout'} on KinFit 💪`});
 }
 function shareProgress(){
   const j=getJournal(),ds=workoutDates(j),ws=weekStart(new Date()),wk=ds.filter(d=>parseIso(d)>=ws).length,rec=recordsTable(j);
   const best=Object.entries(rec).filter(([n,r])=>r.w).sort((a,b)=>b[1].w-a[1].w).slice(0,2).map(([n,r])=>`🏋️ ${n}: ${round1(r.w)} ${profile.unit}`);
   shareImage({big:'🔥',title:`${profile.name||'My'}${profile.name?"'s":''} progress`,sub:`${lvl().emoji} ${lvl().name} level`,stats:[[ds.length,'workouts'],[weekStreak(),'week streak'],[earnedBadges().length,'badges']],
-    lines:[`📅 ${wk} active ${wk===1?'day':'days'} this week`,...best],text:'My progress on JAMS Fitness 🔥'});
+    lines:[`📅 ${wk} active ${wk===1?'day':'days'} this week`,...best],text:'My progress on KinFit 🔥'});
 }
 
 /* ---------- Stretching & mobility ---------- */
@@ -173,7 +173,7 @@ function renderReport(v){
     ${acts.length?`<div class="card stack"><h3>🏃 Activities</h3>${Object.entries(acts.reduce((m,e)=>(m[e.exercise]=(m[e.exercise]||0)+(e.minutes||0),m),{})).map(([n,m])=>`<div class="row between"><span>${esc(n)}</span><b>${m} min</b></div>`).join('')}</div>`:''}
     ${B.length>1?`<div class="card stack"><h3>⚖️ Body weight</h3><p>${round1(toUnit(B[0].w,B[0].unit))} → <b>${round1(toUnit(B[B.length-1].w,B[B.length-1].unit))} ${profile.unit}</b></p></div>`:''}
     <div class="card stack"><h3>🏅 Badges so far</h3><p>${BADGES.filter(b=>earnedBadges().includes(b.id)).map(b=>b.e+' '+b.n).join(' · ')||'None yet'}</p></div>
-    <p class="small muted center">Made with JAMS Fitness · ${location.host}</p>
+    <p class="small muted center">Made with KinFit · ${location.host}</p>
     <button class="btn noprint" id="rprint">🖨️ Print or save as PDF</button>
     <p class="small muted center noprint">On iPhone: tap Print, then pinch out on the preview and tap Share → Save to Files.</p>
   </div>`;
@@ -190,7 +190,7 @@ function feedbackSheet(){
   let t='idea';
   const draw=()=>sheet(`<h2>💬 Send feedback</h2>
     <div class="seg">${[['idea','💡 Idea'],['problem','🐞 Problem'],['love','❤️ Praise']].map(x=>`<button class="${t===x[0]?'on':''}" data-fbt="${x[0]}">${x[1]}</button>`).join('')}</div>
-    <textarea class="txt area" id="fbm" rows="5" maxlength="1000" placeholder="${t==='problem'?'What happened? What were you trying to do?':t==='idea'?'What would make JAMS better for you?':'What do you like?'}">${esc(feedbackSheet.draft||'')}</textarea>
+    <textarea class="txt area" id="fbm" rows="5" maxlength="1000" placeholder="${t==='problem'?'What happened? What were you trying to do?':t==='idea'?'What would make KinFit better for you?':'What do you like?'}">${esc(feedbackSheet.draft||'')}</textarea>
     <input class="txt small-in" id="fbc" maxlength="80" placeholder="Email (optional, only if you'd like a reply)" autocomplete="email">
     <p class="small muted">Kids: ask a grown-up before sharing an email. Please don't include other personal details.</p>
     <button class="btn" id="fbsend">Send</button><button class="btn ghost" id="cancel">Cancel</button>`,()=>{
