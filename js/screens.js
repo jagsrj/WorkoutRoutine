@@ -193,7 +193,9 @@ function runWarmup(onDone){
 }
 
 /* ---------- Workout ---------- */
+let setEditing=null; // "exercise,set" being edited after it was ticked; every other finished set stays locked
 function startWorkout(key){
+  setEditing=null;
   if(key.includes(':'))return startCustom(key[0],key.slice(2));
   let a=store.get(pKey('jams_active'),null);
   if(!(a&&a.key===key&&a.level===profile.level)){
@@ -235,14 +237,16 @@ function renderWorkout(v){
         <div>${ex.m.map(m=>`<span class="chip">${esc(m)}</span>`).join('')}${ex.start&&!lastSession(ex.name)?`<span class="chip">Start ~${ex.start}</span>`:''}${it.orig?`<span class="chip">🔄 swapped</span>`:''}</div></div></div>
       ${progressHint(p,ex)}
       ${howTo(it.id)}
-      <div class="sets">${it.sets.map((s,k)=>`
-        <div class="set ${cols} ${s.done?'isdone':''}">
-          <div class="n">Set ${k+1}</div>
-          <div><label aria-hidden="true">${ex.time?'Seconds':'Reps'}</label><button class="num numbtn" data-pick="${i},${k},reps" aria-label="Set ${k+1} ${ex.time?'seconds':'reps'}: ${s.reps!==''?esc(s.reps):'not set'}. Tap to change">${s.reps!==''?esc(s.reps):`<span class="ph">${p[2]===p[3]?p[2]:p[2]+'–'+p[3]}</span>`}</button></div>
-          ${ex.weight?`<div><label><span aria-hidden="true">Weight (${profile.unit})</span>${ex.bar?`<button class="plate-btn" data-plate="${i},${k}" aria-label="Plate calculator">🧮</button>`:''}</label><button class="num numbtn" data-pick="${i},${k},weight" aria-label="Set ${k+1} weight: ${s.weight!==''?esc(s.weight)+' '+profile.unit:'not set'}. Tap to change">${s.weight!==''?esc(s.weight):`<span class="ph">${profile.unit}</span>`}</button></div>`:''}
-          ${ex.time?`<button class="check go" data-time="${i},${k}" aria-label="Start ${esc(ex.name)} timer">⏱</button>`:''}
-          <button class="check" data-check="${i},${k}" aria-label="Mark set ${k+1} done">✓</button>
-        </div>`).join('')}</div>
+      <div class="sets">${it.sets.map((s,k)=>{const key=`${i},${k}`,editing=s.done&&setEditing===key,locked=s.done&&!editing,lk=locked?' disabled':'';return `
+        <div class="set ${cols} ${s.done?'isdone':''} ${editing?'editing':''}">
+          <div class="n">Set ${k+1}${editing?`<button class="link undone" data-undone="${key}" aria-label="Mark set ${k+1} not done">Not done</button>`:''}</div>
+          <div><label aria-hidden="true">${ex.time?'Seconds':'Reps'}</label><button class="num numbtn" data-pick="${i},${k},reps" aria-label="Set ${k+1} ${ex.time?'seconds':'reps'}: ${s.reps!==''?esc(s.reps):'not set'}.${locked?' Locked':' Tap to change'}"${lk}>${s.reps!==''?esc(s.reps):`<span class="ph">${p[2]===p[3]?p[2]:p[2]+'–'+p[3]}</span>`}</button></div>
+          ${ex.weight?`<div><label><span aria-hidden="true">Weight (${profile.unit})</span>${ex.bar&&!locked?`<button class="plate-btn" data-plate="${i},${k}" aria-label="Plate calculator">🧮</button>`:''}</label><button class="num numbtn" data-pick="${i},${k},weight" aria-label="Set ${k+1} weight: ${s.weight!==''?esc(s.weight)+' '+profile.unit:'not set'}.${locked?' Locked':' Tap to change'}"${lk}>${s.weight!==''?esc(s.weight):`<span class="ph">${profile.unit}</span>`}</button></div>`:''}
+          ${ex.time&&!s.done?`<button class="check go" data-time="${i},${k}" aria-label="Start ${esc(ex.name)} timer">⏱</button>`:ex.time?'<span></span>':''}
+          ${locked?`<button class="check" data-sedit="${key}" aria-label="Set ${k+1} done and locked. Tap to edit">✓<small>Edit</small></button>`
+            :editing?`<button class="check save" data-check="${key}" aria-label="Save set ${k+1}">Save</button>`
+            :`<button class="check" data-check="${key}" aria-label="Mark set ${k+1} done">✓</button>`}
+        </div>`}).join('')}</div>
       ${it.sets.length&&it.sets.every(s=>s.done)?`<div class="effort">${it.effort?`<span class="small">Felt: <b>${EFF[it.effort]}</b></span> <button class="link" data-eff="${i},0">change</button>`:`<p class="small" style="font-weight:700">How did that feel?</p><div class="seg">${[1,2,3].map(n=>`<button data-eff="${i},${n}">${EFF[n]}</button>`).join('')}</div>`}</div>`:''}
       <div class="row between" style="margin-top:8px"><span><button class="link" data-add="${i}">＋ Set</button>${it.sets.length>1?` <button class="link" style="color:var(--muted);margin-left:10px" data-rm="${i}">− Set</button>`:''}</span>${canSwap?`<button class="link" data-swap="${i}">🔄 Swap exercise</button>`:''}</div>
     </div>`}).join('')}
@@ -254,6 +258,7 @@ function renderWorkout(v){
   const markDone=(i,k)=>{const allDone=a.items.every(it=>it.sets.every(x=>x.done));if(allDone){hideTimer();toast('All sets done! Tap Finish 🎉');say('All sets done. Amazing work! Tap finish.')}else{nextSay=nextUp(a);say(`Nice! Rest ${restSecs()} seconds.`);startTimer(restSecs())}};
   v.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{
     const [i,k,f]=b.dataset.pick.split(','),it=a.items[+i],s=it.sets[+k],p=it.p||plan[+i],ex=EX[it.id],prev=it.sets[+k-1];
+    if(s.done&&setEditing!==`${i},${k}`)return; // finished sets are locked until you tap Edit
     if(f==='reps')return pickNumber({title:`${esc(ex.name)} · set ${+k+1}`,value:s.reps!==''?s.reps:p[2],step:ex.time?5:1,max:ex.time?900:300,
       quick:[p[2],Math.round((p[2]+p[3])/2),p[3],prev&&prev.reps],unit:(ex.time?'seconds':'reps')+(ex.per?' '+ex.per:'')},val=>{s.reps=val;save();rerender()});
     const st=profile.unit==='kg'?2.5:5,old=s.weight,w=parseFloat(s.weight)||0;
@@ -266,9 +271,13 @@ function renderWorkout(v){
   if($('#skipwarm'))$('#skipwarm').onclick=warmDone;
   v.querySelectorAll('[data-check]').forEach(b=>b.onclick=()=>{
     const [i,k]=b.dataset.check.split(',').map(Number),s=a.items[i].sets[k],p=a.items[i].p||plan[i];
-    if(!s.done&&s.reps==='')s.reps=String(p[2]);
-    s.done=!s.done;save();rerender();if(s.done)markDone(i,k);
+    if(s.done){if(setEditing===`${i},${k}`){setEditing=null;save();rerender();toast('✏️ Set updated')}return} // saving an edit: no rest timer
+    if(s.reps==='')s.reps=String(p[2]);
+    s.done=true;setEditing=null;save();rerender();markDone(i,k);
   });
+  v.querySelectorAll('[data-undone]').forEach(b=>b.onclick=()=>{const [i,k]=b.dataset.undone.split(',').map(Number);a.items[i].sets[k].done=false;setEditing=null;save();rerender()});
+  v.querySelectorAll('[data-sedit]').forEach(b=>b.onclick=()=>{setEditing=b.dataset.sedit;rerender();
+    const f=document.querySelector(`[data-pick="${setEditing},reps"]`);if(f)f.focus()});
   v.querySelectorAll('[data-time]').forEach(b=>b.onclick=()=>{
     const [i,k]=b.dataset.time.split(',').map(Number),it=a.items[i],s=it.sets[k],p=it.p||plan[i],ex=EX[it.id];
     const target=parseInt(s.reps)||p[2];hideTimer();
@@ -297,6 +306,7 @@ function renderWorkout(v){
   v.querySelectorAll('[data-plate]').forEach(b=>b.onclick=e=>{e.preventDefault();const [i,k]=b.dataset.plate.split(',').map(Number);platesSheet(parseFloat(a.items[i].sets[k].weight)||(profile.unit==='kg'?60:135))});
 }
 function finishWorkout(a){
+  setEditing=null;
   const j=getJournal(),date=a.date||isoLocal(),before=recordsTable(j),fresh=[];let sets=0,vol=0;
   const time=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
   a.items.forEach((it,i)=>{
