@@ -2,13 +2,15 @@
 // Answers fitness questions with Workers AI. No API key needed.
 // Setup (one time): Cloudflare dashboard → this Pages project → Settings → Bindings
 //   → Add → Workers AI → Variable name: AI → Save, then redeploy.
-// Optional: add an environment variable MODEL to use a different Workers AI model.
+// Optional: add an environment variable MODEL to try a specific Workers AI model first.
 // Limits protect the free daily AI allowance: 20 questions per hour per person (IP)
 // and 300 per day for the whole site. Limits are shared across servers when the
 // STORE (KV) binding is set up (the same one cloud sync uses).
 import { overLimit, clientIp, json, sameOrigin } from '../_lib/limit.js';
 
-const DEFAULT_MODEL = '@cf/meta/llama-3.1-8b-instruct';
+// Tried in order. If one is retired or busy, the next is used.
+// (@cf/meta/llama-3.1-8b-instruct was retired by Cloudflare on 2026-05-30.)
+const MODELS = ['@cf/meta/llama-3.1-8b-instruct-fast', '@cf/meta/llama-3.3-70b-instruct-fp8-fast', '@cf/zai-org/glm-4.7-flash'];
 const MAX_MSG_CHARS = 600;
 const MAX_HISTORY = 8;
 
@@ -54,18 +56,22 @@ export async function onRequestPost({ request, env }) {
   const level = ['beginner', 'intermediate', 'expert'].includes(body.level) ? body.level : 'beginner';
   const context = `The user is on the ${level} level.` + (body.today ? ` Today's workout: ${clean(body.today, 300)}.` : '');
 
-  try {
-    const result = await env.AI.run(env.MODEL || DEFAULT_MODEL, {
-      messages: [{ role: 'system', content: SYSTEM + '\n\n' + context }, ...history],
-      max_tokens: 400,
-      temperature: 0.4,
-    });
-    const reply = clean(result && (result.response ?? result.result?.response), 3000).trim();
-    if (!reply) return json({ error: 'empty' }, 502);
-    return json({ reply });
-  } catch (e) {
-    return json({ error: 'ai_failed' }, 502);
+  const messages = [{ role: 'system', content: SYSTEM + '\n\n' + context }, ...history];
+  const models = env.MODEL ? [env.MODEL, ...MODELS] : MODELS;
+  let lastError = '';
+  for (const model of models) {
+    try {
+      const result = await env.AI.run(model, { messages, max_tokens: 400, temperature: 0.4 });
+      // Older models return { response }, newer ones return OpenAI-style { choices: [{ message: { content } }] }.
+      const text = result && (result.response ?? result.result?.response ?? result.choices?.[0]?.message?.content);
+      const reply = clean(typeof text === 'string' ? text : '', 3000).trim();
+      if (reply) return json({ reply });
+      lastError = model + ': empty reply';
+    } catch (e) {
+      lastError = model + ': ' + String((e && e.message) || e).slice(0, 160);
+    }
   }
+  return json({ error: 'ai_failed', detail: lastError }, 502);
 }
 
 export const onRequest = () => json({ error: 'method_not_allowed' }, 405);
