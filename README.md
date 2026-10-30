@@ -6,6 +6,15 @@ Simple workout plans for every level. Pick your level, follow the plan and watch
 
 **Hosting:** Cloudflare Pages at https://workoutroutine-aeq.pages.dev. Every push to `main` redeploys automatically (no build command, output directory `/`).
 
+**One-time Cloudflare settings** (Pages project → Settings → Bindings):
+
+| Binding | Type | What it turns on |
+|---|---|---|
+| `AI` | Workers AI | AI answers in the Coach chat |
+| `STORE` | KV namespace (create one first under Storage & Databases → KV) | Cloud sync, and Coach limits shared across servers |
+
+Redeploy after adding bindings. Coach allows 20 AI questions per hour per person and 300 per day for the whole site, to stay inside the free allowance.
+
 **Turning on AI answers in the Coach chat:** in the Cloudflare dashboard open the Pages project, then **Settings → Bindings → Add → Workers AI**, set the variable name to `AI`, save, and redeploy. Without it, Coach still answers from its built-in answers. The server code is in `functions/api/chat.js`.
 
 ## Features
@@ -21,6 +30,15 @@ Simple workout plans for every level. Pick your level, follow the plan and watch
 - **Exercise library:** simple 3-step instructions, a tip and a video for every move.
 - **Progress:** total workouts, a week streak, a 12-week calendar, a chart for each exercise, and history you can delete from. It also suggests moving up a level when you're ready.
 - **Ask Coach chat:** built-in answers about exercises, levels, soreness, warm-ups and progression work instantly and offline. Other questions go to Cloudflare Workers AI with kid-safe, fitness-only rules.
+- **People:** several people on one phone, each with their own level, history, badges and buddy avatar.
+- **Badges:** 17 badges for workouts, streaks, records, warm-ups and more.
+- **Guided warm-up:** a 5-minute follow-along with a countdown.
+- **Timed moves:** planks and wall sits have a big countdown button.
+- **Animated drawings:** every exercise has a moving figure.
+- **Swap an exercise:** switch to an easier or no-equipment move.
+- **Edit history:** fix past entries.
+- **Cloud sync:** a private sync code shares people and workouts across devices, with no account needed.
+- **Offline:** a service worker (`sw.js`) lets the app open without internet.
 - **Settings:** lbs or kg, rest time, and back up or restore your data. Safety tips are included.
 - Works offline, has no sign-up and no tracking. Data stays on the device (localStorage).
 - Supports dark mode.
