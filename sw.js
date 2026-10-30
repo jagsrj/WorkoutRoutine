@@ -1,7 +1,7 @@
 // JAMS Fitness service worker: lets the app open without internet.
 // Pages load fresh from the network when online (so updates show right away)
 // and fall back to the saved copy when offline. /api/ calls are never cached.
-const CACHE = 'jams-v6';
+const CACHE = 'jams-v7';
 // Cloudflare serves the app at ./ (index.html redirects there), so the page is cached under ./
 const SHELL = ['./', 'icon.svg', 'manifest.webmanifest'];
 

@@ -37,6 +37,10 @@ export async function onRequestPost({ request, env }) {
     await env.STORE.put(key, JSON.stringify(d), { metadata: { updated: Date.now() } });
     return json({ ok: true });
   }
+  if (body.op === 'delete') {
+    await env.STORE.delete(key);
+    return json({ ok: true });
+  }
   return json({ error: 'bad_request' }, 400);
 }
 
