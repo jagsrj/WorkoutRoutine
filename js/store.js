@@ -14,18 +14,28 @@ const cleanText=(x,max=60)=>String(x??'').replace(/[<>"`\\]/g,'').replace(/[\u00
 const cleanEmoji=(x,fb)=>{x=String(x||'');return x&&x.length<=12&&!/[\x00-\x7f]/.test(x.replace(/️|‍/g,''))?x:fb};
 const cleanNum=(x,max=1e6)=>{x=Number(x);return Number.isFinite(x)&&x>=0?Math.min(x,max):0};
 const ISO_RE=/^\d{4}-\d{2}-\d{2}$/,ID_RE=/^[a-z0-9_]{1,48}$/i;
+// Habit ticks: {"2026-10-30": {u: time, c: {water: 3}}}, last 120 days only.
+function cleanHabitLog(l){
+  const o={};if(!l||typeof l!=='object'||Array.isArray(l))return o;
+  Object.keys(l).filter(d=>ISO_RE.test(d)).sort().slice(-120).forEach(d=>{const day=l[d];if(!day||typeof day!=='object'||!day.c||typeof day.c!=='object')return;
+    const c={};Object.entries(day.c).slice(0,20).forEach(([k,v])=>{if(/^[a-z0-9_]{1,30}$/.test(k))c[k]=Math.round(cleanNum(v,20))});o[d]={u:cleanNum(day.u,1e14),c}});
+  return o;
+}
 function sanitizeProfile(p){
   if(!p||typeof p!=='object'||!/^p[a-z0-9]{1,40}$/.test(String(p.id||'')))return null;
   const o={id:p.id,name:cleanText(p.name,24),avatar:AVATARS.includes(p.avatar)?p.avatar:'🙂',level:['beginner','intermediate','expert'].includes(p.level)?p.level:'beginner',
     unit:p.unit==='kg'?'kg':'lbs',rest:['auto','45','60','90','120'].includes(String(p.rest))?String(p.rest):'auto',
     warmups:cleanNum(p.warmups,1e5),questions:cleanNum(p.questions,1e6),updated:cleanNum(p.updated,1e14),fivesSeen:cleanNum(p.fivesSeen,1e14),
     badges:(Array.isArray(p.badges)?p.badges:[]).filter(b=>BADGES.some(x=>x.id===b)),photos:!!p.photos,toured:!!p.toured,
-    todayHide:(Array.isArray(p.todayHide)?p.todayHide:[]).filter(k=>['phase','challenge','goal','family','badges','tip'].includes(k)),
+    todayHide:(Array.isArray(p.todayHide)?p.todayHide:[]).filter(k=>['habits','phase','challenge','goal','family','badges','tip'].includes(k)),
     chDone:(Array.isArray(p.chDone)?p.chDone:[]).slice(-60).map(x=>cleanText(x,30)).filter(x=>/^\d{4}-\d{2}-[a-z]+$/.test(x)),
     goals:(Array.isArray(p.goals)?p.goals:[]).slice(-20).filter(g=>g&&['lift','reps','workouts','minutes'].includes(g.type)&&ISO_RE.test(String(g.start))&&ISO_RE.test(String(g.by))).map(g=>({id:cleanText(g.id,30)||newPid(),type:g.type,ex:cleanText(g.ex,60),target:cleanNum(g.target,1e6),start:g.start,by:g.by,done:ISO_RE.test(String(g.done))?g.done:null}))};
   if(ISO_RE.test(String(p.planStart)))o.planStart=p.planStart;
   if(p.coachAI===false)o.coachAI=false;
   if(p.kid===true)o.kid=true;
+  o.habits=(Array.isArray(p.habits)?p.habits:[]).filter(h=>h&&/^[a-z0-9_]{1,30}$/.test(String(h.id))).slice(0,8)
+    .map(h=>({id:String(h.id),e:cleanEmoji(h.e,'⭐'),n:cleanText(h.n,24)||'Habit',t:Math.max(1,Math.min(20,Math.round(cleanNum(h.t,20))||1)),...(h.unit?{unit:cleanText(h.unit,12)}:{})}));
+  o.hlog=cleanHabitLog(p.hlog);
   o.customEx={};Object.entries(p.customEx&&typeof p.customEx==='object'?p.customEx:{}).slice(0,100).forEach(([k,v])=>{if(!/^c_[a-z0-9]{1,40}$/.test(k)||!v||typeof v!=='object')return;
     const name=cleanText(v.name,40);if(!name)return;
     o.customEx[k]={name,e:cleanEmoji(v.e,'⭐'),m:(Array.isArray(v.m)?v.m:[]).slice(0,6).map(x=>cleanText(x,20)).filter(Boolean),weight:!!v.weight,time:!!v.time,
@@ -118,7 +128,7 @@ function weekStreak(){
 /* ---------- Badges ---------- */
 function badgeStats(){
   const j=getJournal(),dates=workoutDates(j);
-  const s={workouts:dates.length,sets:0,bestStreak:0,fullWeek:false,pr:false,warmups:profile.warmups||0,questions:profile.questions||0,levels:new Set(),challenges:(profile.chDone||[]).length,goals:(profile.goals||[]).filter(g=>g.done).length};
+  const s={workouts:dates.length,sets:0,bestStreak:0,fullWeek:false,pr:false,warmups:profile.warmups||0,questions:profile.questions||0,levels:new Set(),challenges:(profile.chDone||[]).length,goals:(profile.goals||[]).filter(g=>g.done).length,habitBest:habitBestStreak()};
   const weekMap={},best={};
   dates.forEach(d=>{const wk=isoLocal(weekStart(parseIso(d)));weekMap[wk]=weekMap[wk]||new Set();
     j[d].forEach(e=>{s.sets+=(e.sets||[]).length;if(e.workout)weekMap[wk].add(e.workout);if(e.level)s.levels.add(e.level);

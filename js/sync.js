@@ -11,7 +11,10 @@ function localPayload(){
 function mergePayload(L,R){
   if(!R||!Array.isArray(R.profiles))return L;
   const deleted=[...new Set([...(L.deletedProfiles||[]),...(R.deletedProfiles||[])])];
-  const byId={};[...R.profiles,...L.profiles].forEach(p=>{if(!p||!p.id||deleted.includes(p.id))return;const o=byId[p.id];if(!o||(p.updated||0)>=(o.updated||0))byId[p.id]=p});
+  const byId={},hl={};[...R.profiles,...L.profiles].forEach(p=>{if(!p||!p.id||deleted.includes(p.id))return;const o=byId[p.id];if(!o||(p.updated||0)>=(o.updated||0))byId[p.id]=p;
+    // Habit ticks merge day by day (the newest change to each day wins), so ticks from two phones aren't lost.
+    const h=hl[p.id]=hl[p.id]||{};Object.entries(p.hlog&&typeof p.hlog==='object'?p.hlog:{}).forEach(([d,v])=>{if(v&&(!h[d]||(v.u||0)>=(h[d].u||0)))h[d]=v})});
+  Object.keys(byId).forEach(id=>{if(Object.keys(hl[id]).length)byId[id]=Object.assign({},byId[id],{hlog:hl[id]})});
   const data={};
   Object.keys(byId).forEach(id=>{
     const l=(L.data||{})[id]||{},r=(R.data||{})[id]||{};

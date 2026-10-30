@@ -132,6 +132,7 @@ function renderToday(v){
     ${heroHtml}
     ${backupCard()}
     ${streakCard()}
+    ${habitsCard()}
     ${weekCard(strip,earned)}
     <button class="card row" id="logact" style="width:100%;text-align:left;padding:14px"><span class="big-emoji">🏃</span><div style="flex:1"><b>Log a sport or activity</b><p class="muted small">Walks, runs, cricket, soccer… they all count!</p></div><span class="muted" style="font-size:22px" aria-hidden="true">＋</span></button>
     <details class="card fold"><summary><b>${isWork?'Missed a day? Do a different workout':'Want to train anyway?'}</b></summary><div class="stack" style="margin-top:12px">${others}${(profile.routines||[]).map(r=>`<button class="card row" data-start="r:${r.id}" style="width:100%;text-align:left;padding:14px"><span class="ex-emoji">${r.e}</span><div style="flex:1"><b>${esc(r.name)}</b><p class="muted small">⭐ My workout · ${plural(r.items.length,'exercise')}</p></div><span class="muted">›</span></button>`).join('')}<button class="link" id="morew">Build your own or train for a sport ›</button></div></details>
@@ -142,7 +143,7 @@ function renderToday(v){
   v.querySelectorAll('button[data-go]:not(.streakpill)').forEach(b=>b.onclick=()=>go(b.dataset.go));
   if($('#warmonly'))$('#warmonly').onclick=()=>runWarmup();
   renderPhotoNudge();
-  bindFamily(v);
+  bindFamily(v);bindHabits(v);
   if($('#logact'))$('#logact').onclick=()=>activitySheet();
   if($('#tcust'))$('#tcust').onclick=customizeToday;
   v.querySelectorAll('.wrow[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
@@ -372,6 +373,7 @@ function renderProgress(v){
     ${levelUp}
     ${familyCard()}
     ${activityCard()}
+    ${habitsProgressCard()}
     <div class="card stack"><div class="row between"><h2 class="h3">Badges 🏅</h2><span class="small muted" style="font-weight:700">${earned.size} / ${BADGES.length}</span></div>
       <div class="badges">${BADGES.map(b=>`<button class="badge-i ${earned.has(b.id)?'on':''}" data-b="${b.id}"><span>${earned.has(b.id)?b.e:'🔒'}</span><b>${b.n}</b></button>`).join('')}</div>
       <p class="small muted">Tap a badge to see how to earn it.</p></div>
