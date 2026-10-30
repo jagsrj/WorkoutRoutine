@@ -66,3 +66,10 @@ History saved by the earlier version (the `workout_journal` key) is kept and sho
 ## Safety
 
 This app gives general fitness guidance, not medical advice. Under-18s should lift weights with an adult or coach nearby. Stop if something hurts sharply.
+
+## Security
+- Every value loaded from storage, sync or a backup file is cleaned (`sanitizeProfile` and `sanitizeJournal` in `app.js`) and escaped when shown.
+- `_headers` sets a strict Content-Security-Policy (scripts only from this site, so injected code can't run), plus frame, sniffing, referrer and permissions protections.
+- `/api/sync` rejects badly shaped data, limits request rates and stores data only under a SHA-256 hash of the recovery code.
+- `tests/smoke.js` includes a test that plants booby-trapped data and confirms it can't run.
+- Keep your recovery code private, and turn on two-factor login for your Cloudflare and GitHub accounts.
