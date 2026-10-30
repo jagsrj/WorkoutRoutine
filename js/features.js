@@ -188,26 +188,49 @@ function recordsCard(){
 }
 
 /* ---------- Muscle map ---------- */
-function weekMuscles(){
-  const j=getJournal(),ws=weekStart(new Date()),cnt={};
-  workoutDates(j).filter(d=>parseIso(d)>=ws).forEach(d=>j[d].forEach(e=>{const ex=EX[exByName(e.exercise)];if(!ex)return;const n=(e.sets||[]).length;
-    new Set(ex.m.flatMap(m=>MUSCLE_KEYS[m]||[])).forEach(k=>cnt[k]=(cnt[k]||0)+n)}));
-  return cnt;
+const MUSCLE_NAMES={chest:'Chest',shoulders:'Shoulders',biceps:'Biceps',triceps:'Triceps',forearms:'Forearms & grip',abs:'Core',upperback:'Upper back',lowerback:'Lower back',glutes:'Glutes',quads:'Quads',hams:'Hamstrings',calves:'Calves'};
+let muscleMode='sets';
+// Per muscle: sets this week, pounds (or kg) lifted this week, and the strongest lift ever.
+function muscleStats(){
+  const j=getJournal(),ws=weekStart(new Date()),sets={},load={},best={};
+  workoutDates(j).forEach(d=>{const thisWeek=parseIso(d)>=ws;
+    j[d].forEach(e=>{const ex=EX[exByName(e.exercise)];if(!ex||e.kind==='activity')return;
+      const keys=[...new Set(ex.m.flatMap(m=>MUSCLE_KEYS[m]||[]))];
+      const vol=(e.sets||[]).reduce((t,x)=>t+(Number(x.reps)||0)*toUnit(Number(x.weight)||0,e.unit),0);
+      const b=bestOf(e.sets,e.unit);
+      keys.forEach(k=>{
+        if(thisWeek){sets[k]=(sets[k]||0)+(e.sets||[]).length;load[k]=(load[k]||0)+vol}
+        if(b.er>0&&(!best[k]||b.er>best[k].er))best[k]={er:b.er,w:b.w,wr:b.wr,ex:e.exercise,d};
+      })})});
+  return {sets,load,best};
 }
+function weekMuscles(){return muscleStats().sets}
 function muscleMap(){
-  const c=weekMuscles(),fill=k=>{const n=c[k]||0;return n?`fill="var(--lvl)" fill-opacity="${n>=9?1:n>=4?.7:.4}"`:'fill="var(--line)"'};
-  const E=(k,x,y,rx,ry)=>`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" ${fill(k)}><title>${k}: ${c[k]||0} sets</title></ellipse>`;
-  const R=(k,x,y,w,h)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" ${fill(k)}><title>${k}: ${c[k]||0} sets</title></rect>`;
+  const st=muscleStats(),m=muscleMode;
+  const val=k=>m==='sets'?(st.sets[k]||0):m==='load'?Math.round(st.load[k]||0):Math.round((st.best[k]||{}).er||0);
+  const max=Math.max(1,...Object.keys(MUSCLE_NAMES).map(val));
+  const fill=k=>{const n=val(k);if(!n)return 'fill="var(--line)"';const f=n/max;return `fill="var(--lvl)" fill-opacity="${f>.66?1:f>.33?.7:.4}"`};
+  const unit=profile.unit,fmt=n=>n.toLocaleString();
+  const tip=k=>`${MUSCLE_NAMES[k]}: ${m==='sets'?val(k)+' sets this week':m==='load'?fmt(val(k))+' '+unit+' this week':val(k)?'strongest est. 1-rep max '+val(k)+' '+unit:'no weighted lifts yet'}`;
+  const E=(k,x,y,rx,ry)=>`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" ${fill(k)}><title>${tip(k)}</title></ellipse>`;
+  const R=(k,x,y,w,h)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" ${fill(k)}><title>${tip(k)}</title></rect>`;
   const body=(cx,front)=>`<circle cx="${cx}" cy="22" r="11" fill="var(--line)"/>`+
     E('shoulders',cx-17,46,8,6)+E('shoulders',cx+17,46,8,6)+
     (front?E('chest',cx-7,56,8,7)+E('chest',cx+7,56,8,7)+R('abs',cx-8,66,16,28)+E('biceps',cx-23,66,5,11)+E('biceps',cx+23,66,5,11)+E('quads',cx-7,120,7,21)+E('quads',cx+7,120,7,21)
       :R('upperback',cx-12,48,24,22)+R('lowerback',cx-8,72,16,18)+E('triceps',cx-23,66,5,11)+E('triceps',cx+23,66,5,11)+E('glutes',cx-7,100,8,8)+E('glutes',cx+7,100,8,8)+E('hams',cx-7,124,7,17)+E('hams',cx+7,124,7,17))+
     E('forearms',cx-26,90,4,10)+E('forearms',cx+26,90,4,10)+E('calves',cx-7,160,5,14)+E('calves',cx+7,160,5,14);
-  const top=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,n])=>`${({upperback:'upper back',lowerback:'lower back',hams:'hamstrings'})[k]||k} (${n})`);
-  return `<div class="card stack"><h3>💪 Muscles this week</h3>
-    <svg viewBox="0 0 200 182" class="mmap" role="img" aria-label="Body map of muscles trained this week">${body(50,true)}${body(150,false)}<text x="50" y="181" text-anchor="middle" font-size="9" fill="var(--muted)">FRONT</text><text x="150" y="181" text-anchor="middle" font-size="9" fill="var(--muted)">BACK</text></svg>
-    <p class="small muted">${top.length?`Most trained: ${top.join(', ')} sets. Darker = more sets.`:'Finish a workout and the muscles you worked light up here.'}</p></div>`;
+  const rows=Object.keys(MUSCLE_NAMES).map(k=>[k,val(k)]).filter(r=>r[1]>0).sort((a,b)=>b[1]-a[1]);
+  const note=m==='sets'?'How many sets each muscle did this week.'
+    :m==='load'?`Weight × reps for every set this week. Each muscle counts the full weight of the exercises that use it (so a bench press adds to chest, shoulders and triceps).`
+    :'Each muscle\'s strongest lift ever, as an estimated 1-rep max: the most it could lift once. A score to watch grow, not a weight to try!';
+  return `<div class="card stack" id="mmcard"><h3>💪 Muscle power</h3>
+    <div class="seg">${[['sets','Sets'],['load',`${unit} lifted`],['best','Strength']].map(o=>`<button class="${o[0]===m?'on':''}" data-mm="${o[0]}">${o[1]}</button>`).join('')}</div>
+    <svg viewBox="0 0 200 182" class="mmap" role="img" aria-label="Body map of muscles">${body(50,true)}${body(150,false)}<text x="50" y="181" text-anchor="middle" font-size="9" fill="var(--muted)">FRONT</text><text x="150" y="181" text-anchor="middle" font-size="9" fill="var(--muted)">BACK</text></svg>
+    ${rows.length?`<div class="stack" style="gap:8px">${rows.map(([k,n])=>`<div><div class="row between small"><b>${MUSCLE_NAMES[k]}</b><span>${m==='sets'?plural(n,'set'):fmt(n)+' '+unit}${m==='best'?` <span class="muted">· ${esc(st.best[k].ex)}</span>`:''}</span></div><div class="famBar"><i style="width:${n/max*100}%"></i></div></div>`).join('')}</div>`
+      :`<p class="small muted">${m==='sets'?'Finish a workout and the muscles you worked light up here.':m==='load'?`No weights lifted this week yet. Bodyweight moves count in Sets. Weighted exercises show here in ${unit}.`:'Lift with weights (dumbbells, machines or a barbell) to see each muscle\'s strength score.'}</p>`}
+    <p class="small muted">${note}</p></div>`;
 }
+document.addEventListener('click',e=>{const b=e.target.closest('[data-mm]');if(!b)return;muscleMode=b.dataset.mm;const c=$('#mmcard');if(c)c.outerHTML=muscleMap()});
 
 /* ---------- Plate calculator & warm-up sets ---------- */
 function platesSheet(target){
