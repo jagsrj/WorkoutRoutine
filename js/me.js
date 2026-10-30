@@ -1,4 +1,4 @@
-/* JAMS Fitness · Me / Settings screen and app start-up. */
+/* KinFit · Me / Settings screen and app start-up. */
 /* ---------- Me / Settings ---------- */
 function renderMe(v){
   const others=DB.list.filter(p=>p.id!==profile.id);
@@ -57,7 +57,7 @@ function renderMe(v){
       <label class="btn secondary" style="cursor:pointer">⬆️ Restore from backup<input type="file" id="imp" accept="application/json,.json" hidden></label>
       ${others.length?`<button class="btn danger" id="rmp">Remove ${esc(profile.name||'this person')} from this phone</button>`:''}
       <button class="btn danger" id="reset">Erase everything on this phone</button></div>
-    <p class="small muted center">JAMS Fitness · Made for every level 💙<br><a href="privacy.html" style="color:var(--lvl)">Privacy policy</a></p>
+    <p class="small muted center">KinFit · Made for every level 💙<br><a href="privacy.html" style="color:var(--lvl)">Privacy policy</a></p>
   </div>`;
   v.querySelectorAll('[data-pid]').forEach(b=>b.onclick=()=>{if(b.dataset.pid!==profile.id)switchProfile(b.dataset.pid)});
   $('#addp').onclick=addPerson;
@@ -143,7 +143,7 @@ function joinSheet(after){
     };
   });
 }
-const KC_USER='JAMS Fitness';
+const KC_USER='KinFit';
 function saveCodeSheet(){
   if(!syncCfg.code)return;
   sheet(`<h2>🔑 Save your recovery code</h2>
@@ -204,7 +204,7 @@ function importBackup(e){
       const have=new Set((j[k]||[]).map(x=>String(x.id)));
       incoming[k].forEach(en=>{if(en&&typeof en.exercise==='string'&&Array.isArray(en.sets)&&!have.has(String(en.id))){(j[k]=j[k]||[]).push(en);added++}})});
     setJournal(j);toast(`Restored ${added} entries ✅`);syncNow(true);
-  }catch(err){toast('That file is not a JAMS backup')}};
+  }catch(err){toast('That file is not a KinFit backup')}};
   r.readAsText(f);
 }
 

@@ -1,4 +1,6 @@
-# JAMS Fitness 🏋️
+# KinFit 🏋️
+
+*Developed by the JAMS family 💙*
 
 Simple workout plans for every level. Pick your level, follow the plan and watch yourself get stronger. It's built to be easy enough for a 12-year-old.
 

@@ -1,4 +1,4 @@
-/* JAMS Fitness · Workouts library, custom workouts, records, muscle map, plates, activities, body, family, reminders, parent lock. */
+/* KinFit · Workouts library, custom workouts, records, muscle map, plates, activities, body, family, reminders, parent lock. */
 /* =========================================================
    Pro features: custom workouts & exercises, sport plans, PRs, muscle map,
    plate calculator, effort rating, activities, body measurements, voice coach,

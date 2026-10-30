@@ -1,4 +1,4 @@
-/* JAMS Fitness · Storage, people, data cleaning, helpers, badges and screen router. */
+/* KinFit · Storage, people, data cleaning, helpers, badges and screen router. */
 /* ---------- Storage & people (profiles) ----------
    Each person has their own level, settings and history. The first person ("p1") keeps
    the original 'workout_journal' key, so history from earlier versions stays. */
@@ -148,7 +148,7 @@ function render(){
   if(onb) return renderOnboard(v);
   ({today:renderToday,workout:renderWorkout,library:renderLibrary,progress:renderProgress,me:renderMe,ask:renderAsk,report:renderReport}[route]||renderToday)(v);
 }
-const logo=()=>`<div class="logo"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="var(--lvl)"/><path d="M14 27h6v10h-6zM44 27h6v10h-6zM20 23h5v18h-5zM39 23h5v18h-5zM25 30h14v4H25z" fill="#fff"/></svg>JAMS FITNESS</div>`;
+const logo=()=>`<div class="logo"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="var(--lvl)"/><path d="M14 27h6v10h-6zM44 27h6v10h-6zM20 23h5v18h-5zM39 23h5v18h-5zM25 30h14v4H25z" fill="#fff"/></svg>KINFIT</div>`;
 const topbar=(right='')=>`<div class="topbar">${logo()}${right}</div>`;
 const levelPill=()=>{const n=weekStreak();return `<div class="row" style="gap:6px"><button class="pill streakpill ${n?'':'off'}" data-go="progress" aria-label="${n}-week streak">🔥 ${n}</button><button class="pill" data-who aria-label="Switch person"><span class="pname">${esc(profile.avatar||'🙂')} ${esc(profile.name||'Me')}</span></button></div>`};
 function streakCard(){

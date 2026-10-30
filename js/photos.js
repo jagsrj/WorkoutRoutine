@@ -1,4 +1,4 @@
-/* JAMS Fitness · Progress photos (stored only on this device). */
+/* KinFit · Progress photos (stored only on this device). */
 /* ---------- Progress photos ----------
    Stored only on this device (IndexedDB), never synced or uploaded. Off by default; each person turns it on. */
 const PH={db:null};

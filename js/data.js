@@ -1,4 +1,4 @@
-/* JAMS Fitness · Exercises, levels, plans, drawings, badges and other data. */
+/* KinFit · Exercises, levels, plans, drawings, badges and other data. */
 /* ---------- Levels ---------- */
 const LEVELS = {
   beginner: {
