@@ -41,6 +41,20 @@ Redeploy after adding bindings. Coach allows 20 AI questions per hour per person
 - **Progress photos (optional):** off by default; photos stay on the device only, with a timeline and a before/after slider.
 - **Streak:** a weekly streak card on Today and a 🔥 counter at the top of every screen.
 - **Offline:** a service worker (`sw.js`) lets the app open without internet.
+- **Build your own:** custom workouts and custom exercises, plus sport plans (cricket, soccer, swimming, running, basketball).
+- **75 exercises** you can search and filter by muscle.
+- **Personal records:** automatic PR detection, estimated 1-rep max, and charts for heaviest, 1RM or volume.
+- **Muscle map:** shows which muscles you trained this week.
+- **Plate calculator and warm-up sets** for barbell lifts.
+- **"How did that feel?"** effort rating that shapes the next workout's advice.
+- **Activities:** log walks, runs, sports and more; they count toward streaks.
+- **Body measurements:** weight and waist (part of opt-in body tracking).
+- **Voice coach:** reads exercises, rest times and countdowns aloud.
+- **Coach knows your history:** AI answers use your recent training log.
+- **Family challenge:** a weekly leaderboard and high-fives between people.
+- **Reminders:** repeating calendar reminders (`/api/calendar`).
+- **Parent controls:** a PIN lock, plus Coach AI on/off per person. See the [privacy policy](privacy.html).
+- **Automated tests:** `tests/smoke.js` runs on every change (GitHub Actions).
 - **Settings:** lbs or kg, rest time, and back up or restore your data. Safety tips are included.
 - Works offline, has no sign-up and no tracking. Data stays on the device (localStorage).
 - Supports dark mode.
