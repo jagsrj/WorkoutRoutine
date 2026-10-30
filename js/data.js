@@ -190,7 +190,8 @@ const FIG = {
 const REDUCED = (()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}})();
 function parsePose(str){const o={};(str||'').trim().split(/\s+/).forEach(t=>{if(!t)return;const [k,v]=t.split(':');o[k]=v.split(',').map(Number)});return o}
 function figSvg(id,cls='fig'){
-  const m=FIG[id];if(!m)return '';const P=POSES[m[0]];
+  if(typeof EX!=='undefined'&&EX[id]&&EX[id].variantOf)id=EX[id].figId; // equipment version: show the matching drawing, or none
+  const m=id&&FIG[id];if(!m)return '';const P=POSES[m[0]];
   const A=parsePose(P.a),B=Object.assign({},A,parsePose(P.b));
   [A,B].forEach(X=>{X.e2=X.e2||X.e;X.w2=X.w2||X.w;X.k2=X.k2||X.k;X.f2=X.f2||X.f});
   const dur=(P.dur||2.4)+'s',moves=!REDUCED;

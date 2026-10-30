@@ -28,6 +28,7 @@ function renderMe(v){
 
     ${displayCard()}
 
+    ${gearCard()}
     ${planCard()}
 
     ${syncCard()}
