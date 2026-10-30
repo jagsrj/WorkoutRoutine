@@ -75,14 +75,14 @@ function md(t){
 }
 let chat=store.get(pKey('jams_chat'),[]),chatBusy=false;
 const askTimes=()=>store.get('jams_ask_times',[]).filter(t=>Date.now()-t<3600000);
-const SUGGEST=['Which level should I choose?','How do I do a squat?','Is it OK to feel sore?','How do I warm up?','When should I add weight?','What is a rep and a set?'];
+const SUGGEST=['Make me a 15-min workout','Which level should I choose?','How do I do a squat?','Is it OK to feel sore?','How do I warm up?','When should I add weight?','What is a rep and a set?'];
 function renderAsk(v){
   const today=SCHEDULE[new Date().getDay()].k;
   v.innerHTML=`${topbar(levelPill())}<div class="stack-lg" style="padding-bottom:80px">
     <div><h1>Ask Coach 💬</h1><p class="muted" style="margin-top:4px">Questions about exercises, your plan or staying safe? Just ask!</p></div>
     <div class="chat" id="chat">
       <div class="msg bot">${md(`Hi${profile.name?' '+profile.name:''}! 👋 I'm Coach. Ask me how to do an exercise, which level to pick, or anything about your workouts.`)}</div>
-      ${chat.map(m=>`<div class="msg ${m.role==='user'?'me':'bot'}">${m.role==='user'?esc(m.content):md(m.content)}</div>`).join('')}
+      ${chat.map((m,i)=>`<div class="msg ${m.role==='user'?'me':'bot'}">${m.role==='user'?esc(m.content):md(m.content)}${m.build?`<div class="row" style="gap:6px;margin-top:10px"><button class="btn sm secondary" data-cbsave="${i}">⭐ Save</button><button class="btn sm" data-cbstart="${i}">▶ Start</button></div>`:''}</div>`).join('')}
     </div>
     <div class="sugg" id="sugg">${(chat.length?SUGGEST.slice(0,3):SUGGEST).map(q=>`<button>${q}</button>`).join('')}</div>
     ${chat.length?`<button class="link" id="clear" style="color:var(--muted)">🧹 Clear chat</button>`:''}
@@ -92,12 +92,20 @@ function renderAsk(v){
   const scroll=()=>window.scrollTo(0,document.body.scrollHeight);scroll();
   $('#ask').onsubmit=e=>{e.preventDefault();const q=$('#q').value.trim();if(q&&!chatBusy)ask(q,today)};
   v.querySelectorAll('#sugg button').forEach(b=>b.onclick=()=>{if(!chatBusy)ask(b.textContent,today)});
+  const builtFrom=i=>{const w=chat[i]&&chat[i].build;if(!w||!Array.isArray(w.items))return null;const items=w.items.filter(p=>EX[p[0]]);return items.length?{id:w.id||newId('r'),name:cleanText(w.name,30)||'Coach workout',e:cleanEmoji(w.e,'✨'),items}:null};
+  v.querySelectorAll('[data-cbsave]').forEach(b=>b.onclick=()=>{const w=builtFrom(+b.dataset.cbsave);if(w)saveBuilt(w,false)});
+  v.querySelectorAll('[data-cbstart]').forEach(b=>b.onclick=()=>{const w=builtFrom(+b.dataset.cbstart);if(w)saveBuilt(w,true)});
   if($('#clear'))$('#clear').onclick=()=>{chat=[];store.del(pKey('jams_chat'));renderAsk(v)};
 }
 async function ask(q,today){
   chat.push({role:'user',content:q});chatBusy=true;profile.questions=(profile.questions||0)+1;saveProfile();
   const box=$('#chat');box.insertAdjacentHTML('beforeend',`<div class="msg me">${esc(q)}</div><div class="msg bot typing" id="typing"><span></span><span></span><span></span></div>`);
   $('#q').value='';$('#send').disabled=true;$('#sugg').classList.add('hide');window.scrollTo(0,document.body.scrollHeight);
+  if(isBuildRequest(q)){
+    const w=await buildWithCoach(q);
+    chat.push({role:'assistant',content:workoutText(w),build:w});chat=chat.slice(-40);store.set(pKey('jams_chat'),chat);chatBusy=false;
+    renderAsk($('#view'));window.scrollTo(0,document.body.scrollHeight);return;
+  }
   const lq=' '+q.toLowerCase()+' ';
   const howTo=/how|form|technique|teach|explain|what is|show|do i do|correct/.test(lq)||lq.trim().split(/\s+/).length<=4;
   const exA=howTo?exerciseAnswer(lq):null,faq=faqMatch(lq);

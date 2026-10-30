@@ -56,9 +56,9 @@ async function shareImage(opts){
   let y=880;(opts.lines||[]).slice(0,4).forEach(t=>{center(t.length>44?t.slice(0,43)+'…':t,y,'700',42);y+=66});
   center('KINFIT',H-110,'900',44);center(location.host,H-58,'600',30,'rgba(255,255,255,.7)');
   const blob=await new Promise(r=>c.toBlob(r,'image/png'));
-  const file=new File([blob],'jams-fitness.png',{type:'image/png'});
+  const file=new File([blob],'kinfit.png',{type:'image/png'});
   try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],text:opts.text||'My workout on KinFit 💪'});return}}catch(e){if(e&&e.name==='AbortError')return}
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='jams-fitness.png';document.body.appendChild(a);a.click();a.remove();toast('Image saved');
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='kinfit.png';document.body.appendChild(a);a.click();a.remove();toast('Image saved');
 }
 let lastDone=null;
 function shareWorkout(){

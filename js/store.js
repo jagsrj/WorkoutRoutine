@@ -19,7 +19,9 @@ function sanitizeProfile(p){
   const o={id:p.id,name:cleanText(p.name,24),avatar:AVATARS.includes(p.avatar)?p.avatar:'🙂',level:['beginner','intermediate','expert'].includes(p.level)?p.level:'beginner',
     unit:p.unit==='kg'?'kg':'lbs',rest:['auto','45','60','90','120'].includes(String(p.rest))?String(p.rest):'auto',
     warmups:cleanNum(p.warmups,1e5),questions:cleanNum(p.questions,1e6),updated:cleanNum(p.updated,1e14),fivesSeen:cleanNum(p.fivesSeen,1e14),
-    badges:(Array.isArray(p.badges)?p.badges:[]).filter(b=>BADGES.some(x=>x.id===b)),photos:!!p.photos,toured:!!p.toured};
+    badges:(Array.isArray(p.badges)?p.badges:[]).filter(b=>BADGES.some(x=>x.id===b)),photos:!!p.photos,toured:!!p.toured,
+    chDone:(Array.isArray(p.chDone)?p.chDone:[]).slice(-60).map(x=>cleanText(x,30)).filter(x=>/^\d{4}-\d{2}-[a-z]+$/.test(x)),
+    goals:(Array.isArray(p.goals)?p.goals:[]).slice(-20).filter(g=>g&&['lift','reps','workouts','minutes'].includes(g.type)&&ISO_RE.test(String(g.start))&&ISO_RE.test(String(g.by))).map(g=>({id:cleanText(g.id,30)||newPid(),type:g.type,ex:cleanText(g.ex,60),target:cleanNum(g.target,1e6),start:g.start,by:g.by,done:ISO_RE.test(String(g.done))?g.done:null}))};
   if(ISO_RE.test(String(p.planStart)))o.planStart=p.planStart;
   if(p.coachAI===false)o.coachAI=false;
   o.customEx={};Object.entries(p.customEx&&typeof p.customEx==='object'?p.customEx:{}).slice(0,100).forEach(([k,v])=>{if(!/^c_[a-z0-9]{1,40}$/.test(k)||!v||typeof v!=='object')return;
@@ -111,7 +113,7 @@ function weekStreak(){
 /* ---------- Badges ---------- */
 function badgeStats(){
   const j=getJournal(),dates=workoutDates(j);
-  const s={workouts:dates.length,sets:0,bestStreak:0,fullWeek:false,pr:false,warmups:profile.warmups||0,questions:profile.questions||0,levels:new Set()};
+  const s={workouts:dates.length,sets:0,bestStreak:0,fullWeek:false,pr:false,warmups:profile.warmups||0,questions:profile.questions||0,levels:new Set(),challenges:(profile.chDone||[]).length,goals:(profile.goals||[]).filter(g=>g.done).length};
   const weekMap={},best={};
   dates.forEach(d=>{const wk=isoLocal(weekStart(parseIso(d)));weekMap[wk]=weekMap[wk]||new Set();
     j[d].forEach(e=>{s.sets+=(e.sets||[]).length;if(e.workout)weekMap[wk].add(e.workout);if(e.level)s.levels.add(e.level);

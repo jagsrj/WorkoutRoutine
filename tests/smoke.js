@@ -75,7 +75,7 @@ const check = (ok, what) => { console.log(`${ok ? '✅' : '❌'} ${what}`); if (
     await page.click('#radd'); await page.click('[data-pk="squat"]'); await page.click('#rsave'); await page.waitForTimeout(200);
     check((await page.textContent('body')).includes('Quick legs'), 'Custom workout saved');
     // Coach built-in answer
-    await page.click('[data-go="ask"]'); await page.click('#sugg button:nth-child(2)');
+    await page.click('[data-go="ask"]'); await page.click('#sugg button:has-text("How do I do a squat?")');
     await page.waitForFunction(() => !document.querySelector('#typing'));
     check((await page.locator('.msg.bot').last().textContent()).includes('Squat'), 'Coach explains a squat');
     // Security: booby-trapped saved data must never run as code

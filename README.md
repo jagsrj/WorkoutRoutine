@@ -63,6 +63,8 @@ Redeploy after adding bindings. Coach allows 20 AI questions per hour per person
 - **Feedback button** (`/api/feedback`) and **automatic error reports** (`/api/log`), both stored in KV (keys `fb:` and `err:`).
 - **Daily backup history:** 30 days of snapshots you can restore (`/api/sync` ops `snapshots` and `snapshot`).
 - **Home page:** `about.html`, with share-preview tags, `robots.txt` and `sitemap.xml`.
+- **Coach builds workouts:** "make me a 15-min cricket workout" (AI picks from the library and the app double-checks the result; falls back to a built-in builder). Also **Workouts → Mine → ✨ Build one for me**.
+- **Goals** (lift, reps, workouts, active minutes) and **monthly challenges** with family progress and badges.
 - **Automated tests:** `tests/smoke.js` runs on every change (GitHub Actions).
 - **Settings:** lbs or kg, rest time, and back up or restore your data. Safety tips are included.
 - Works offline, has no sign-up and no tracking. Data stays on the device (localStorage).
@@ -84,4 +86,4 @@ This app gives general fitness guidance, not medical advice. Under-18s should li
 - Keep your recovery code private, and turn on two-factor login for your Cloudflare and GitHub accounts.
 
 ## Code layout
-`index.html` (page and styles) loads `js/errors.js`, then `data`, `store`, `screens`, `sync`, `coach`, `photos`, `features`, `extras` and `me`, in that order. Server functions are in `functions/api/`. Tests are in `tests/smoke.js` and include unit checks for sync merging, data cleaning, 1RM maths and plan phases.
+`index.html` (page and styles) loads `js/errors.js`, then `data`, `store`, `screens`, `sync`, `coach`, `photos`, `features`, `extras` and `me`, in that order. Server functions are in `functions/api/`. Tests are in `tests/smoke.js` (plus a manual iPhone checklist in `TESTING.md`) and include unit checks for sync merging, data cleaning, 1RM maths and plan phases.
