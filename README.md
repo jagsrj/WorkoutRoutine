@@ -54,6 +54,13 @@ Redeploy after adding bindings. Coach allows 20 AI questions per hour per person
 - **Family challenge:** a weekly leaderboard and high-fives between people.
 - **Reminders:** repeating calendar reminders (`/api/calendar`).
 - **Parent controls:** a PIN lock, plus Coach AI on/off per person. See the [privacy policy](privacy.html).
+- **6-month plan phases:** Foundation, Build and Strength, with a recovery week every 4th week.
+- **Share cards:** images of a workout or your progress, to send to family chats.
+- **First-time tour, stretching and mobility routines, text size and a light/dark switch.**
+- **Monthly report:** print it or save it as a PDF.
+- **Feedback button** (`/api/feedback`) and **automatic error reports** (`/api/log`), both stored in KV (keys `fb:` and `err:`).
+- **Daily backup history:** 30 days of snapshots you can restore (`/api/sync` ops `snapshots` and `snapshot`).
+- **Home page:** `about.html`, with share-preview tags, `robots.txt` and `sitemap.xml`.
 - **Automated tests:** `tests/smoke.js` runs on every change (GitHub Actions).
 - **Settings:** lbs or kg, rest time, and back up or restore your data. Safety tips are included.
 - Works offline, has no sign-up and no tracking. Data stays on the device (localStorage).
@@ -68,8 +75,11 @@ History saved by the earlier version (the `workout_journal` key) is kept and sho
 This app gives general fitness guidance, not medical advice. Under-18s should lift weights with an adult or coach nearby. Stop if something hurts sharply.
 
 ## Security
-- Every value loaded from storage, sync or a backup file is cleaned (`sanitizeProfile` and `sanitizeJournal` in `app.js`) and escaped when shown.
+- Every value loaded from storage, sync or a backup file is cleaned (`sanitizeProfile` and `sanitizeJournal` in `js/store.js`) and escaped when shown.
 - `_headers` sets a strict Content-Security-Policy (scripts only from this site, so injected code can't run), plus frame, sniffing, referrer and permissions protections.
 - `/api/sync` rejects badly shaped data, limits request rates and stores data only under a SHA-256 hash of the recovery code.
 - `tests/smoke.js` includes a test that plants booby-trapped data and confirms it can't run.
 - Keep your recovery code private, and turn on two-factor login for your Cloudflare and GitHub accounts.
+
+## Code layout
+`index.html` (page and styles) loads `js/errors.js`, then `data`, `store`, `screens`, `sync`, `coach`, `photos`, `features`, `extras` and `me`, in that order. Server functions are in `functions/api/`. Tests are in `tests/smoke.js` and include unit checks for sync merging, data cleaning, 1RM maths and plan phases.

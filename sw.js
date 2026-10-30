@@ -1,9 +1,10 @@
-// JAMS Fitness service worker: lets the app open without internet.
+// JAMS Fitness service worker (bump CACHE when adding or renaming files): lets the app open without internet.
 // Everything loads fresh from the network when online (so updates show right away)
 // and falls back to the saved copy when offline. /api/ calls are never cached.
-const CACHE = 'jams-v8';
+const CACHE = 'jams-v9';
 // Cloudflare serves the app at ./ (index.html redirects there), so the page is cached under ./
-const SHELL = ['./', 'app.js', 'icon.svg', 'manifest.webmanifest'];
+const JS = ['errors', 'data', 'store', 'screens', 'sync', 'coach', 'photos', 'features', 'extras', 'me'].map(n => `js/${n}.js`);
+const SHELL = ['./', ...JS, 'icon.svg', 'manifest.webmanifest'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));

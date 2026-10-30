@@ -26,6 +26,34 @@ const check = (ok, what) => { console.log(`${ok ? '✅' : '❌'} ${what}`); if (
     check((await page.textContent('h1')).includes('Beginner'), 'Quiz recommends Beginner for a new exerciser');
     await page.click('#ok'); await page.waitForTimeout(300);
     check((await page.textContent('h1')).includes('Tester'), 'Today screen greets the user');
+    await page.waitForSelector('.tour-tip', { timeout: 4000 }).catch(() => {});
+    check(await page.isVisible('.tour-tip'), 'First-time tour appears');
+    if (await page.isVisible('#tskip')) await page.click('#tskip');
+    // Unit checks of core logic, run inside the app
+    const u = await page.evaluate(() => {
+      const r = {};
+      const L = { profiles: [{ id: 'pa', name: 'A', updated: 1 }], deletedProfiles: [], data: { pa: { journal: { '2026-01-01': [{ id: 1, exercise: 'Squat', sets: [{ reps: 5, weight: 0 }], u: 1 }] }, tomb: [] } } };
+      const R = { profiles: [{ id: 'pa', name: 'A2', updated: 2 }], deletedProfiles: [], data: { pa: { journal: { '2026-01-02': [{ id: 2, exercise: 'Plank', sets: [{ reps: 30, weight: 0 }], u: 1 }] }, tomb: ['1'] } } };
+      const m = mergePayload(L, R);
+      r.mergeDelete = !m.data.pa.journal['2026-01-01'];
+      r.mergeAdd = m.data.pa.journal['2026-01-02'].length === 1;
+      r.mergeNewerProfile = m.profiles[0].name === 'A2';
+      const sp = sanitizeProfile({ id: 'pz', name: 'Bob<b>', avatar: '<img>', level: 'god', customEx: { c_x: { name: 'X"y', steps: ['<s>'] }, bad: { name: 'no' } } });
+      r.cleanName = sp.name === 'Bobb';
+      r.cleanAvatar = sp.avatar === '🙂' && sp.level === 'beginner';
+      r.cleanCustom = sp.customEx.c_x.name === 'Xy' && !sp.customEx.bad && sp.customEx.c_x.steps[0] === 's';
+      r.rejectBadId = sanitizeProfile({ id: '<x>' }) === null;
+      r.e1rm = Math.round(e1rm(100, 10)) === 133;
+      const save = profile.planStart;
+      const back = w => { const d = new Date(); d.setDate(d.getDate() - 7 * (w - 1)); return isoLocal(d); };
+      profile.planStart = back(10); const p2 = phasePlan([['squat', 3, 10, 15], ['plank', 3, 20, 30]]);
+      r.phaseBuild = p2[0][1] === 4;
+      profile.planStart = back(12); r.phaseRecovery = phasePlan([['squat', 3, 10, 15]])[0][1] === 3;
+      profile.planStart = back(18); r.phaseStrength = phasePlan([['goblet_squat', 3, 10, 12]])[0][2] === 8;
+      profile.planStart = save;
+      return r;
+    });
+    Object.entries(u).forEach(([k, v]) => check(v, 'Unit: ' + k));
     // Start the Upper A workout from the folded list, tick a set, finish
     await page.click('details.fold summary'); await page.click('details.fold [data-start="ua"]'); await page.waitForTimeout(300);
     check(await page.isVisible('#finish'), 'Workout screen opens');
@@ -55,7 +83,7 @@ const check = (ok, what) => { console.log(`${ok ? '✅' : '❌'} ${what}`); if (
     await page.evaluate(b => {
       const d = JSON.parse(localStorage.getItem('jams_profiles'));
       const p = d.list[0];
-      p.avatar = b; p.name = 'Evil' + b;
+      p.toured = true; p.avatar = b; p.name = 'Evil' + b;
       p.customEx = { c_evil: { name: 'Hack' + b, e: b, m: [b], steps: [b, '"><svg onload="window.__pwned=2">'], tip: b } };
       p.routines = [{ id: 'revil', name: 'R' + b, e: b, items: [['c_evil', 3, 8, 12]] }];
       p.fives = [{ from: b, av: b, at: Date.now() }];
