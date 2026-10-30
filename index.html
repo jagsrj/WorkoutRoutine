@@ -261,6 +261,8 @@ details.fold[open] summary::after{transform:rotate(180deg)}
 @media (prefers-color-scheme:dark){.card.five{background:linear-gradient(135deg,#3a3210,#4a3d10);border-color:#6b5a1a}}
 .txt.pin{text-align:center;font-size:30px;letter-spacing:.5em}
 a.btn{text-decoration:none}
+.backup{border:2px solid var(--lvl)}
+.txt.small-in{height:44px;font-size:15px}
 </style>
 </head>
 <body data-level="beginner">
@@ -803,7 +805,7 @@ function renderOnboard(v){
       <button class="btn" id="start">Let's go! 🚀</button>
       <button class="btn ghost" id="pick">I already know my level</button>
       <p class="small muted center">🔒 Your workouts stay on your phone. <a href="privacy.html" style="color:var(--lvl)">Privacy policy</a></p>
-      <button class="link" id="joinsync" style="width:100%">☁️ Already use JAMS on another device? Enter your sync code</button>
+      <button class="link" id="joinsync" style="width:100%">☁️ Used JAMS before? Restore with your recovery code</button>
     </div>`;
     $('#joinsync').onclick=()=>joinSheet();
     $('#start').onclick=()=>{ob.step=1;render()};
@@ -874,6 +876,7 @@ function finishOnboard(level){
     const id=newPid();if(!DB.list.length&&!DB.legacyId)DB.legacyId=id; // first person adopts any older history
     profile=Object.assign({},DEFAULT_P,{id,name:ob.name,avatar:ob.avatar||'🙂',level,unit:profile.unit||'lbs'});
     DB.current=id;saveProfile();chat=store.get(pKey('jams_chat'),[]);libLevel=null;chartEx=null;
+    if(!syncCfg.code)autoBackup();
   }
   ob={step:0,answers:[],name:'',avatar:'🙂'};
   go('today');toast(`${LEVELS[level].emoji} ${profile.name||'You'}: ${LEVELS[level].name}. Let's do this!`);
@@ -913,6 +916,7 @@ function renderToday(v){
     <div><h1>${hello()}${profile.name?', '+esc(profile.name):''}! ${profile.avatar||'👋'}</h1><p class="muted" style="margin-top:4px">${now.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'})}</p></div>
     ${fivesCard()}
     ${heroHtml}
+    ${backupCard()}
     ${streakCard()}
     ${familyCard()}
     <button class="card row" id="logact" style="width:100%;text-align:left"><span class="big-emoji">🏃</span><div style="flex:1"><b>Log a sport or activity</b><p class="muted small">Walks, runs, cricket, soccer… they all count!</p></div><span class="muted" style="font-size:22px">＋</span></button>
@@ -930,6 +934,7 @@ function renderToday(v){
   if($('#logact'))$('#logact').onclick=()=>activitySheet();
   if($('#fiveok'))$('#fiveok').onclick=()=>{profile.fivesSeen=Date.now();saveProfile();render()};
   if($('#morew'))$('#morew').onclick=()=>{libTab='mine';go('library')};
+  bindBackup();
 }
 const TIPS=['💧 Drink water before, during and after your workout.','🔥 Warm up for 5 minutes first. Try the guided warm-up!','🐢 Slow and controlled beats fast and sloppy.','😴 Sleep is when your muscles get stronger. Aim for 8–10 hours if you are a kid or teen.','🛑 Sore muscles are normal. Sharp pain is not. Stop and tell an adult.','🎯 Good form first. Add weight or reps only when the moves look and feel right.','🗣️ Breathe out when you push or lift. Never hold your breath.'];
 function tipOfDay(){const t=TIPS[new Date().getDate()%TIPS.length];return `<div class="card"><p class="small muted" style="font-weight:700">TIP OF THE DAY</p><p style="margin-top:4px">${t}</p></div>`}
@@ -1255,7 +1260,7 @@ async function syncNow(silent){
     if(!silent){toast('☁️ Synced!');render()}
     return true;
   }catch(e){
-    if(!silent)toast(e.message==='not_configured'?'Sync isn\'t switched on for this website yet':e.message==='rate_limited'?'Too many syncs. Try again in a bit':'Couldn\'t sync. Check your internet');
+    if(!silent)toast(e.message==='not_configured'?'Sync isn\'t switched on for this website yet':e.message==='rate_limited'?'Too many syncs. Try again in a bit':'Couldn\'t reach the backup. Check your internet');
     return false;
   }finally{syncing=false}
 }
@@ -1984,14 +1989,16 @@ function renderMe(v){
     DB={current:null,list:[],deleted:[]};profile=Object.assign({},DEFAULT_P);syncCfg={code:null,last:0};chat=[];ob={step:0,answers:[],name:'',avatar:'🙂'};go('today')},true),'A parent PIN is needed to erase everything.');
 }
 function syncCard(){
-  if(!syncCfg.code)return `<div class="card stack"><h3>☁️ Sync across devices</h3>
-    <p class="small muted">Keep everyone's workouts safe and use the app on more than one phone or tablet. No account needed, just a private sync code.</p>
-    <button class="btn secondary" id="syncon">Turn on sync</button>
-    <button class="link" id="syncjoin" style="padding:0">I have a code from another device</button></div>`;
+  if(!syncCfg.code)return `<div class="card stack"><h3>☁️ Backup & sync is off</h3>
+    <p class="small muted">Turn it on so clearing your browser or losing your phone never wipes your workouts. It also lets you use the app on more than one device. No account needed, just a private recovery code.</p>
+    <button class="btn secondary" id="syncon">Turn on backup & sync</button>
+    <button class="link" id="syncjoin" style="padding:0">I have a recovery code</button></div>`;
   const ago=syncCfg.last?Math.round((Date.now()-syncCfg.last)/60000):null;
-  return `<div class="card stack"><h3>☁️ Sync is on</h3>
-    <p class="small muted">Your sync code. Enter it on another device to share these people and workouts:</p>
+  return `<div class="card stack"><h3>☁️ Backup & sync is on</h3>
+    <p class="small muted">Your recovery code. Use it to get everything back after clearing your browser, or to connect another device:</p>
     <div class="code">${syncCfg.code}</div>
+    ${syncCfg.saved?'<p class="small" style="color:var(--ok);font-weight:700">✅ Saved to your passwords</p>':''}
+    <button class="btn" id="savecode">🔑 ${syncCfg.saved?'Save it again':'Save to my passwords'}</button>
     <p class="small muted">🔒 Keep it private. Anyone with this code can see and change this data.</p>
     <button class="btn secondary" id="syncnow">🔄 Sync now</button>
     <p class="small muted center">${ago===null?'Not synced yet':ago<1?'Last synced just now':`Last synced ${ago<60?ago+' min':Math.round(ago/60)+' h'} ago`}</p>
@@ -1999,28 +2006,81 @@ function syncCard(){
     <button class="link" id="syncdel" style="padding:0;color:var(--bad)">Delete the cloud copy</button></div>`;
 }
 function bindSync(v){
-  if($('#syncon'))$('#syncon').onclick=()=>requirePin(async()=>{syncCfg={code:newSyncCode(),last:0};saveSync();const ok=await syncNow(false);if(!ok){syncCfg={code:null,last:0};saveSync()}renderMe(v)},'A parent PIN is needed to change sync.');
+  if($('#syncon'))$('#syncon').onclick=()=>requirePin(async()=>{syncCfg={code:newSyncCode(),last:0};saveSync();const ok=await syncNow(false);if(!ok){syncCfg={code:null,last:0};saveSync()}renderMe(v);if(ok)saveCodeSheet()},'A parent PIN is needed to change sync.');
   if($('#syncjoin'))$('#syncjoin').onclick=()=>requirePin(()=>joinSheet(()=>renderMe(v)),'A parent PIN is needed to change sync.');
   if($('#syncdel'))$('#syncdel').onclick=()=>requirePin(()=>confirmBox('Delete the cloud copy?','Everyone\'s synced data will be deleted from the cloud and sync turns off. Data on this phone stays. Other devices keep their own copy until you erase them.','Delete cloud copy',async()=>{
     try{const r=await fetch('api/sync',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({code:syncCfg.code,op:'delete'})});if(!r.ok)throw 0;syncCfg={code:null,last:0};saveSync();toast('☁️ Cloud copy deleted');renderMe(v)}catch(e){toast("Couldn't delete. Check your internet")}},true),'A parent PIN is needed to change sync.');
+  if($('#savecode'))$('#savecode').onclick=saveCodeSheet;
   if($('#syncnow'))$('#syncnow').onclick=async()=>{await syncNow(false);if(route==='me')renderMe(v)};
   if($('#syncoff'))$('#syncoff').onclick=()=>requirePin(()=>confirmBox('Turn off sync?','Your data stays on this phone and in the cloud. You can turn sync back on with the same code later.','Turn off',()=>{syncCfg={code:null,last:0};saveSync();renderMe(v)}),'A parent PIN is needed to change sync.');
 }
 function joinSheet(after){
-  sheet(`<h2>Enter your sync code</h2><p class="muted small">Find it on your other device under <b>Me → Sync</b>.</p>
-    <input class="txt" id="sc" placeholder="XXXX-XXXX-XXXX-XXXX" autocapitalize="characters" autocomplete="off" style="font-family:ui-monospace,monospace;letter-spacing:.06em">
-    <button class="btn" id="join">Connect</button><button class="btn ghost" id="cancel">Cancel</button>`,()=>{
+  sheet(`<h2>Restore with your recovery code 🔑</h2><p class="muted small">If you saved it to your passwords, tap the code box and pick it from the bar above the keyboard. You can also find it on another device under <b>Me → Backup & sync</b>.</p>
+    <form id="jf" class="stack" autocomplete="on">
+      <input class="txt small-in" name="username" autocomplete="username" value="${KC_USER}" aria-label="Account name">
+      <div class="row" style="gap:8px"><input class="txt" id="sc" name="password" type="password" autocomplete="current-password" placeholder="XXXX-XXXX-XXXX-XXXX" autocapitalize="characters" style="font-family:ui-monospace,monospace;letter-spacing:.06em;flex:1"><button type="button" class="btn sm ghost" id="scshow" aria-label="Show code">👁</button></div>
+      ${window.PasswordCredential?'<button type="button" class="btn secondary" id="kcget">🔑 Use my saved code</button>':''}
+      <button class="btn" id="join" type="submit">Restore</button></form>
+    <button class="btn ghost" id="cancel">Cancel</button>`,()=>{
     $('#cancel').onclick=closeLayer;
-    $('#join').onclick=async()=>{
+    $('#scshow').onclick=()=>{const i=$('#sc');i.type=i.type==='password'?'text':'password'};
+    if($('#kcget'))$('#kcget').onclick=async()=>{try{const c=await navigator.credentials.get({password:true,mediation:'optional'});if(c&&c.password)$('#sc').value=c.password;else toast('No saved code found')}catch(e){toast('No saved code found')}};
+    $('#jf').onsubmit=async e=>{
+      e.preventDefault();
       let c=$('#sc').value.toUpperCase().replace(/[^A-Z0-9]/g,'');
       if(c.length!==16){toast('The code has 16 letters and numbers');return}
-      c=c.match(/.{4}/g).join('-');const prev=syncCfg;syncCfg={code:c,last:0};saveSync();
-      $('#join').disabled=true;$('#join').textContent='Connecting…';
+      c=c.match(/.{4}/g).join('-');const prev=syncCfg;syncCfg={code:c,last:0,saved:true};saveSync();
+      $('#join').disabled=true;$('#join').textContent='Restoring…';
       const ok=await syncNow(false);
-      if(!ok){syncCfg=prev;saveSync();$('#join').disabled=false;$('#join').textContent='Connect';return}
-      closeLayer();toast('☁️ Connected!');if(after)after();else render();
+      if(!ok){syncCfg=prev;saveSync();$('#join').disabled=false;$('#join').textContent='Restore';return}
+      closeLayer();toast('☁️ Everything is back!');if(after)after();else render();
     };
   });
+}
+const KC_USER='JAMS Fitness';
+function saveCodeSheet(){
+  if(!syncCfg.code)return;
+  sheet(`<h2>🔑 Save your recovery code</h2>
+    <p class="muted">This code brings back <b>everyone's</b> workouts if this browser is cleared or you get a new phone. Save it in your phone's passwords so you never lose it.</p>
+    <div class="code">${syncCfg.code}</div>
+    <form id="kc" method="post" action="api/saved" autocomplete="on" class="stack">
+      <input class="txt small-in" name="username" autocomplete="username" value="${KC_USER}" aria-label="Account name">
+      <input class="txt small-in" name="password" type="password" autocomplete="new-password" value="${syncCfg.code}" aria-label="Recovery code">
+      <button class="btn" type="submit">🔑 Save to my passwords</button></form>
+    <p class="small muted">When your phone asks <b>"Save password?"</b>, tap <b>Save</b>. It will be saved as "${KC_USER}".</p>
+    <div class="row" style="gap:8px"><button class="btn sm secondary" id="kcopy" style="flex:1">📋 Copy code</button><button class="btn sm ghost" id="kdone" style="flex:1">I saved it</button></div>
+    <button class="link" id="klater" style="color:var(--muted)">Later</button>`,()=>{
+    const mark=()=>{syncCfg.saved=true;saveSync()};
+    $('#kc').onsubmit=async e=>{
+      mark();
+      if(window.PasswordCredential){e.preventDefault();
+        try{await navigator.credentials.store(new PasswordCredential({id:KC_USER,password:syncCfg.code,name:KC_USER}))}catch(err){}
+        closeLayer();toast('🔑 Saved to your passwords');render()}
+      // Otherwise (Safari) the form really submits, which is what makes the phone offer to save it.
+    };
+    $('#kcopy').onclick=async()=>{try{await navigator.clipboard.writeText(syncCfg.code);toast('📋 Copied. Paste it somewhere safe, like Notes')}catch(e){toast('Copy not available. Write it down instead')}};
+    $('#kdone').onclick=()=>{mark();closeLayer();toast('👍 Great!');render()};
+    $('#klater').onclick=()=>{syncCfg.snooze=Date.now()+3*864e5;saveSync();closeLayer();render()};
+  });
+}
+async function autoBackup(){
+  syncCfg={code:newSyncCode(),last:0,auto:true};saveSync();
+  const ok=await syncNow(true);
+  if(!ok){syncCfg={code:null,last:0};saveSync();return}
+  if(route==='today'&&!$('#layer').innerHTML)render();
+}
+function backupCard(){
+  if(syncCfg.snooze&&Date.now()<syncCfg.snooze)return '';
+  if(!syncCfg.code)return `<div class="card stack backup"><div class="row"><span class="big-emoji">☁️</span><div style="flex:1"><b>Protect your workouts</b><p class="small muted">Turn on backup so clearing your browser or losing your phone never wipes your progress.</p></div></div>
+    <div class="row" style="gap:8px"><button class="btn sm" id="bkon" style="flex:1">Turn on backup</button><button class="btn sm ghost" id="bklater">Later</button></div></div>`;
+  if(!syncCfg.saved)return `<div class="card stack backup"><div class="row"><span class="big-emoji">🔑</span><div style="flex:1"><b>Save your recovery code</b><p class="small muted">Your workouts are backed up. Save the code so you can get them back on any device.</p></div></div>
+    <div class="row" style="gap:8px"><button class="btn sm" id="bksave" style="flex:1">Save code</button><button class="btn sm ghost" id="bklater">Later</button></div></div>`;
+  return '';
+}
+function bindBackup(){
+  if($('#bkon'))$('#bkon').onclick=()=>requirePin(async()=>{syncCfg={code:newSyncCode(),last:0};saveSync();const ok=await syncNow(false);if(!ok){syncCfg={code:null,last:0};saveSync();render();return}render();saveCodeSheet()},'A parent PIN is needed to turn on backup.');
+  if($('#bksave'))$('#bksave').onclick=saveCodeSheet;
+  if($('#bklater'))$('#bklater').onclick=()=>{syncCfg.snooze=Date.now()+3*864e5;saveSync();render()};
 }
 function exportBackup(){
   const data={app:'jams-fitness',version:3,exported:new Date().toISOString(),profile,journal:getJournal()};
@@ -2043,6 +2103,7 @@ function importBackup(e){
 }
 
 /* ---------- Start ---------- */
+if(/[?&]saved=1/.test(location.search)){syncCfg.saved=true;saveSync();history.replaceState(null,'',location.pathname);setTimeout(()=>toast('🔑 Recovery code saved. You\'re protected!'),300)}
 render();
 if(syncCfg.code)syncNow(true).then(ok=>{if(ok&&route!=='workout'&&!runner&&!$('#layer').innerHTML)render()});
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
