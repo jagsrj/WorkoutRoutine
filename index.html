@@ -9,6 +9,11 @@
 <meta name="theme-color" content="#2563eb">
 <meta name="description" content="JAMS Fitness — simple workout plans for Beginner, Intermediate and Expert. Find your level, follow the plan, track your progress.">
 <title>JAMS Fitness — Workouts for every level</title>
+<meta property="og:title" content="JAMS Fitness: workouts for the whole family">
+<meta property="og:description" content="Free workout plans for Beginner, Intermediate and Expert, with guided workouts, badges, a friendly AI coach and family challenges.">
+<meta property="og:image" content="og.jpg">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon.svg">
@@ -20,17 +25,11 @@
   --radius:20px; --shadow:0 1px 2px rgba(15,23,42,.05),0 6px 20px rgba(15,23,42,.06);
   --safe-b:env(safe-area-inset-bottom,0px);
 }
-@media (prefers-color-scheme:dark){
-  :root{--bg:#0b1020;--card:#151b2e;--text:#eef2ff;--muted:#94a3b8;--line:#263049;--brand-soft:#1c2a4d;--shadow:none}
-}
+@media (prefers-color-scheme:dark){html:not([data-theme=light]){--bg:#0b1020;--card:#151b2e;--text:#eef2ff;--muted:#94a3b8;--line:#263049;--brand-soft:#1c2a4d;--shadow:none}}html[data-theme=dark]{--bg:#0b1020;--card:#151b2e;--text:#eef2ff;--muted:#94a3b8;--line:#263049;--brand-soft:#1c2a4d;--shadow:none}
 body[data-level="beginner"]{--lvl:#16a34a;--lvl-soft:#e6f6ec}
 body[data-level="intermediate"]{--lvl:#ea580c;--lvl-soft:#fdeee4}
 body[data-level="expert"]{--lvl:#7c3aed;--lvl-soft:#f0e9fe}
-@media (prefers-color-scheme:dark){
-  body[data-level="beginner"]{--lvl-soft:#12301f}
-  body[data-level="intermediate"]{--lvl-soft:#3a2214}
-  body[data-level="expert"]{--lvl-soft:#2a1f47}
-}
+@media (prefers-color-scheme:dark){html:not([data-theme=light]) body[data-level="beginner"]{--lvl-soft:#12301f}html:not([data-theme=light]) body[data-level="intermediate"]{--lvl-soft:#3a2214}html:not([data-theme=light]) body[data-level="expert"]{--lvl-soft:#2a1f47}}html[data-theme=dark] body[data-level="beginner"]{--lvl-soft:#12301f}html[data-theme=dark] body[data-level="intermediate"]{--lvl-soft:#3a2214}html[data-theme=dark] body[data-level="expert"]{--lvl-soft:#2a1f47}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--text);font:17px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
 button,input,select{font:inherit;color:inherit}
@@ -94,7 +93,7 @@ details.how ol{margin:0 0 10px;padding-left:22px}
 details.how li{margin:6px 0}
 .tip{margin:6px 0 12px;padding:10px 12px;border-radius:12px;background:var(--card);border:1px dashed var(--line);font-size:15px}
 .hint{margin-top:10px;padding:10px 12px;border-radius:12px;background:#fff7e0;color:#7a4b00;font-size:15px;font-weight:600}
-@media (prefers-color-scheme:dark){.hint{background:#3a2e10;color:#ffd98a}}
+@media (prefers-color-scheme:dark){html:not([data-theme=light]) .hint{background:#3a2e10;color:#ffd98a}}html[data-theme=dark] .hint{background:#3a2e10;color:#ffd98a}
 .sets{margin-top:12px}
 .set{display:grid;grid-template-columns:54px 1fr 1fr 56px;gap:8px;align-items:center;margin-top:8px}
 .set.nowt{grid-template-columns:54px 1fr 56px}
@@ -175,7 +174,7 @@ input.txt:focus{outline:none;border-color:var(--lvl)}
 .fig{width:100%;max-width:240px;display:block;margin:0 auto}
 .figbox{background:var(--card);border-radius:14px;margin:2px 0 8px;padding:8px 6px 2px}
 :root{--fig-prop:#cbd5e1;--fig-dark:#475569}
-@media (prefers-color-scheme:dark){:root{--fig-prop:#334155;--fig-dark:#94a3b8}}
+@media (prefers-color-scheme:dark){html:not([data-theme=light]){--fig-prop:#334155;--fig-dark:#94a3b8}}html[data-theme=dark]{--fig-prop:#334155;--fig-dark:#94a3b8}
 details.fold{padding:16px 18px}
 details.fold summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px}
 details.fold summary::-webkit-details-marker{display:none}
@@ -217,9 +216,9 @@ details.fold[open] summary::after{transform:rotate(180deg)}
 .range{width:100%;accent-color:var(--lvl);height:32px}
 .streakpill{background:#fff1e6;color:#c2410c}
 .streakpill.off{filter:grayscale(1);opacity:.6}
-@media (prefers-color-scheme:dark){.streakpill{background:#3a2214;color:#fdba74}}
+@media (prefers-color-scheme:dark){html:not([data-theme=light]) .streakpill{background:#3a2214;color:#fdba74}}html[data-theme=dark] .streakpill{background:#3a2214;color:#fdba74}
 .card.streak{background:linear-gradient(135deg,#fff7ed,#ffedd5);border-color:#fed7aa}
-@media (prefers-color-scheme:dark){.card.streak{background:linear-gradient(135deg,#2a1a10,#3a2214);border-color:#5a3418}}
+@media (prefers-color-scheme:dark){html:not([data-theme=light]) .card.streak{background:linear-gradient(135deg,#2a1a10,#3a2214);border-color:#5a3418}}html[data-theme=dark] .card.streak{background:linear-gradient(135deg,#2a1a10,#3a2214);border-color:#5a3418}
 .flame{font-size:44px;line-height:1;animation:flick 1.6s ease-in-out infinite;transform-origin:50% 90%}
 .flame.off{filter:grayscale(1);opacity:.4;animation:none}
 @keyframes flick{0%,100%{transform:scale(1) rotate(-2deg)}50%{transform:scale(1.08) rotate(2deg)}}
@@ -258,17 +257,31 @@ details.fold[open] summary::after{transform:rotate(180deg)}
 .fam{gap:10px}.fam .av{font-size:24px;width:40px;height:40px;flex:0 0 40px;display:grid;place-items:center;background:var(--lvl-soft);border-radius:12px}
 .famBar{height:8px;background:var(--line);border-radius:8px;margin-top:4px;overflow:hidden}.famBar i{display:block;height:100%;background:var(--lvl);border-radius:8px}
 .card.five{background:linear-gradient(135deg,#fef9c3,#fde68a);border-color:#fcd34d}
-@media (prefers-color-scheme:dark){.card.five{background:linear-gradient(135deg,#3a3210,#4a3d10);border-color:#6b5a1a}}
+@media (prefers-color-scheme:dark){html:not([data-theme=light]) .card.five{background:linear-gradient(135deg,#3a3210,#4a3d10);border-color:#6b5a1a}}html[data-theme=dark] .card.five{background:linear-gradient(135deg,#3a3210,#4a3d10);border-color:#6b5a1a}
 .txt.pin{text-align:center;font-size:30px;letter-spacing:.5em}
 a.btn{text-decoration:none}
 .backup{border:2px solid var(--lvl)}
 .txt.small-in{height:44px;font-size:15px}
+.wrap,.sheet,.runner-in,.tour-tip{zoom:var(--zoom,1)}
+.btn.ghost-light{background:rgba(255,255,255,.18);color:#fff}
+.phase .progress{height:8px}
+.tour{position:fixed;inset:0;z-index:70}
+.tour-hole{position:fixed;border-radius:16px;box-shadow:0 0 0 9999px rgba(2,6,23,.6);transition:all .25s;pointer-events:none}
+.tour-tip{position:fixed;left:16px;right:16px;max-width:520px;margin:0 auto;background:var(--card);color:var(--text);border-radius:20px;padding:18px;box-shadow:0 12px 30px rgba(0,0,0,.3);font-size:17px}
+.report .stats{margin-top:4px}
+@media print{
+  .tabbar,.noprint,.timer,.toast,#layer{display:none!important}
+  body,html{background:#fff!important;color:#000!important}
+  .wrap{padding:0!important;max-width:none;zoom:1}
+  .card{box-shadow:none!important;border:1px solid #ccc!important;break-inside:avoid;background:#fff!important}
+  .stat{background:#fff!important;border:1px solid #ccc!important}
+}
 </style>
 </head>
 <body data-level="beginner">
 <div class="wrap" id="view"></div>
 
-<nav class="tabbar" id="tabbar">
+<nav class="tabbar" id="tabbar" aria-label="Main">
   <div class="in">
     <button class="tab" data-go="today"><span class="ic">🏠</span>Today</button>
     <button class="tab" data-go="library"><span class="ic">📚</span>Workouts</button>
@@ -284,9 +297,18 @@ a.btn{text-decoration:none}
   <button id="timer-add">+15s</button>
   <button id="timer-skip">Skip ⏭</button>
 </div>
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div id="layer"></div>
 
-<script src="app.js"></script>
+<script src="js/errors.js"></script>
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/screens.js"></script>
+<script src="js/sync.js"></script>
+<script src="js/coach.js"></script>
+<script src="js/photos.js"></script>
+<script src="js/features.js"></script>
+<script src="js/extras.js"></script>
+<script src="js/me.js"></script>
 </body>
 </html>

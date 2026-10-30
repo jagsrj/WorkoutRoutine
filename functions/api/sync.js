@@ -46,6 +46,15 @@ export async function onRequestPost({ request, env }) {
   if (!CODE_RE.test(code)) return json({ error: 'bad_code' }, 400);
   const key = await keyFor(code);
 
+  const snapPrefix = 'snap:' + key.slice(5) + ':';
+  if (body.op === 'snapshots') {
+    const list = await env.STORE.list({ prefix: snapPrefix });
+    return json({ dates: list.keys.map(k => k.name.slice(snapPrefix.length)).sort().reverse() });
+  }
+  if (body.op === 'snapshot') {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(body.date))) return json({ error: 'bad_request' }, 400);
+    return json({ data: await env.STORE.get(snapPrefix + body.date, 'json') });
+  }
   if (body.op === 'get') {
     const data = await env.STORE.get(key, 'json');
     return json({ data: data || null });
@@ -53,11 +62,19 @@ export async function onRequestPost({ request, env }) {
   if (body.op === 'put') {
     const d = body.data;
     if (!validPayload(d)) return json({ error: 'bad_request' }, 400);
+    // Keep one copy per day (the state before the day's first change) for 30 days.
+    const snapKey = snapPrefix + new Date().toISOString().slice(0, 10);
+    if (!(await env.STORE.get(snapKey))) {
+      const current = await env.STORE.get(key);
+      if (current) await env.STORE.put(snapKey, current, { expirationTtl: 30 * 86400 });
+    }
     await env.STORE.put(key, JSON.stringify(d), { metadata: { updated: Date.now() } });
     return json({ ok: true });
   }
   if (body.op === 'delete') {
     await env.STORE.delete(key);
+    const snaps = await env.STORE.list({ prefix: snapPrefix });
+    await Promise.all(snaps.keys.map(k => env.STORE.delete(k.name)));
     return json({ ok: true });
   }
   return json({ error: 'bad_request' }, 400);
