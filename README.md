@@ -38,6 +38,8 @@ Redeploy after adding bindings. Coach allows 20 AI questions per hour per person
 - **Swap an exercise:** switch to an easier or no-equipment move.
 - **Edit history:** fix past entries.
 - **Cloud sync:** a private sync code shares people and workouts across devices, with no account needed.
+- **Progress photos (optional):** off by default; photos stay on the device only, with a timeline and a before/after slider.
+- **Streak:** a weekly streak card on Today and a 🔥 counter at the top of every screen.
 - **Offline:** a service worker (`sw.js`) lets the app open without internet.
 - **Settings:** lbs or kg, rest time, and back up or restore your data. Safety tips are included.
 - Works offline, has no sign-up and no tracking. Data stays on the device (localStorage).
