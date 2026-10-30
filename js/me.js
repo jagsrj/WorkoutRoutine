@@ -191,7 +191,7 @@ function bindBackup(){
 function exportBackup(){
   const data={app:'jams-fitness',version:3,exported:new Date().toISOString(),profile,journal:getJournal()};
   const blob=new Blob([JSON.stringify(data,null,1)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`jams_fitness_${(profile.name||'backup').replace(/[^a-z0-9]+/gi,'_')}_${isoLocal()}.json`;document.body.appendChild(a);a.click();a.remove();
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`kinfit_${(profile.name||'backup').replace(/[^a-z0-9]+/gi,'_')}_${isoLocal()}.json`;document.body.appendChild(a);a.click();a.remove();
   toast('Backup downloaded');
 }
 function importBackup(e){

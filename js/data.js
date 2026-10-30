@@ -269,6 +269,8 @@ const BADGES = [
   {id:'coach',e:'💬',n:'Curious mind',d:'Ask Coach 5 questions',t:s=>s.questions>=5},
   {id:'inter',e:'⬆️',n:'Level up',d:'Do a workout on Intermediate',t:s=>s.levels.has('intermediate')},
   {id:'expert',e:'🦁',n:'Beast mode',d:'Do a workout on Expert',t:s=>s.levels.has('expert')},
+  {id:'chal',e:'🏆',n:'Challenge champ',d:'Complete a monthly challenge',t:s=>s.challenges>=1},
+  {id:'goal',e:'🎯',n:'Goal getter',d:'Reach a goal you set',t:s=>s.goals>=1},
 ];
 const AVATARS=['🙂','🦁','🐯','🐼','🐨','🦊','🐸','🐵','🦄','🐲','🐬','🦖','🐱','🐶','🚀','⚽'];
 

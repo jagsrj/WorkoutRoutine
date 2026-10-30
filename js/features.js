@@ -121,7 +121,7 @@ function renderLibrary(v){
     body=`<div class="stack"><h3>My workouts</h3>
       ${rs.length?rs.map(r=>`<div class="card row" style="padding:14px"><span class="ex-emoji">${r.e}</span><div style="flex:1"><b>${esc(r.name)}</b><p class="small muted">${plural(r.items.length,'exercise')}</p></div><button class="btn sm ghost" data-redit="${r.id}" aria-label="Edit">✏️</button><button class="btn sm" data-rstart="${r.id}">▶</button></div>`).join('')
         :`<div class="card empty"><div class="big-emoji">📝</div><p class="muted">Build your own workout from any exercises. Great for leg day, sports practice or a quick 10 minutes.</p></div>`}
-      <button class="btn" id="rnew">＋ Create a workout</button></div>
+      <button class="btn" id="rnew">＋ Create a workout</button><button class="btn secondary" id="rbuild">✨ Build one for me</button></div>
     <div class="stack"><h3>My exercises</h3>
       ${cx.length?cx.map(k=>exCard(k,'',true)).join(''):`<p class="small muted">Can't find a move in the library? Add your own, with your own steps.</p>`}
       <button class="btn secondary" id="xnew">＋ Create an exercise</button></div>`;
@@ -149,6 +149,7 @@ function renderLibrary(v){
   v.querySelectorAll('[data-ssave]').forEach(b=>b.onclick=()=>{const s=SPORTS.find(x=>x.id===b.dataset.ssave);routineSheet({id:newId('r'),name:s.name+' training',e:s.e,items:s.items.map(p=>p.slice())})});
   v.querySelectorAll('[data-xedit]').forEach(b=>b.onclick=()=>exerciseSheet(b.dataset.xedit));
   if($('#rnew'))$('#rnew').onclick=()=>routineSheet();
+  if($('#rbuild'))$('#rbuild').onclick=builderSheet;
   if($('#xnew'))$('#xnew').onclick=()=>exerciseSheet();
   if($('#lq'))$('#lq').oninput=e=>{libQuery=e.target.value.toLowerCase().trim();const pos=e.target.selectionStart;renderLibrary(v);const n=$('#lq');n.focus();n.setSelectionRange(pos,pos)};
 }

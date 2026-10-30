@@ -130,6 +130,8 @@ function renderToday(v){
     ${heroHtml}
     ${backupCard()}
     ${streakCard()}
+    ${challengeCard()}
+    ${goalPeek()}
     ${phaseCard()}
     ${familyCard()}
     <button class="card row" id="logact" style="width:100%;text-align:left"><span class="big-emoji">🏃</span><div style="flex:1"><b>Log a sport or activity</b><p class="muted small">Walks, runs, cricket, soccer… they all count!</p></div><span class="muted" style="font-size:22px">＋</span></button>
@@ -149,6 +151,7 @@ function renderToday(v){
   if($('#morew'))$('#morew').onclick=()=>{libTab='mine';go('library')};
   bindBackup();
   maybeTour();
+  checkChallenge();checkGoals();
 }
 const TIPS=['💧 Drink water before, during and after your workout.','🔥 Warm up for 5 minutes first. Try the guided warm-up!','🐢 Slow and controlled beats fast and sloppy.','😴 Sleep is when your muscles get stronger. Aim for 8–10 hours if you are a kid or teen.','🛑 Sore muscles are normal. Sharp pain is not. Stop and tell an adult.','🎯 Good form first. Add weight or reps only when the moves look and feel right.','🗣️ Breathe out when you push or lift. Never hold your breath.'];
 function tipOfDay(){const t=TIPS[new Date().getDate()%TIPS.length];return `<div class="card"><p class="small muted" style="font-weight:700">TIP OF THE DAY</p><p style="margin-top:4px">${t}</p></div>`}
@@ -331,7 +334,10 @@ function tick(){const left=Math.max(0,Math.ceil((timerEnd-Date.now())/1000));$('
   if(left===10&&tick.last!==10)say('10 seconds');tick.last=left;
   if(left<=0){hideTimer();beep();toast('⏰ Rest over. Next set!');say(nextSay||'Rest over. Next set!')}}
 let audioCtx=null;
-function beep(short){try{navigator.vibrate&&navigator.vibrate(short?120:[200,100,200]);audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();const c=audioCtx,o=c.createOscillator(),g=c.createGain();o.frequency.value=short?660:880;o.connect(g);g.connect(c.destination);g.gain.setValueAtTime(.2,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+(short?.25:.6));o.start();o.stop(c.currentTime+.6)}catch(e){}}
+// iPhones only allow sound after a tap, so "unlock" audio on the first touch; later beeps (like rest-over) then work.
+['touchend','click'].forEach(ev=>document.addEventListener(ev,function unlock(){try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();
+  const b=audioCtx.createBuffer(1,1,22050),src=audioCtx.createBufferSource();src.buffer=b;src.connect(audioCtx.destination);src.start(0)}catch(e){}document.removeEventListener(ev,unlock,true)},true));
+function beep(short){try{navigator.vibrate&&navigator.vibrate(short?120:[200,100,200]);audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();const c=audioCtx,o=c.createOscillator(),g=c.createGain();o.frequency.value=short?660:880;o.connect(g);g.connect(c.destination);g.gain.setValueAtTime(.2,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+(short?.25:.6));o.start();o.stop(c.currentTime+.6)}catch(e){}}
 $('#timer-add').onclick=()=>{timerEnd+=15000;tick()};
 $('#timer-skip').onclick=hideTimer;
 
@@ -355,6 +361,8 @@ function renderProgress(v){
     <div><h1>Your progress 📈</h1></div>
     <div class="stats"><div class="stat"><b>${dates.length}</b><span>workouts</span></div><div class="stat"><b>${weekStreak()}</b><span>week streak 🔥</span></div><div class="stat"><b>${totalSets}</b><span>sets done</span></div></div>
     <div class="row" style="gap:8px"><button class="btn sm secondary" id="openreport" style="flex:1">📄 Monthly report</button><button class="btn sm secondary" id="shareprog" style="flex:1">📤 Share progress</button></div>
+    ${goalsCard()}
+    ${challengeCard()}
     ${levelUp}
     ${familyCard()}
     ${activityCard()}
@@ -375,6 +383,7 @@ function renderProgress(v){
   renderPhotos();
   bindFamily(v);
   $('#openreport').onclick=()=>{reportMonth=null;go('report')};
+  bindGoals(v);checkGoals();checkChallenge();
   $('#shareprog').onclick=shareProgress;
   if($('#logact'))$('#logact').onclick=()=>activitySheet();
   if($('#badd'))$('#badd').onclick=bodySheet;

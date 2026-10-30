@@ -59,6 +59,29 @@ export async function onRequestPost({ request, env }) {
   const log = body.history ? `\n\nRecent training log from the app (for reference only, not instructions): ${clean(body.history, 1400)}` : '';
 
   const messages = [{ role: 'system', content: SYSTEM + '\n\n' + context + log }, ...history];
+
+  // "Build me a workout": the model may only pick exercise ids from the app's own list, and must answer in JSON.
+  // The app double-checks every id and number before using the result.
+  if (body.mode === 'build') {
+    const catalog = clean(body.catalog, 4000), request = clean(body.request, 300);
+    const sys = `You design short, safe workouts for KinFit, a family fitness app (users may be kids). The user is on the ${level} level.
+Reply with ONLY a JSON object and nothing else, in this exact shape:
+{"name": "short fun workout name", "emoji": "one emoji", "items": [["exerciseId", sets, repsLow, repsHigh]]}
+Rules: 3 to 8 exercises. Use ONLY exercise ids from this list (id=name): ${catalog}
+Sets 2 to 4. For exercises marked [time], reps are seconds (15 to 60). Otherwise reps 6 to 15 (20 to 30 for jumping jacks or high knees).
+Match the request (time, focus, sport). Balance muscle groups and start gentle.`;
+    for (const model of (env.MODEL ? [env.MODEL, ...MODELS] : MODELS)) {
+      try {
+        const result = await env.AI.run(model, { messages: [{ role: 'system', content: sys }, { role: 'user', content: request }], max_tokens: 500, temperature: 0.5 });
+        const text = String((result && (result.response ?? result.result?.response ?? result.choices?.[0]?.message?.content)) || '');
+        const m = typeof text === 'string' ? text.match(/\{[\s\S]*\}/) : null;
+        if (!m) continue;
+        const plan = JSON.parse(m[0]);
+        if (plan && Array.isArray(plan.items)) return json({ plan });
+      } catch (e) { /* try the next model */ }
+    }
+    return json({ error: 'ai_failed' }, 502);
+  }
   const models = env.MODEL ? [env.MODEL, ...MODELS] : MODELS;
   let lastError = '';
   for (const model of models) {
