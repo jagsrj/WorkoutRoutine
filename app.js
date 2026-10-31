@@ -1113,11 +1113,12 @@ function celebrate(sets,mins,vol,badges,prs=[]){
     <div class="stats"><div class="stat"><b>${sets}</b><span>sets</span></div><div class="stat"><b>${mins}</b><span>${mins===1?'minute':'minutes'}</span></div><div class="stat"><b>${weekStreak()}</b><span>week streak 🔥</span></div></div>
     ${prs.length?`<div class="card stack" style="text-align:left"><h2 class="h3">🏆 New personal ${prs.length>1?'records':'record'}!</h2>${prs.map(p=>`<p>⭐ ${esc(p)}</p>`).join('')}</div>`:''}
     ${badgeRow(badges)}
+    ${backupNudge()}
     ${vol>0?`<p class="muted">You moved <b>${Math.round(vol).toLocaleString()} ${profile.unit}</b> in total! 💪</p>`:'<p class="muted">Every rep makes you stronger. See you next time!</p>'}
     <div class="row" style="gap:8px"><button class="btn secondary" id="cshare" style="flex:1">📤 Share</button><button class="btn secondary" id="ccool" style="flex:1">🧘 Cool-down</button></div>
     <button class="btn" id="done">Done</button></div></div>`;
   $('#done').onclick=()=>{closeLayer();go('progress')};
-  $('#cshare').onclick=()=>shareWorkout();
+  $('#cshare').onclick=()=>shareWorkout();bindBackupNudge();
   $('#ccool').onclick=()=>{closeLayer();go('progress');runStretch('cool')};
   say(praise+(prs.length?' And you set a new personal record!':''));
 }
@@ -3118,8 +3119,17 @@ function backupCard(){
     <div class="row" style="gap:8px"><button class="btn sm" id="bksave" style="flex:1">Save code</button><button class="btn sm ghost" id="bklater">Later</button></div></div>`;
   return '';
 }
+// Creates a recovery code, backs everything up, then shows the code to save.
+function turnOnBackup(){requirePin(async()=>{syncCfg={code:newSyncCode(),last:0};saveSync();const ok=await syncNow(false);if(!ok){syncCfg={code:null,last:0};saveSync();render();return}render();saveCodeSheet()},'A parent PIN is needed to turn on backup.')}
+// Shown on the "workout done" screen until backup is on and the code is saved: the best moment to ask.
+function backupNudge(){
+  if(!syncCfg.code)return `<div class="card stack backup" style="text-align:left"><p><b>☁️ Back up this workout so it's never lost</b></p><p class="small muted">If the browser is cleared or the phone is lost, your workouts come back with a recovery code. Free, no sign-up.</p><button class="btn sm" id="cbk" style="width:100%">Turn on backup</button></div>`;
+  if(!syncCfg.saved)return `<div class="card stack backup" style="text-align:left"><p><b>🔑 Save your recovery code</b></p><p class="small muted">Your workouts are backed up. Save the code so you can get them back on any device.</p><button class="btn sm" id="cbk" style="width:100%">Save code</button></div>`;
+  return '';
+}
+function bindBackupNudge(){const b=$('#cbk');if(b)b.onclick=()=>{const save=!!syncCfg.code;closeLayer();go('progress');if(save)saveCodeSheet();else turnOnBackup()}}
 function bindBackup(){
-  if($('#bkon'))$('#bkon').onclick=()=>requirePin(async()=>{syncCfg={code:newSyncCode(),last:0};saveSync();const ok=await syncNow(false);if(!ok){syncCfg={code:null,last:0};saveSync();render();return}render();saveCodeSheet()},'A parent PIN is needed to turn on backup.');
+  if($('#bkon'))$('#bkon').onclick=turnOnBackup;
   if($('#bksave'))$('#bksave').onclick=saveCodeSheet;
   if($('#bklater'))$('#bklater').onclick=()=>{syncCfg.snooze=Date.now()+3*864e5;saveSync();render()};
 }

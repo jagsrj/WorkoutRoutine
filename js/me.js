@@ -185,8 +185,17 @@ function backupCard(){
     <div class="row" style="gap:8px"><button class="btn sm" id="bksave" style="flex:1">Save code</button><button class="btn sm ghost" id="bklater">Later</button></div></div>`;
   return '';
 }
+// Creates a recovery code, backs everything up, then shows the code to save.
+function turnOnBackup(){requirePin(async()=>{syncCfg={code:newSyncCode(),last:0};saveSync();const ok=await syncNow(false);if(!ok){syncCfg={code:null,last:0};saveSync();render();return}render();saveCodeSheet()},'A parent PIN is needed to turn on backup.')}
+// Shown on the "workout done" screen until backup is on and the code is saved: the best moment to ask.
+function backupNudge(){
+  if(!syncCfg.code)return `<div class="card stack backup" style="text-align:left"><p><b>☁️ Back up this workout so it's never lost</b></p><p class="small muted">If the browser is cleared or the phone is lost, your workouts come back with a recovery code. Free, no sign-up.</p><button class="btn sm" id="cbk" style="width:100%">Turn on backup</button></div>`;
+  if(!syncCfg.saved)return `<div class="card stack backup" style="text-align:left"><p><b>🔑 Save your recovery code</b></p><p class="small muted">Your workouts are backed up. Save the code so you can get them back on any device.</p><button class="btn sm" id="cbk" style="width:100%">Save code</button></div>`;
+  return '';
+}
+function bindBackupNudge(){const b=$('#cbk');if(b)b.onclick=()=>{const save=!!syncCfg.code;closeLayer();go('progress');if(save)saveCodeSheet();else turnOnBackup()}}
 function bindBackup(){
-  if($('#bkon'))$('#bkon').onclick=()=>requirePin(async()=>{syncCfg={code:newSyncCode(),last:0};saveSync();const ok=await syncNow(false);if(!ok){syncCfg={code:null,last:0};saveSync();render();return}render();saveCodeSheet()},'A parent PIN is needed to turn on backup.');
+  if($('#bkon'))$('#bkon').onclick=turnOnBackup;
   if($('#bksave'))$('#bksave').onclick=saveCodeSheet;
   if($('#bklater'))$('#bklater').onclick=()=>{syncCfg.snooze=Date.now()+3*864e5;saveSync();render()};
 }
