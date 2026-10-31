@@ -2,7 +2,7 @@
 // Run locally:  npm i playwright && npx playwright install chromium && node tests/smoke.js
 const http = require('http'), fs = require('fs'), path = require('path');
 const { chromium } = require('playwright');
-const ROOT = path.join(__dirname, '..'), PORT = 4173;
+const ROOT = path.join(__dirname, '..', 'public'), PORT = 4173; // serve exactly what Cloudflare publishes
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json' };
 const server = http.createServer((req, res) => {
   let p = decodeURIComponent(req.url.split('?')[0]); if (p === '/') p = '/index.html';

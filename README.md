@@ -6,7 +6,7 @@ Simple workout plans for every level. Pick your level, follow the plan and watch
 
 **Use it:** open `index.html` in any browser. On a phone, tap **Share → Add to Home Screen** to use it like an app.
 
-**Hosting:** Cloudflare Pages at https://kinfit.pages.dev (project `kinfit`; build command `exit 0`, output directory `/`, bindings `STORE` = KV `jams-store` and `AI` = Workers AI). Every push to `main` redeploys automatically.
+**Hosting:** Cloudflare Pages at https://kinfit.pages.dev (project `kinfit`; build command `exit 0`, **build output directory `public`**, bindings `STORE` = KV `jams-store` and `AI` = Workers AI). Every push to `main` redeploys automatically.
 
 **One-time Cloudflare settings** (Pages project → Settings → Bindings):
 
@@ -44,7 +44,7 @@ Redeploy after adding bindings. Coach allows 20 AI questions per hour per person
 - **Backup & sync (on by default):** a private recovery code backs up people and workouts and restores them after a browser clear or on a new device. The code can be saved to the phone's password manager (`/api/saved`).
 - **Progress photos (optional):** off by default; photos stay on the device only, with a timeline and a before/after slider.
 - **Streak:** a weekly streak card on Today and a 🔥 counter at the top of every screen.
-- **Offline:** a service worker (`sw.js`) lets the app open without internet.
+- **Offline:** a service worker (`public/sw.js`) lets the app open without internet.
 - **Build your own:** custom workouts and custom exercises, plus sport plans (cricket, soccer, swimming, running, basketball).
 - **128 exercises** you can search and filter by muscle: bodyweight, backpack, dumbbell, cable/functional trainer, machine, barbell and EZ-bar moves, each with steps, a tip, a swap and a moving drawing. Exercises list the equipment they need (`need` in `js/data.js`), so "My equipment" and the workout builder only suggest what you can do.
 - **Muscle recovery** (`js/recovery.js`): tracks how tired each muscle is from recent sets, effort ratings and sports. If today's workout hits a muscle that's still recovering, Today says so and offers a fresher workout. Progress → Muscle power → **Ready?** shows every muscle and when it will be ready. The Coach's workout builder skips tired muscles when it can.
@@ -100,10 +100,12 @@ This app gives general fitness guidance, not medical advice. Under-18s should li
 
 ## Security
 - Every value loaded from storage, sync or a backup file is cleaned (`sanitizeProfile` and `sanitizeJournal` in `js/store.js`) and escaped when shown.
-- `_headers` sets a strict Content-Security-Policy (scripts only from this site, so injected code can't run), plus frame, sniffing, referrer and permissions protections.
+- `public/_headers` sets a strict Content-Security-Policy (scripts only from this site, so injected code can't run), plus frame, sniffing, referrer and permissions protections.
 - `/api/sync` rejects badly shaped data, limits request rates and stores data only under a SHA-256 hash of the recovery code.
 - `tests/smoke.js` includes a test that plants booby-trapped data and confirms it can't run.
 - Keep your recovery code private, and turn on two-factor login for your Cloudflare and GitHub accounts.
 
 ## Code layout
-`index.html` (page and styles) loads `js/errors.js`, then `app.js`. **`app.js` is generated:** edit the files in `js/` (`data`, `store`, `screens`, `sync`, `coach`, `photos`, `features`, `extras`, `smart`, `more`, `me`, joined in that order), then run `node scripts/build.js`. The test workflow fails if `app.js` is out of date. Server functions are in `functions/api/`. Tests are in `tests/smoke.js` (plus a manual iPhone checklist in `TESTING.md`) and include unit checks for sync merging, data cleaning, 1RM maths and plan phases.
+**Folders:** everything the website serves is in `public/` (the build output directory). Source (`js/`), server functions (`functions/`), scripts, tests and `docs/` stay out of it, so they are never published.
+
+`public/index.html` (page and styles) loads `js/errors.js`, then `app.js`. **`public/app.js` is generated:** edit the files in `js/` (`data`, `store`, `screens`, `sync`, `coach`, `photos`, `features`, `extras`, `smart`, `more`, `me`, joined in that order), then run `node scripts/build.js`. The test workflow fails if `app.js` is out of date. Server functions are in `functions/api/`. Tests are in `tests/smoke.js` (plus a manual iPhone checklist in `TESTING.md`) and include unit checks for sync merging, data cleaning, 1RM maths and plan phases.
