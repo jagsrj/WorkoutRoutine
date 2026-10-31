@@ -358,6 +358,42 @@ const MUSCLE_KEYS={Chest:['chest'],'Upper Chest':['chest'],Shoulders:['shoulders
   Biceps:['biceps'],Triceps:['triceps'],Arms:['biceps','triceps'],Forearms:['forearms'],Grip:['forearms'],Core:['abs'],Abs:['abs'],Obliques:['abs'],'Hip flexors':['quads'],
   Legs:['quads','hams','calves'],Quads:['quads'],Hamstrings:['hams'],Glutes:['glutes'],Calves:['calves'],'Whole body':['quads','chest','upperback','abs'],Agility:['quads','calves'],Heart:[]};
 
+/* ---------- Body map: a front and back figure with muscles coloured in ----------
+   level(key) returns 0 (not used), up to 1 (fully used). Left-side shapes are drawn once and mirrored. */
+function bodyMap(level,opts={}){
+  const tip=opts.tip||(()=>'');
+  const f=k=>{const v=level(k)||0;return v>0?`fill="var(--lvl-text)" fill-opacity="${v>=1?1:v>=.66?.8:v>=.4?.55:.35}"`:'fill="var(--fig-prop)"'};
+  const t=k=>{const s=tip(k);return s?`<title>${s}</title>`:''};
+  const P=(k,d)=>`<path d="${d}" ${f(k)} stroke="var(--body-edge)" stroke-width=".6">${t(k)}</path>`;
+  const E=(k,cx,cy,rx,ry,rot=0)=>`<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}"${rot?` transform="rotate(${rot} ${cx} ${cy})"`:''} ${f(k)} stroke="var(--body-edge)" stroke-width=".6">${t(k)}</ellipse>`;
+  const mirror=s=>s+`<g transform="translate(100,0) scale(-1,1)">${s}</g>`;
+  const sil=mirror(`<path d="M50,30 L44,30 L44,33 Q32,33 26,36 Q17,40 16,52 L14,80 L10,112 Q9,121 15,122 Q20,121 20,112 L25,84 L28,60 L30,72 Q31,92 35,104 L34,110 Q33,130 36,150 L37,190 Q36,197 41,198 L47,198 Q48,192 47,186 L48,152 Q50,132 50,118 Z" fill="var(--body)"/>`)
+    +`<circle cx="50" cy="17" r="11" fill="var(--body)"/>`;
+  const front=sil+mirror(E('shoulders',26,42,7,7.5,-15)+P('chest','M49,38 L35,37 Q29,44 32,53 Q40,59 49,56 Z')+E('biceps',22,62,4.6,11,8)
+      +E('forearms',17,95,4,13,9)+P('abs','M34,60 Q33,80 37,100 L42,100 L42,60 Z')+P('quads','M37,112 Q34,130 38,150 L47,150 Q50,131 48,113 Z')+E('calves',42,171,4.2,14))
+    +`<rect x="43" y="58" width="14" height="42" rx="4" ${f('abs')} stroke="var(--body-edge)" stroke-width=".6">${t('abs')}</rect>`
+    +`<path d="M43,72 H57 M43,86 H57 M50,58 V100" stroke="var(--body-edge)" stroke-width=".7" fill="none"/>`;
+  const back=sil+mirror(E('shoulders',26,42,7,7.5,-15)+E('triceps',21,62,4.6,11,8)+E('forearms',17,95,4,13,9)
+      +P('upperback','M35,52 Q32,70 38,86 L46,80 L42,58 Z')+P('glutes','M50,100 Q37,98 35,110 Q38,121 50,119 Z')
+      +P('hams','M37,122 Q35,138 39,152 L47,152 Q50,137 48,122 Z')+E('calves',42,170,5,13))
+    +P('upperback','M50,30 L35,38 L40,60 L50,70 L60,60 L65,38 Z')+`<rect x="43" y="74" width="14" height="24" rx="4" ${f('lowerback')} stroke="var(--body-edge)" stroke-width=".6">${t('lowerback')}</rect>`;
+  const lab=opts.labels!==false;
+  return `<svg class="${opts.cls||'bodymap'}" viewBox="0 0 220 ${lab?214:202}" role="img" aria-label="${opts.label||'Body map of muscles'}">
+    <g>${front}</g><g transform="translate(120,0)">${back}</g>
+    ${lab?`<text x="50" y="212" text-anchor="middle" font-size="9" fill="var(--muted)">FRONT</text><text x="170" y="212" text-anchor="middle" font-size="9" fill="var(--muted)">BACK</text>`:''}</svg>`;
+}
+// Which body-map areas an exercise works: the first muscle listed is the main one (1), the rest help (0.5).
+function exMuscleLevels(ex){
+  const out={};(ex&&ex.m||[]).forEach((m,i)=>(MUSCLE_KEYS[m]||[]).forEach(k=>{out[k]=Math.max(out[k]||0,i===0?1:.5)}));
+  return out;
+}
+const MUSCLE_LABEL={chest:'Chest',shoulders:'Shoulders',biceps:'Biceps',triceps:'Triceps',forearms:'Forearms',abs:'Core',upperback:'Upper back',lowerback:'Lower back',glutes:'Glutes',quads:'Quads',hams:'Hamstrings',calves:'Calves'};
+function exBodyMap(ex,cls){
+  const lv=exMuscleLevels(ex),keys=Object.keys(lv);if(!keys.length)return '';
+  const main=keys.filter(k=>lv[k]>=1).map(k=>MUSCLE_LABEL[k]),help=keys.filter(k=>lv[k]<1).map(k=>MUSCLE_LABEL[k]);
+  return bodyMap(k=>lv[k],{cls:cls||'bodymap',label:`Muscles worked. Main: ${main.join(', ')}${help.length?'. Also: '+help.join(', '):''}`,tip:k=>lv[k]?`${MUSCLE_LABEL[k]}: ${lv[k]>=1?'main muscle':'helps'}`:''});
+}
+
 /* ===== js/store.js ===== */
 /* KinFit · Storage, people, data cleaning, helpers, badges and screen router. */
 /* ---------- Storage & people (profiles) ----------
@@ -782,7 +818,13 @@ function progressHint(p,ex){
   if(ex.weight)return `<div class="hint">🚀 You hit ${p[3]} reps on every set last time. Add ${profile.unit==='kg'?'2.5 kg':'5 lbs'} today!</div>`;
   return `<div class="hint">🚀 Crushed it last time! Try ${ex.time?'5 more seconds':'2 more reps'} per set${ex.time?'':' or a harder version'}.</div>`;
 }
-const howTo=id=>{const ex=EX[id];return `${gearNote(ex)}<details class="how"><summary>How to do it</summary>${(f=>f?`<div class="figbox">${f}</div>`:'')(figSvg(id,'fig big'))}<ol>${ex.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol><div class="tip">💡 ${esc(ex.tip)}</div>
+// The moving drawing next to a body map of the muscles worked (either one may be missing).
+function figPair(id){
+  const f=figSvg(id,'fig big'),b=exBodyMap(EX[id]);if(!f&&!b)return '';
+  const leg=b?`<p class="small muted figlegend"><i aria-hidden="true"></i>main muscle<i class="lt" aria-hidden="true"></i>helpers</p>`:'';
+  return f&&b?`<div class="figbox"><div class="figpair">${f}${b}</div>${leg}</div>`:`<div class="figbox">${f||b}${leg}</div>`;
+}
+const howTo=id=>{const ex=EX[id];return `${gearNote(ex)}<details class="how"><summary>How to do it</summary>${figPair(id)}<ol>${ex.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol><div class="tip">💡 ${esc(ex.tip)}</div>
   <a class="btn sm secondary" style="margin-bottom:12px;text-decoration:none;display:inline-flex" href="${ex.video||YTS(ex.name)}" target="_blank" rel="noopener">▶ ${ex.ownVideo?'Watch my video':'Watch a video'}</a> <button class="btn sm secondary" style="margin-bottom:12px;display:inline-flex" data-say="${id}">🔊 Read aloud</button>
   <button class="link small" style="display:block" data-myvid="${id}">🔗 ${ex.ownVideo?'Change my video':'Use my own YouTube video'}</button></details>`};
 function renderWorkout(v){
@@ -955,7 +997,7 @@ function renderProgress(v){
     ${muscleMap()}
     <div class="card stack"><h2 class="h3">Last 12 weeks</h2><div style="display:grid;grid-template-columns:repeat(12,1fr);gap:3px">${heat}</div><p class="small muted">Each square is a day. Coloured = you worked out. Aim for 3–4 a week!</p></div>
     <div class="card stack"><h2 class="h3">How am I improving?</h2>
-      ${names.length?`<select class="sel" id="exsel">${names.map(n=>`<option ${n===chartEx?'selected':''}>${esc(n)}</option>`).join('')}</select><div id="chart"></div>`:`<div class="empty"><div class="big-emoji">🌱</div><p class="muted">Finish your first workout to see your progress chart here.</p></div>`}
+      ${names.length?`<select class="sel" id="exsel" aria-label="Exercise to chart">${names.map(n=>`<option ${n===chartEx?'selected':''}>${esc(n)}</option>`).join('')}</select><div id="chart"></div>`:`<div class="empty"><div class="big-emoji">🌱</div><p class="muted">Finish your first workout to see your progress chart here.</p></div>`}
     </div>
     ${recordsCard()}
     ${bodyCard()}
@@ -1314,7 +1356,7 @@ function compareSheet(list){
     const gap=Math.round((parseIso(b.date)-parseIso(a.date))/864e5);
     const dw=a.w&&b.w?round1(toUnit(b.w,b.unit)-toUnit(a.w,a.unit)):null;
     sheet(`<h2>Before & after ↔️</h2>
-      <div class="row" style="gap:8px"><select class="sel" id="ca">${opts(a)}</select><select class="sel" id="cb">${opts(b)}</select></div>
+      <div class="row" style="gap:8px"><select class="sel" id="ca" aria-label="First photo">${opts(a)}</select><select class="sel" id="cb" aria-label="Second photo">${opts(b)}</select></div>
       <div class="cmp" id="cmp"><img src="${blobUrl(b)}" alt="After"><div class="cmp-a" id="cma"><img src="${blobUrl(a)}" alt="Before"></div><div class="cmp-h" id="cmh"></div>
         <span class="cmp-l">Before</span><span class="cmp-r">After</span></div>
       <input type="range" id="cr" min="0" max="100" value="50" aria-label="Slide to compare" class="range">
@@ -1561,23 +1603,15 @@ function muscleMap(){
   const st=muscleStats(),m=muscleMode;
   const val=k=>m==='sets'?(st.sets[k]||0):m==='load'?Math.round(st.load[k]||0):Math.round((st.best[k]||{}).er||0);
   const max=Math.max(1,...Object.keys(MUSCLE_NAMES).map(val));
-  const fill=k=>{const n=val(k);if(!n)return 'fill="var(--line)"';const f=n/max;return `fill="var(--lvl-text)" fill-opacity="${f>.66?1:f>.33?.7:.4}"`};
   const unit=profile.unit,fmt=n=>n.toLocaleString();
   const tip=k=>`${MUSCLE_NAMES[k]}: ${m==='sets'?val(k)+' sets this week':m==='load'?fmt(val(k))+' '+unit+' this week':val(k)?'strongest est. 1-rep max '+val(k)+' '+unit:'no weighted lifts yet'}`;
-  const E=(k,x,y,rx,ry)=>`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" ${fill(k)}><title>${tip(k)}</title></ellipse>`;
-  const R=(k,x,y,w,h)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" ${fill(k)}><title>${tip(k)}</title></rect>`;
-  const body=(cx,front)=>`<circle cx="${cx}" cy="22" r="11" fill="var(--line)"/>`+
-    E('shoulders',cx-17,46,8,6)+E('shoulders',cx+17,46,8,6)+
-    (front?E('chest',cx-7,56,8,7)+E('chest',cx+7,56,8,7)+R('abs',cx-8,66,16,28)+E('biceps',cx-23,66,5,11)+E('biceps',cx+23,66,5,11)+E('quads',cx-7,120,7,21)+E('quads',cx+7,120,7,21)
-      :R('upperback',cx-12,48,24,22)+R('lowerback',cx-8,72,16,18)+E('triceps',cx-23,66,5,11)+E('triceps',cx+23,66,5,11)+E('glutes',cx-7,100,8,8)+E('glutes',cx+7,100,8,8)+E('hams',cx-7,124,7,17)+E('hams',cx+7,124,7,17))+
-    E('forearms',cx-26,90,4,10)+E('forearms',cx+26,90,4,10)+E('calves',cx-7,160,5,14)+E('calves',cx+7,160,5,14);
   const rows=Object.keys(MUSCLE_NAMES).map(k=>[k,val(k)]).filter(r=>r[1]>0).sort((a,b)=>b[1]-a[1]);
   const note=m==='sets'?'How many sets each muscle did this week.'
     :m==='load'?`Weight × reps for every set this week. Each muscle counts the full weight of the exercises that use it (so a bench press adds to chest, shoulders and triceps).`
     :'Each muscle\'s strongest lift ever, as an estimated 1-rep max: the most it could lift once. A score to watch grow, not a weight to try!';
   return `<div class="card stack" id="mmcard"><h2 class="h3">💪 Muscle power</h2>
     <div class="seg">${[['sets','Sets'],['load',`${unit} lifted`],['best','Strength']].map(o=>`<button class="${o[0]===m?'on':''}" data-mm="${o[0]}">${o[1]}</button>`).join('')}</div>
-    <svg viewBox="0 0 200 182" class="mmap" role="img" aria-label="Body map of muscles">${body(50,true)}${body(150,false)}<text x="50" y="181" text-anchor="middle" font-size="9" fill="var(--muted)">FRONT</text><text x="150" y="181" text-anchor="middle" font-size="9" fill="var(--muted)">BACK</text></svg>
+    ${bodyMap(k=>{const n=val(k);return n?n/max:0},{cls:'mmap',tip,label:'Body map of muscles worked'})}
     ${rows.length?`<div class="stack" style="gap:8px">${rows.map(([k,n])=>`<div><div class="row between small"><b>${MUSCLE_NAMES[k]}</b><span>${m==='sets'?plural(n,'set'):fmt(n)+' '+unit}${m==='best'?` <span class="muted">· ${esc(st.best[k].ex)}</span>`:''}</span></div><div class="famBar"><i style="width:${n/max*100}%"></i></div></div>`).join('')}</div>`
       :`<p class="small muted">${m==='sets'?'Finish a workout and the muscles you worked light up here.':m==='load'?`No weights lifted this week yet. Bodyweight moves count in Sets. Weighted exercises show here in ${unit}.`:'Lift with weights (dumbbells, machines or a barbell) to see each muscle\'s strength score.'}</p>`}
     <p class="small muted">${note}</p></div>`;
@@ -2411,7 +2445,7 @@ function goalSheet(){
   const suggest=()=>{if(st.type==='workouts')return 20;if(st.type==='minutes')return 600;if(!st.ex)return '';const cur=goalProgress({type:st.type,ex:st.ex});return cur?Math.ceil(cur*1.15/(st.type==='lift'?5:1))*(st.type==='lift'?5:1):(st.type==='lift'?20:10)};
   const draw=()=>sheet(`<h2>🎯 New goal</h2>
     <div class="chips">${Object.entries(GOAL_TYPES).map(([k,l])=>`<button class="${st.type===k?'on':''}" data-gt="${k}">${l}</button>`).join('')}</div>
-    ${st.type==='lift'||st.type==='reps'?`<div><label class="small muted" style="font-weight:700">EXERCISE</label><select class="sel" id="gex"><option value="">Pick an exercise…</option>${exOpts().map(n=>`<option ${n===st.ex?'selected':''}>${esc(n)}</option>`).join('')}</select>${st.ex?`<p class="small muted" style="margin-top:6px">Your best so far: <b>${goalProgress({type:st.type,ex:st.ex})||'none yet'}</b></p>`:''}</div>`:''}
+    ${st.type==='lift'||st.type==='reps'?`<div><label class="small muted" style="font-weight:700">EXERCISE</label><select class="sel" id="gex" aria-label="Exercise"><option value="">Pick an exercise…</option>${exOpts().map(n=>`<option ${n===st.ex?'selected':''}>${esc(n)}</option>`).join('')}</select>${st.ex?`<p class="small muted" style="margin-top:6px">Your best so far: <b>${goalProgress({type:st.type,ex:st.ex})||'none yet'}</b></p>`:''}</div>`:''}
     <div class="row" style="gap:10px"><div style="flex:1"><label class="small muted" style="font-weight:700">TARGET ${st.type==='lift'?'('+profile.unit+')':st.type==='minutes'?'(minutes)':st.type==='workouts'?'(days)':'(reps)'}</label><input class="num" id="gt" type="number" inputmode="decimal" min="1" value="${st.target||suggest()}"></div>
       <div style="flex:1"><label class="small muted" style="font-weight:700">BY</label><input class="num" id="gby" type="date" min="${isoLocal()}" value="${st.by}" style="font-size:16px"></div></div>
     <p class="small muted">💡 A good goal is a little hard but doable. Aim for about 10–20% better in 6–8 weeks.</p>

@@ -221,7 +221,13 @@ function progressHint(p,ex){
   if(ex.weight)return `<div class="hint">🚀 You hit ${p[3]} reps on every set last time. Add ${profile.unit==='kg'?'2.5 kg':'5 lbs'} today!</div>`;
   return `<div class="hint">🚀 Crushed it last time! Try ${ex.time?'5 more seconds':'2 more reps'} per set${ex.time?'':' or a harder version'}.</div>`;
 }
-const howTo=id=>{const ex=EX[id];return `${gearNote(ex)}<details class="how"><summary>How to do it</summary>${(f=>f?`<div class="figbox">${f}</div>`:'')(figSvg(id,'fig big'))}<ol>${ex.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol><div class="tip">💡 ${esc(ex.tip)}</div>
+// The moving drawing next to a body map of the muscles worked (either one may be missing).
+function figPair(id){
+  const f=figSvg(id,'fig big'),b=exBodyMap(EX[id]);if(!f&&!b)return '';
+  const leg=b?`<p class="small muted figlegend"><i aria-hidden="true"></i>main muscle<i class="lt" aria-hidden="true"></i>helpers</p>`:'';
+  return f&&b?`<div class="figbox"><div class="figpair">${f}${b}</div>${leg}</div>`:`<div class="figbox">${f||b}${leg}</div>`;
+}
+const howTo=id=>{const ex=EX[id];return `${gearNote(ex)}<details class="how"><summary>How to do it</summary>${figPair(id)}<ol>${ex.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol><div class="tip">💡 ${esc(ex.tip)}</div>
   <a class="btn sm secondary" style="margin-bottom:12px;text-decoration:none;display:inline-flex" href="${ex.video||YTS(ex.name)}" target="_blank" rel="noopener">▶ ${ex.ownVideo?'Watch my video':'Watch a video'}</a> <button class="btn sm secondary" style="margin-bottom:12px;display:inline-flex" data-say="${id}">🔊 Read aloud</button>
   <button class="link small" style="display:block" data-myvid="${id}">🔗 ${ex.ownVideo?'Change my video':'Use my own YouTube video'}</button></details>`};
 function renderWorkout(v){
@@ -394,7 +400,7 @@ function renderProgress(v){
     ${muscleMap()}
     <div class="card stack"><h2 class="h3">Last 12 weeks</h2><div style="display:grid;grid-template-columns:repeat(12,1fr);gap:3px">${heat}</div><p class="small muted">Each square is a day. Coloured = you worked out. Aim for 3–4 a week!</p></div>
     <div class="card stack"><h2 class="h3">How am I improving?</h2>
-      ${names.length?`<select class="sel" id="exsel">${names.map(n=>`<option ${n===chartEx?'selected':''}>${esc(n)}</option>`).join('')}</select><div id="chart"></div>`:`<div class="empty"><div class="big-emoji">🌱</div><p class="muted">Finish your first workout to see your progress chart here.</p></div>`}
+      ${names.length?`<select class="sel" id="exsel" aria-label="Exercise to chart">${names.map(n=>`<option ${n===chartEx?'selected':''}>${esc(n)}</option>`).join('')}</select><div id="chart"></div>`:`<div class="empty"><div class="big-emoji">🌱</div><p class="muted">Finish your first workout to see your progress chart here.</p></div>`}
     </div>
     ${recordsCard()}
     ${bodyCard()}

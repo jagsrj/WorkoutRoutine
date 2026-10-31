@@ -12,11 +12,13 @@ function loadData() {
   vm.runInContext(fs.readFileSync(path.join(root, 'js/data.js'), 'utf8') + '\n;globalThis.__d={EX,PLANS,LEVELS,WORKOUTS,SCHEDULE,SPORTS,DAYS};', ctx);
   // gear.js only needs a few globals at load time; we just want its equipment versions.
   vm.runInContext(fs.readFileSync(path.join(root, 'js/gear.js'), 'utf8') + '\n;globalThis.__g={GEAR_VARIANTS,GEAR_REQ};', ctx);
-  return Object.assign({ figSvg: ctx.figSvg }, ctx.__d, ctx.__g);
+  return Object.assign({ figSvg: ctx.figSvg, exBodyMap: ctx.exBodyMap }, ctx.__d, ctx.__g);
 }
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const slug = s => s.toLowerCase().replace(/\(.*?\)/g, m => ' ' + m.slice(1, -1) + ' ').replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const legend = '<p class="small legend"><i aria-hidden="true"></i>main muscle <i class="lt" aria-hidden="true"></i>helpers</p>';
+const figPair = (fig, body) => !fig && !body ? '' : `<div class="figbox${fig && body ? ' pair' : ''}">${fig || ''}${body || ''}</div>${body ? legend : ''}`;
 const reps = (p, ex) => { const r = p[2] === p[3] ? p[2] : `${p[2]}–${p[3]}`; return `${p[1]} sets × ${r} ${ex.time ? 'sec' : 'reps'}${ex.per ? ' ' + ex.per : ''}`; };
 let S = {}; // exercise id -> unique URL slug
 const LEVEL_COLOR = { beginner: '#15803d', intermediate: '#c2410c', expert: '#6d28d9' };
@@ -136,7 +138,7 @@ ${cta(`Do the ${s.name} workout in KinFit`)}
       crumbs: [['Exercises', '/exercises/'], [ex.name]],
       body: `<h1>${esc(ex.e)} How to do ${esc(ex.name)}</h1>
 <p class="lead">Works: <b>${esc(ex.m.join(', '))}</b>${ex.weight ? (ex.start ? ` · Starting weight: about ${esc(ex.start)}` : ' · Uses weights') : ' · No equipment'}${ex.time ? ' · Timed exercise' : ''}</p>
-${fig ? `<div class="figbox">${fig}</div>` : ''}
+${figPair(fig, D.exBodyMap(ex))}
 <h2>Step by step</h2><ol>${ex.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
 <p class="tip">💡 <b>Tip:</b> ${esc(ex.tip)}</p>
 ${homeVer.length ? `<h2>At home: other ways to do it</h2>${homeVer.map(v => `<p>${exLinkName(v.name)}</p>`).join('')}` : ''}
@@ -161,6 +163,7 @@ ${cta()}`,
       crumbs: [['Exercises', '/exercises/'], [v.name]],
       body: `<h1>${esc(base.e)} ${esc(v.name)}</h1>
 <p class="lead">A home-gym version of <a href="/exercises/${S[id]}">${esc(base.name)}</a>. Works: <b>${esc(base.m.join(', '))}</b>.</p>
+${figPair('', D.exBodyMap(base))}
 <h2>Step by step</h2><ol>${v.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
 ${v.tip ? `<p class="tip">💡 <b>Tip:</b> ${esc(v.tip)}</p>` : ''}
 <p><a class="btn2" href="https://www.youtube.com/results?search_query=${encodeURIComponent('how to do ' + v.q + ' proper form')}" rel="noopener" target="_blank">▶ Watch videos</a></p>

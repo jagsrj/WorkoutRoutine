@@ -354,3 +354,39 @@ const ACTIVITIES=[['🚶','Walk'],['🏃','Run'],['🚴','Bike'],['🏊','Swim']
 const MUSCLE_KEYS={Chest:['chest'],'Upper Chest':['chest'],Shoulders:['shoulders'],'Rear shoulders':['shoulders','upperback'],Back:['upperback','lowerback'],'Upper back':['upperback'],'Whole back side':['upperback','lowerback','glutes','hams'],
   Biceps:['biceps'],Triceps:['triceps'],Arms:['biceps','triceps'],Forearms:['forearms'],Grip:['forearms'],Core:['abs'],Abs:['abs'],Obliques:['abs'],'Hip flexors':['quads'],
   Legs:['quads','hams','calves'],Quads:['quads'],Hamstrings:['hams'],Glutes:['glutes'],Calves:['calves'],'Whole body':['quads','chest','upperback','abs'],Agility:['quads','calves'],Heart:[]};
+
+/* ---------- Body map: a front and back figure with muscles coloured in ----------
+   level(key) returns 0 (not used), up to 1 (fully used). Left-side shapes are drawn once and mirrored. */
+function bodyMap(level,opts={}){
+  const tip=opts.tip||(()=>'');
+  const f=k=>{const v=level(k)||0;return v>0?`fill="var(--lvl-text)" fill-opacity="${v>=1?1:v>=.66?.8:v>=.4?.55:.35}"`:'fill="var(--fig-prop)"'};
+  const t=k=>{const s=tip(k);return s?`<title>${s}</title>`:''};
+  const P=(k,d)=>`<path d="${d}" ${f(k)} stroke="var(--body-edge)" stroke-width=".6">${t(k)}</path>`;
+  const E=(k,cx,cy,rx,ry,rot=0)=>`<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}"${rot?` transform="rotate(${rot} ${cx} ${cy})"`:''} ${f(k)} stroke="var(--body-edge)" stroke-width=".6">${t(k)}</ellipse>`;
+  const mirror=s=>s+`<g transform="translate(100,0) scale(-1,1)">${s}</g>`;
+  const sil=mirror(`<path d="M50,30 L44,30 L44,33 Q32,33 26,36 Q17,40 16,52 L14,80 L10,112 Q9,121 15,122 Q20,121 20,112 L25,84 L28,60 L30,72 Q31,92 35,104 L34,110 Q33,130 36,150 L37,190 Q36,197 41,198 L47,198 Q48,192 47,186 L48,152 Q50,132 50,118 Z" fill="var(--body)"/>`)
+    +`<circle cx="50" cy="17" r="11" fill="var(--body)"/>`;
+  const front=sil+mirror(E('shoulders',26,42,7,7.5,-15)+P('chest','M49,38 L35,37 Q29,44 32,53 Q40,59 49,56 Z')+E('biceps',22,62,4.6,11,8)
+      +E('forearms',17,95,4,13,9)+P('abs','M34,60 Q33,80 37,100 L42,100 L42,60 Z')+P('quads','M37,112 Q34,130 38,150 L47,150 Q50,131 48,113 Z')+E('calves',42,171,4.2,14))
+    +`<rect x="43" y="58" width="14" height="42" rx="4" ${f('abs')} stroke="var(--body-edge)" stroke-width=".6">${t('abs')}</rect>`
+    +`<path d="M43,72 H57 M43,86 H57 M50,58 V100" stroke="var(--body-edge)" stroke-width=".7" fill="none"/>`;
+  const back=sil+mirror(E('shoulders',26,42,7,7.5,-15)+E('triceps',21,62,4.6,11,8)+E('forearms',17,95,4,13,9)
+      +P('upperback','M35,52 Q32,70 38,86 L46,80 L42,58 Z')+P('glutes','M50,100 Q37,98 35,110 Q38,121 50,119 Z')
+      +P('hams','M37,122 Q35,138 39,152 L47,152 Q50,137 48,122 Z')+E('calves',42,170,5,13))
+    +P('upperback','M50,30 L35,38 L40,60 L50,70 L60,60 L65,38 Z')+`<rect x="43" y="74" width="14" height="24" rx="4" ${f('lowerback')} stroke="var(--body-edge)" stroke-width=".6">${t('lowerback')}</rect>`;
+  const lab=opts.labels!==false;
+  return `<svg class="${opts.cls||'bodymap'}" viewBox="0 0 220 ${lab?214:202}" role="img" aria-label="${opts.label||'Body map of muscles'}">
+    <g>${front}</g><g transform="translate(120,0)">${back}</g>
+    ${lab?`<text x="50" y="212" text-anchor="middle" font-size="9" fill="var(--muted)">FRONT</text><text x="170" y="212" text-anchor="middle" font-size="9" fill="var(--muted)">BACK</text>`:''}</svg>`;
+}
+// Which body-map areas an exercise works: the first muscle listed is the main one (1), the rest help (0.5).
+function exMuscleLevels(ex){
+  const out={};(ex&&ex.m||[]).forEach((m,i)=>(MUSCLE_KEYS[m]||[]).forEach(k=>{out[k]=Math.max(out[k]||0,i===0?1:.5)}));
+  return out;
+}
+const MUSCLE_LABEL={chest:'Chest',shoulders:'Shoulders',biceps:'Biceps',triceps:'Triceps',forearms:'Forearms',abs:'Core',upperback:'Upper back',lowerback:'Lower back',glutes:'Glutes',quads:'Quads',hams:'Hamstrings',calves:'Calves'};
+function exBodyMap(ex,cls){
+  const lv=exMuscleLevels(ex),keys=Object.keys(lv);if(!keys.length)return '';
+  const main=keys.filter(k=>lv[k]>=1).map(k=>MUSCLE_LABEL[k]),help=keys.filter(k=>lv[k]<1).map(k=>MUSCLE_LABEL[k]);
+  return bodyMap(k=>lv[k],{cls:cls||'bodymap',label:`Muscles worked. Main: ${main.join(', ')}${help.length?'. Also: '+help.join(', '):''}`,tip:k=>lv[k]?`${MUSCLE_LABEL[k]}: ${lv[k]>=1?'main muscle':'helps'}`:''});
+}
