@@ -13,7 +13,9 @@ function renderOnboard(v){
         <div class="card row"><span class="big-emoji">🧭</span><div><b>Find your level</b><p class="muted small">5 quick questions</p></div></div>
         <div class="card row"><span class="big-emoji">✅</span><div><b>Follow the plan</b><p class="muted small">Tap ✓ after each set and we'll time your rest</p></div></div>
         <div class="card row"><span class="big-emoji">🏅</span><div><b>Earn badges</b><p class="muted small">Watch yourself get stronger every week</p></div></div>
+        <div class="card row"><span class="big-emoji">👨‍👩‍👧</span><div><b>Bring the family</b><p class="muted small">A profile for everyone, high-fives and a parent PIN</p></div></div>
       </div>
+      <p class="small muted center" style="font-weight:700">✅ Free · No sign-up · No ads · Works offline</p>
       <button class="btn" id="start">Let's go! 🚀</button>
       <button class="btn ghost" id="pick">I already know my level</button>
       <p class="small muted center">🔒 Your workouts stay on your phone. <a href="privacy.html" style="color:var(--lvl-text)">Privacy</a> · <a href="about.html" style="color:var(--lvl-text)">About</a></p>

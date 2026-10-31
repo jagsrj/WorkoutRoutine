@@ -35,3 +35,4 @@ ol li,ul li{margin:4px 0}
 table{width:100%;border-collapse:collapse;font-size:16px}th,td{text-align:left;padding:8px 6px;border-top:1px solid var(--line);vertical-align:top}th{border-top:0;color:var(--muted)}
 footer{max-width:820px;margin:0 auto;padding:20px 18px 40px;border-top:1px solid var(--line);font-size:16px}
 @media (prefers-reduced-motion:reduce){.fig animate{display:none}}
+.why{list-style:none;padding:0}.why li{padding:6px 0}
