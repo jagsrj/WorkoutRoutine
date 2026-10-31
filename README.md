@@ -19,6 +19,8 @@ Redeploy after adding bindings. Coach allows 20 AI questions per hour per person
 
 **Turning on AI answers in the Coach chat:** in the Cloudflare dashboard open the Pages project, then **Settings → Bindings → Add → Workers AI**, set the variable name to `AI`, save, and redeploy. Without it, Coach still answers from its built-in answers. The server code is in `functions/api/chat.js`.
 
+**Coach guardrails** (`functions/_lib/guard.js`): every AI question is first labelled by a small topic filter, so off-topic questions get a fixed "I can only help with fitness" reply and never reach the main model. Llama Guard checks both the question and the answer; self-harm messages get help-line numbers instead. Coach replies are signed (key stored in `STORE`, or set a `CHAT_SECRET` variable), so the browser can't feed in fake Coach turns. App data (today's workout, training log) is passed as data, not as rules. If a guard model is unavailable, the app falls back to its built-in answers. Tests: `node tests/chat-guard.test.mjs`.
+
 ## Features
 
 - **Find your level quiz:** 5 quick questions recommend Beginner, Intermediate or Expert. It caps the level for safety by age: under 13 → Beginner; 13–17 → no barbell plan without a coach.

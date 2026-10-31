@@ -109,7 +109,7 @@ async function ask(q,today){
   const lq=' '+q.toLowerCase()+' ';
   const howTo=/how|form|technique|teach|explain|what is|show|do i do|correct/.test(lq)||lq.trim().split(/\s+/).length<=4;
   const exA=howTo?exerciseAnswer(lq):null,faq=faqMatch(lq);
-  let reply=null;
+  let reply=null,sig='';
   if(exA)reply=exA;
   else if(faq.score>=2)reply=faq.ans();
   else if(profile.coachAI===false)reply=faq.score>=1?faq.ans():`I can answer common questions, like "how do I do a squat?" or "how do I warm up?" 🙂 (AI answers are turned off for this person.)`;
@@ -123,12 +123,12 @@ async function ask(q,today){
       const r=await fetch('api/chat',{method:'POST',headers:{'content-type':'application/json'},signal:ctrl.signal,
         body:JSON.stringify({messages:chat.slice(-8),level:profile.level,kid:isKid(),today:W,history:historySummary()})});
       clearTimeout(t);const d=await r.json().catch(()=>({}));
-      if(r.ok&&d.reply)reply=d.reply;else if(r.status===429)limited=true;
+      if(r.ok&&d.reply){reply=d.reply;sig=d.sig||''}else if(r.status===429)limited=true;
     }catch(e){}
     if(!reply&&limited)reply=`Coach is taking a short break because lots of questions came in. 😅 Try again later! I can still answer common questions, like "how do I warm up?"`;
     if(!reply)reply=faq.score>=1?faq.ans():`Hmm, I'm not sure about that one 🤔 I can help with:\n- How to do any exercise (try "how do I do a plank?")\n- Picking your level\n- Warming up, soreness, rest and sleep\n- When to add weight\nFor anything about health or pain, please ask a parent, coach or doctor.`;
   }
-  chat.push({role:'assistant',content:reply});chat=chat.slice(-40);store.set(pKey('jams_chat'),chat);chatBusy=false;
+  chat.push(sig?{role:'assistant',content:reply,sig}:{role:'assistant',content:reply});chat=chat.slice(-40);store.set(pKey('jams_chat'),chat);chatBusy=false;
   const ty=$('#typing');if(ty){ty.classList.remove('typing');ty.removeAttribute('id');ty.innerHTML=md(reply)}
   if($('#send'))$('#send').disabled=false;
   const nb=newBadges();if(nb.length)setTimeout(()=>toast(`🏅 New badge: ${nb[0].e} ${nb[0].n}!`),400);
