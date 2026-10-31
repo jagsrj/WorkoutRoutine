@@ -78,6 +78,42 @@ const check = (ok, what) => { console.log(`${ok ? '✅' : '❌'} ${what}`); if (
     await page.click('[data-go="ask"]'); await page.click('#sugg button:has-text("How do I do a squat?")');
     await page.waitForFunction(() => !document.querySelector('#typing'));
     check((await page.locator('.msg.bot').last().textContent()).includes('Squat'), 'Coach explains a squat');
+    // Set types, effort and supersets
+    await page.click('[data-go="today"]'); await page.click('details.fold summary'); await page.click('details.fold [data-start="ub"]'); await page.waitForTimeout(300);
+    await page.click('[data-stype="0,0"]'); await page.click('[data-st="w"]'); await page.click('[data-rp="7"]'); await page.click('#ok'); await page.waitForTimeout(150);
+    check((await page.textContent('[data-stype="0,0"]')).includes('Warm'), 'A set can be marked as a warm-up with effort');
+    check((await page.textContent('[data-stype="0,1"]')).includes('Set 1'), 'Warm-up sets are not counted in set numbers');
+    await page.click('[data-link="0"]'); await page.waitForTimeout(150);
+    check(await page.isVisible('.sshead'), 'Two exercises can be joined into a superset');
+    await page.click('[data-check="0,0"]'); await page.waitForTimeout(200);
+    check(!(await page.evaluate(() => document.querySelector('#timer').classList.contains('show'))), 'Superset goes to the next exercise with no rest');
+    await page.click('[data-check="1,0"]'); await page.waitForTimeout(200);
+    check(await page.evaluate(() => document.querySelector('#timer').classList.contains('show')), 'Rest starts after the last exercise of the superset');
+    await page.click('#finish'); await page.waitForTimeout(400);
+    const logged = await page.evaluate(() => { const j = getJournal(), e = j[isoLocal()]; const a = e[e.length - 2], b = e[e.length - 1]; return a.sets[0].t === 'w' && a.sets[0].rpe === 7 && a.ss === 'A' && b.ss === 'A'; });
+    check(logged, 'Set type, effort and superset are saved in history');
+    if (await page.isVisible('#done')) await page.click('#done');
+    // Recovery model and library
+    const rec = await page.evaluate(() => {
+      const r = {}, now = Date.now(), d = isoLocal();
+      const legs = { [d]: [{ id: 1, exercise: 'Bodyweight Squats', u: now - 2 * 36e5, sets: Array(8).fill({ reps: 12, weight: 0 }) }] };
+      r.tiredAfterLegs = muscleReady(now, legs).quads < 0.4;
+      r.restedLater = muscleReady(now + 4 * 864e5, legs).quads > 0.99;
+      r.armsStillFresh = muscleReady(now, legs).biceps > 0.99;
+      r.warmupsDontTire = muscleReady(now, { [d]: [{ id: 2, exercise: 'Bodyweight Squats', u: now, sets: Array(8).fill({ reps: 12, weight: 0, t: 'w' }) }] }).quads === 1;
+      const keep = getJournal(); setJournal(legs);
+      const card = recoveryCard('la'); r.todayWarns = card.includes('still recovering') && /data-start="u[ab]"/.test(card);
+      r.noWarnForUpper = recoveryCard('ua') === '';
+      setJournal(keep);
+      const ids = Object.keys(EX).filter(k => !k.startsWith('_') && !k.startsWith('c_'));
+      r.bigLibrary = ids.length >= 120;
+      r.everyMoveDrawn = ids.every(k => figSvg(k) && EX[k].steps.length >= 3 && EX[k].tip);
+      r.cableNotAtHome = !buildPool('none').includes('cable_fly') && !buildPool('dumbbells').includes('cable_fly') && buildPool('dumbbells').includes('db_fly');
+      return r;
+    });
+    Object.entries(rec).forEach(([k, v]) => check(v, 'Unit: ' + k));
+    await page.click('[data-go="progress"]'); await page.click('[data-mm="ready"]'); await page.waitForTimeout(150);
+    check((await page.textContent('#mmcard')).includes('Ready'), 'Muscle "Ready?" tab shows');
     // Security: booby-trapped saved data must never run as code
     const bad = '<img src=x onerror="window.__pwned=1">';
     await page.evaluate(b => {

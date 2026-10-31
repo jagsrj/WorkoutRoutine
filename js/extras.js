@@ -213,7 +213,7 @@ async function restoreHistorySheet(){
 }
 
 /* ---------- Today: one compact "This week" card, and optional rows ---------- */
-const TODAY_ROWS={habits:'🌱 Daily habits',phase:'📅 6-month plan',challenge:'🏆 Monthly challenge',goal:'🎯 Goals',family:'👨‍👩‍👧 Family challenge',badges:'🏅 Badges',tip:'💡 Tip of the day'};
+const TODAY_ROWS={recovery:'😴 Muscle recovery tips',habits:'🌱 Daily habits',phase:'📅 6-month plan',challenge:'🏆 Monthly challenge',goal:'🎯 Goals',family:'👨‍👩‍👧 Family challenge',badges:'🏅 Badges',tip:'💡 Tip of the day'};
 const todayHidden=k=>(profile.todayHide||[]).includes(k);
 function weekRow(icon,title,value,pct,go='progress'){
   return `<button class="wrow" data-go="${go}"><span class="wi" aria-hidden="true">${icon}</span><span class="wt"><b>${title}</b>${pct!=null?`<span class="mini" aria-hidden="true"><i style="width:${Math.max(0,Math.min(100,pct))}%"></i></span>`:''}</span><span class="wv">${value}</span></button>`;

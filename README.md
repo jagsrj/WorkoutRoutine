@@ -46,7 +46,10 @@ Redeploy after adding bindings. Coach allows 20 AI questions per hour per person
 - **Streak:** a weekly streak card on Today and a 🔥 counter at the top of every screen.
 - **Offline:** a service worker (`sw.js`) lets the app open without internet.
 - **Build your own:** custom workouts and custom exercises, plus sport plans (cricket, soccer, swimming, running, basketball).
-- **75 exercises** you can search and filter by muscle.
+- **128 exercises** you can search and filter by muscle: bodyweight, backpack, dumbbell, cable/functional trainer, machine, barbell and EZ-bar moves, each with steps, a tip, a swap and a moving drawing. Exercises list the equipment they need (`need` in `js/data.js`), so "My equipment" and the workout builder only suggest what you can do.
+- **Muscle recovery** (`js/recovery.js`): tracks how tired each muscle is from recent sets, effort ratings and sports. If today's workout hits a muscle that's still recovering, Today says so and offers a fresher workout. Progress → Muscle power → **Ready?** shows every muscle and when it will be ready. The Coach's workout builder skips tired muscles when it can.
+- **Set types and effort:** tap a set's label to mark it as a warm-up, drop set or to-failure set (not shown for child profiles), and to log how hard it was (reps left in the tank, saved as RPE). Warm-up sets don't count for records, progression or recovery, get a shorter rest, and drop sets skip the rest.
+- **Supersets:** tap "🔗 Superset with next exercise" to pair moves. You do one set of each with no rest in between, then rest. Supersets are saved in your history.
 - **Personal records:** automatic PR detection, estimated 1-rep max, and charts for heaviest, 1RM or volume.
 - **Muscle map:** shows which muscles you trained this week.
 - **Plate calculator and warm-up sets** for barbell lifts.

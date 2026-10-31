@@ -48,12 +48,18 @@ function sanitizeProfile(p){
   o.fives=(Array.isArray(p.fives)?p.fives:[]).slice(-20).filter(f=>f&&typeof f==='object').map(f=>({from:cleanText(f.from,24)||'Someone',av:AVATARS.includes(f.av)?f.av:'🙂',at:cleanNum(f.at,1e14)}));
   return o;
 }
+// A logged set: reps, weight, and optionally its type (w warm-up, d drop set, f to failure) and effort (RPE 6–10).
+const SET_TYPES=['w','d','f'];
+function cleanSet(x){const o={reps:cleanNum(x&&x.reps,1e5),weight:cleanNum(x&&x.weight,5000)};if(x&&SET_TYPES.includes(x.t))o.t=x.t;
+  const r=Number(x&&x.rpe);if(r>=6&&r<=10)o.rpe=Math.round(r*2)/2;return o}
+const workSets=sets=>(sets||[]).filter(s=>s.t!=='w'); // warm-up sets don't count for records or progression
 function sanitizeJournal(j){
   const out={};if(!j||typeof j!=='object'||Array.isArray(j))return out;
   Object.keys(j).forEach(d=>{if(!ISO_RE.test(d)||!Array.isArray(j[d]))return;
     const list=j[d].slice(0,300).filter(e=>e&&typeof e==='object'&&typeof e.exercise==='string').map(e=>{
       const o={id:typeof e.id==='number'?e.id:cleanText(e.id,40),exercise:cleanText(e.exercise,60),timestamp:cleanText(e.timestamp,16),unit:e.unit==='kg'?'kg':'lbs',
-        sets:(Array.isArray(e.sets)?e.sets:[]).slice(0,30).map(x=>({reps:cleanNum(x&&x.reps,1e5),weight:cleanNum(x&&x.weight,5000)}))};
+        sets:(Array.isArray(e.sets)?e.sets:[]).slice(0,30).map(cleanSet)};
+      if(typeof e.ss==='string'&&/^[A-H]$/.test(e.ss))o.ss=e.ss;
       if(['beginner','intermediate','expert'].includes(e.level))o.level=e.level;
       if(e.workout)o.workout=cleanText(e.workout,50);if(e.u)o.u=cleanNum(e.u,1e14);if([1,2,3].includes(e.effort))o.effort=e.effort;
       if(e.kind==='activity'){o.kind='activity';o.act=cleanText(e.act,20);o.minutes=cleanNum(e.minutes,1440);o.distance=cleanNum(e.distance,1000);o.dunit=e.dunit==='km'?'km':'mi'}

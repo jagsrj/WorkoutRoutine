@@ -343,7 +343,7 @@ Object.assign(ALT,{
   lateral_shuffle:['side_lunge'],
 });
 const MUSCLE_FILTERS=['Chest','Back','Shoulders','Arms','Core','Legs','Glutes','Heart'];
-const exMatches=(ex,f)=>!f||ex.m.some(m=>m===f||(f==='Arms'&&/Biceps|Triceps|Forearms|Arms/.test(m))||(f==='Legs'&&/Legs|Quads|Hamstrings|Calves/.test(m))||(f==='Core'&&/Core|Abs|Obliques/.test(m))||(f==='Shoulders'&&/Shoulders/.test(m))||(f==='Chest'&&/Chest/.test(m))||(f==='Back'&&/Back/.test(m))||(f==='Heart'&&/Heart|Whole body/.test(m)));
+const exMatches=(ex,f)=>!f||ex.m.some(m=>m===f||(f==='Arms'&&/Biceps|Triceps|Forearms|Arms/.test(m))||(f==='Legs'&&/Legs|Quads|Hamstrings|Calves/.test(m))||(f==='Core'&&/Core|Abs|Obliques/.test(m))||(f==='Shoulders'&&/Shoulders/.test(m))||(f==='Chest'&&/Chest/.test(m))||(f==='Back'&&/Back|back/.test(m))||(f==='Heart'&&/Heart|Whole body/.test(m)));
 
 /* ---------- Sport plans (built from the library) ---------- */
 const SPORTS=[
@@ -354,7 +354,7 @@ const SPORTS=[
   {id:'basketball',e:'🏀',name:'Basketball',sub:'Jumping power and quick moves',items:[['jumping_jacks',3,20,30],['squat',3,12,15],['step_up',3,8,10],['lateral_shuffle',3,20,30],['calf_raise_bw',3,15,20],['burpee',3,6,10],['plank',3,20,40]]},
 ];
 const ACTIVITIES=[['🚶','Walk'],['🏃','Run'],['🚴','Bike'],['🏊','Swim'],['🏏','Cricket'],['⚽','Soccer'],['🏀','Basketball'],['🎾','Tennis'],['🏓','Pickleball'],['💃','Dance'],['🧘','Yoga'],['🥋','Martial arts'],['🧘','Stretch'],['⏱️','Intervals'],['⭐','Other']];
-const MUSCLE_KEYS={Chest:['chest'],'Upper Chest':['chest'],Shoulders:['shoulders'],'Rear shoulders':['shoulders','upperback'],Back:['upperback','lowerback'],'Upper back':['upperback'],'Whole back side':['upperback','lowerback','glutes','hams'],
+const MUSCLE_KEYS={Chest:['chest'],'Upper Chest':['chest'],Shoulders:['shoulders'],'Rear shoulders':['shoulders','upperback'],Back:['upperback','lowerback'],'Upper back':['upperback'],'Lower back':['lowerback'],'Whole back side':['upperback','lowerback','glutes','hams'],
   Biceps:['biceps'],Triceps:['triceps'],Arms:['biceps','triceps'],Forearms:['forearms'],Grip:['forearms'],Core:['abs'],Abs:['abs'],Obliques:['abs'],'Hip flexors':['quads'],
   Legs:['quads','hams','calves'],Quads:['quads'],Hamstrings:['hams'],Glutes:['glutes'],Calves:['calves'],'Whole body':['quads','chest','upperback','abs'],Agility:['quads','calves'],Heart:[]};
 
@@ -393,6 +393,123 @@ function exBodyMap(ex,cls){
   const main=keys.filter(k=>lv[k]>=1).map(k=>MUSCLE_LABEL[k]),help=keys.filter(k=>lv[k]<1).map(k=>MUSCLE_LABEL[k]);
   return bodyMap(k=>lv[k],{cls:cls||'bodymap',label:`Muscles worked. Main: ${main.join(', ')}${help.length?'. Also: '+help.join(', '):''}`,tip:k=>lv[k]?`${MUSCLE_LABEL[k]}: ${lv[k]>=1?'main muscle':'helps'}`:''});
 }
+
+/* ---------- Library expansion 2: more bodyweight, dumbbell, cable, machine and barbell moves ----------
+   need: equipment the exercise requires (any one is enough); used by "My equipment" and the workout builder. */
+POSES.wallpush={a:'h:66,24 s:62,34 e:74,36 w:85,34 p:52,64 k:46,82 f:40,100',b:'h:76,26 s:70,36 e:72,48 w:85,34 p:56,66 k:48,83 f:40,100',props:[{t:'wall',x:88}]};
+POSES.pike={a:'h:84,80 s:80,70 e:83,85 w:85,100 p:58,50 k:44,75 f:30,100',b:'h:86,94 s:80,82 e:72,88 w:85,100 p:56,56 k:43,78 f:30,100'};
+POSES.invrow={a:'h:74,78 s:63,76 e:63,58 w:64,40 p:40,86 k:24,93 f:8,100',b:'h:74,56 s:63,54 e:52,50 w:64,40 p:40,76 k:24,89 f:8,100',props:[{t:'hbar',y:40}]};
+POSES.shrug={a:'h:55,20 s:55,30 e:56,45 w:57,60 p:55,60 k:56,80 f:55,100',b:'h:55,17 s:55,25 e:56,40 w:57,55 p:55,60 k:56,80 f:55,100',dur:1.6};
+POSES.frontraise={a:'h:55,20 s:55,30 e:56,45 w:57,60 p:55,60 k:56,80 f:55,100',b:'h:55,20 s:55,30 e:69,31 w:83,31 p:55,60 k:56,80 f:55,100'};
+POSES.ohext={a:'h:55,22 s:55,32 e:58,14 w:50,28 p:55,62 k:56,81 f:55,100',b:'h:55,22 s:55,32 e:58,14 w:61,-2 p:55,62 k:56,81 f:55,100'};
+POSES.pullover={a:'h:28,74 s:38,77 e:40,62 w:40,48 p:66,78 k:82,80 f:86,100',b:'h:28,74 s:38,77 e:25,70 w:12,72 p:66,78 k:82,80 f:86,100',props:[{t:'bench',x:20,y:81,w:54}]};
+POSES.floorpress={a:'h:20,93 s:30,96 e:32,82 w:32,68 p:60,97 k:74,80 f:86,100',b:'h:20,93 s:30,96 e:26,96 w:32,84 p:60,97 k:74,80 f:86,100'};
+POSES.cablefly={a:'h:55,20 s:55,30 e:44,36 w:34,42 p:55,60 k:56,80 f:55,100 k2:66,80 f2:70,100',b:'h:55,20 s:55,30 e:68,36 w:82,40 p:55,60 k:56,80 f:55,100 k2:66,80 f2:70,100'};
+POSES.cablecrunch={a:'h:62,36 s:60,46 e:66,42 w:64,34 p:56,72 k:56,100 f:36,100',b:'h:84,62 s:76,64 e:84,70 w:84,62 p:54,76 k:56,100 f:36,100',props:[{t:'cable',from:[66,0]}]};
+POSES.pallof={a:'h:55,20 s:55,30 e:60,44 w:66,40 p:55,60 k:52,80 f:50,100 k2:62,80 f2:66,100',b:'h:55,20 s:55,30 e:70,38 w:84,38 p:55,60 k:52,80 f:50,100 k2:62,80 f2:66,100',props:[{t:'cable',from:[115,40]}]};
+POSES.chop={a:'h:52,20 s:54,30 e:66,20 w:78,8 p:55,60 k:56,80 f:54,100 k2:64,80 f2:68,100',b:'h:50,30 s:52,40 e:46,52 w:38,64 p:54,66 k:52,84 f:50,100 k2:64,84 f2:68,100',props:[{t:'cable',from:[110,0]}]};
+POSES.straightpull={a:'h:57,22 s:56,32 e:68,22 w:80,14 p:52,62 k:54,80 f:52,100',b:'h:57,22 s:56,32 e:60,46 w:63,60 p:52,62 k:54,80 f:52,100',props:[{t:'cable',from:[104,0]}]};
+POSES.legcurl={a:'h:16,72 s:26,76 e:24,88 w:22,80 p:60,78 k:80,78 f:100,78',b:'h:16,72 s:26,76 e:24,88 w:22,80 p:60,78 k:80,78 f:90,58',props:[{t:'bench',x:14,y:82,w:74},{t:'pad',at:'f'}]};
+POSES.seatpress={a:'h:44,30 s:44,40 e:44,56 w:58,48 p:46,72 k:66,74 f:68,100',b:'h:44,30 s:44,40 e:60,44 w:76,44 p:46,72 k:66,74 f:68,100',props:[{t:'seat',x:30,y:74,w:30}]};
+POSES.nordic={a:'h:58,36 s:56,46 e:62,58 w:66,64 p:52,72 k:52,100 f:30,100',b:'h:92,62 s:82,66 e:88,82 w:92,96 p:62,82 k:52,100 f:30,100',props:[{t:'pad',at:'f'}],dur:3};
+POSES.punch={a:'h:56,20 s:56,30 e:62,40 w:66,30 e2:58,42 w2:62,32 p:55,60 k:60,80 f:62,100 k2:48,80 f2:44,100',b:'h:58,20 s:58,30 e:74,30 w:90,28 e2:58,42 w2:62,32 p:55,60 k:60,80 f:62,100 k2:48,80 f2:44,100',dur:.9};
+POSES.kickback={a:'h:72,30 s:66,38 e:76,46 w:84,42 p:54,62 k:55,80 f:55,100 k2:53,80 f2:52,100',b:'h:72,30 s:66,38 e:76,46 w:84,42 p:54,62 k:55,80 f:55,100 k2:38,72 f2:24,80'};
+
+Object.assign(EX,{
+  // ---- Bodyweight ----
+  wall_pushup:{name:'Wall Push-Ups',e:'🧱',m:['Chest','Arms'],steps:['Stand an arm\'s length from a wall and put your hands on it at shoulder height.','Keep your body straight and bend your elbows to bring your chest to the wall.','Push back until your arms are straight.'],tip:'Step your feet further back to make it harder.'},
+  diamond_pushup:{name:'Diamond Push-Ups',e:'💎',m:['Triceps','Chest'],steps:['Get into a push-up position with your hands close together under your chest.','Touch thumbs and pointer fingers to make a diamond shape.','Lower your chest to your hands, then push back up.'],tip:'Too hard? Do them on your knees.'},
+  wide_pushup:{name:'Wide Push-Ups',e:'🦅',m:['Chest','Shoulders'],steps:['Get into a push-up position with your hands wider than usual.','Keep your body in a straight line.','Lower your chest towards the floor, then push up.'],tip:'Don\'t go so wide that your shoulders hurt.'},
+  pike_pushup:{name:'Pike Push-Ups',e:'🔺',m:['Shoulders','Triceps'],steps:['Start in a push-up position, then walk your feet in so your hips go up high, like an upside-down V.','Bend your elbows to lower the top of your head towards the floor.','Push back up to the V.'],tip:'Go slowly and keep your head between your hands.'},
+  jump_squat:{name:'Jump Squats',e:'🦘',m:['Legs','Heart'],steps:['Stand with feet shoulder-width apart.','Squat down, then jump up as high as you can.','Land softly with bent knees and go straight into the next squat.'],tip:'Land quietly, like a cat. No jumping? Do fast squats instead.'},
+  split_squat:{name:'Split Squats',e:'🦵',m:['Legs','Glutes'],per:'each leg',steps:['Stand with one foot a big step in front of the other.','Bend both knees and lower your back knee towards the floor.','Push through your front foot to stand up. Do all reps, then switch.'],tip:'Keep your front heel down and your chest up.'},
+  walking_lunge:{name:'Walking Lunges',e:'🚶',m:['Legs','Glutes'],per:'each leg',steps:['Stand tall with hands on your hips.','Take a big step forward and lower your back knee towards the floor.','Push up and bring the back foot forward into the next step.'],tip:'Short on space? Do them on the spot.'},
+  curtsy_lunge:{name:'Curtsy Lunges',e:'👑',m:['Glutes','Legs'],per:'each leg',steps:['Stand with feet hip-width apart.','Step one foot behind and across the other, like a curtsy, and bend both knees.','Push back up to standing and switch sides.'],tip:'Keep your front knee over your toes.'},
+  donkey_kick:{name:'Donkey Kicks',e:'🐴',m:['Glutes'],per:'each leg',steps:['Get on your hands and knees.','Keep your knee bent and lift one foot up towards the ceiling.','Squeeze your bottom at the top, then lower slowly.'],tip:'Don\'t arch your lower back. Only your leg moves.'},
+  fire_hydrant:{name:'Fire Hydrants',e:'🚒',m:['Glutes'],per:'each leg',steps:['Get on your hands and knees.','Keep your knee bent and lift one leg out to the side.','Lower it slowly. Do all reps, then switch.'],tip:'Keep your hips level, like a table.'},
+  bear_crawl:{name:'Bear Crawl',e:'🐻',m:['Whole body','Core'],time:true,steps:['Get on hands and feet with your knees just off the floor.','Crawl forward by moving the opposite hand and foot together.','Keep your back flat and your knees low.'],tip:'No space? Crawl a few steps forward, then backward.'},
+  plank_jack:{name:'Plank Jacks',e:'✳️',m:['Core','Heart'],time:true,steps:['Start in a plank on straight arms.','Jump your feet out wide, then back together.','Keep your hips steady and your tummy tight.'],tip:'Step the feet out one at a time to make it easier.'},
+  reverse_crunch:{name:'Reverse Crunches',e:'🔃',m:['Abs'],steps:['Lie on your back with knees bent and feet off the floor.','Use your tummy to curl your knees towards your chest and lift your hips a little.','Lower slowly without letting your feet touch.'],tip:'Move slowly. No swinging.'},
+  bicycle_crunch:{name:'Bicycle Crunches',e:'🚲',m:['Abs','Obliques'],per:'each side',steps:['Lie on your back, hands by your ears, knees up.','Bring one elbow towards the opposite knee while you straighten the other leg.','Switch sides like you are riding a bike.'],tip:'Slow is better than fast. Don\'t pull on your neck.'},
+  hollow_hold:{name:'Hollow Hold',e:'🍌',m:['Core'],time:true,steps:['Lie on your back and press your lower back into the floor.','Lift your shoulders and legs a little off the floor, arms by your ears.','Hold the banana shape and breathe.'],tip:'Bend your knees to make it easier.'},
+  skater_jump:{name:'Skater Jumps',e:'⛸️',m:['Legs','Heart'],per:'each side',steps:['Stand on one leg.','Jump sideways and land softly on the other leg.','Swing your arms and keep going side to side.'],tip:'Step instead of jumping to make it easier.'},
+  inchworm:{name:'Inchworms',e:'🐛',m:['Whole body','Hamstrings'],steps:['Stand tall, then bend forward and put your hands on the floor.','Walk your hands out to a push-up position.','Walk your hands back to your feet and stand up.'],tip:'Bend your knees as much as you need.'},
+  jump_rope:{name:'Jump Rope',e:'🪢',m:['Heart','Calves'],time:true,steps:['Hold the handles with your elbows close to your sides.','Turn the rope with your wrists and do small jumps.','Stay on the balls of your feet.'],tip:'No rope? Pretend! Same moves without it.'},
+  butt_kicks:{name:'Butt Kicks',e:'🏃',m:['Legs','Heart'],time:true,steps:['Jog on the spot.','Kick your heels up towards your bottom.','Pump your arms and stay light on your feet.'],tip:'Slow it down to a march if you need a break.'},
+  shadow_boxing:{name:'Shadow Boxing',e:'🥊',m:['Heart','Shoulders'],time:true,steps:['Stand with one foot in front, fists up by your chin.','Throw quick punches straight in front of you, left and right.','Bring each fist back to your chin. Keep moving your feet.'],tip:'Never lock your elbows. Punch the air, not too hard.'},
+  inverted_row:{name:'Inverted Rows',e:'🛶',m:['Back','Biceps'],steps:['Lie under a low, sturdy bar (or a Smith machine bar at waist height) and grab it.','Keep your body straight, heels on the floor.','Pull your chest up to the bar, then lower slowly.'],tip:'Bend your knees to make it easier. Only use a bar that cannot move.'},
+  nordic_curl:{name:'Nordic Curls (assisted)',e:'🧎',m:['Hamstrings'],steps:['Kneel on a soft mat. Hook your heels under a sturdy couch, or have an adult hold them.','Keep your body straight and lean forward as slowly as you can.','Catch yourself with your hands, then push back up.'],tip:'Very hard! Only go as far as you can control.'},
+  // ---- Backpack (home) ----
+  backpack_press:{name:'Backpack Overhead Press',e:'🎒',m:['Shoulders','Triceps'],weight:true,steps:['Hold a backpack with books in front of your shoulders.','Press it straight up over your head.','Lower it slowly back to your shoulders.'],tip:'Squeeze your tummy so your back doesn\'t arch.'},
+  backpack_squat:{name:'Backpack Squats',e:'🎒',m:['Legs','Glutes'],weight:true,steps:['Hug a backpack with books to your chest.','Sit back and down like sitting on a chair.','Push through your heels to stand up.'],tip:'Keep your chest up and knees over your toes.'},
+  backpack_rdl:{name:'Backpack Deadlifts',e:'🎒',m:['Hamstrings','Glutes','Back'],weight:true,steps:['Hold a backpack in front of your legs.','Push your hips back with a flat back, sliding the bag down to your knees.','Squeeze your bottom to stand up tall.'],tip:'Your back stays flat like a table the whole time.'},
+  // ---- Dumbbells ----
+  db_shrug:{name:'Dumbbell Shrugs',e:'🤷',m:['Upper back','Forearms'],weight:true,start:'20 lbs each',steps:['Stand holding dumbbells by your sides.','Lift your shoulders straight up towards your ears.','Hold for a second, then lower slowly.'],tip:'Up and down only. Don\'t roll your shoulders.'},
+  db_fly:{name:'Dumbbell Fly',e:'🦋',m:['Chest'],weight:true,start:'10 lbs each',steps:['Lie on a bench holding dumbbells above your chest, palms facing each other.','With a small bend in your elbows, open your arms out wide like a big hug.','Bring them back together over your chest.'],tip:'Go light and stop when you feel a stretch.'},
+  db_pullover:{name:'Dumbbell Pullover',e:'🔄',m:['Chest','Back'],weight:true,start:'15 lbs',steps:['Lie on a bench and hold one dumbbell with both hands above your chest.','Keep your arms nearly straight and lower it slowly behind your head.','Pull it back over your chest.'],tip:'Only go as far back as feels comfortable.'},
+  front_raise:{name:'Front Raises',e:'🙆',m:['Shoulders'],weight:true,start:'8 lbs each',steps:['Stand holding dumbbells in front of your thighs.','Lift them straight in front of you to shoulder height.','Lower slowly.'],tip:'No swinging. Go lighter than you think.'},
+  reverse_fly:{name:'Bent-Over Reverse Fly',e:'🕊️',m:['Rear shoulders','Upper back'],weight:true,start:'8 lbs each',steps:['Hold light dumbbells and bend forward at your hips with a flat back.','Lift your arms out to the sides like wings.','Squeeze your shoulder blades, then lower slowly.'],tip:'Keep a small bend in your elbows.'},
+  db_step_up:{name:'Dumbbell Step-Ups',e:'📦',m:['Legs','Glutes'],weight:true,per:'each leg',start:'15 lbs each',steps:['Hold a dumbbell in each hand and stand in front of a sturdy step or bench.','Step up with one foot and push through that heel to stand on top.','Step down slowly and repeat.'],tip:'Use a low step first. Push with the top leg, not the bottom one.'},
+  db_thruster:{name:'Dumbbell Thrusters',e:'🚀',m:['Whole body','Shoulders','Legs'],weight:true,start:'12 lbs each',steps:['Hold dumbbells at your shoulders.','Squat down, then stand up fast.','Use that push to press the dumbbells overhead. Lower to your shoulders.'],tip:'One smooth move: squat, stand, press.'},
+  db_overhead_ext:{name:'Overhead Tricep Extension',e:'🙋',m:['Triceps'],weight:true,start:'15 lbs',steps:['Hold one dumbbell with both hands above your head.','Bend only your elbows to lower it behind your head.','Straighten your arms to lift it back up.'],tip:'Keep your elbows pointing up and close to your head.'},
+  concentration_curl:{name:'Concentration Curls',e:'🎯',m:['Biceps'],weight:true,per:'each arm',start:'12 lbs',steps:['Sit on a bench and rest your elbow on the inside of your thigh.','Curl the dumbbell up towards your shoulder.','Lower slowly until your arm is straight.'],tip:'Only your forearm moves.'},
+  renegade_row:{name:'Renegade Rows',e:'⚔️',m:['Back','Core'],weight:true,per:'each arm',start:'15 lbs each',steps:['Get in a push-up position holding two dumbbells on the floor.','Pull one dumbbell up to your hip while you keep your hips still.','Put it down and switch arms.'],tip:'Spread your feet wide to stay steady. Use hex dumbbells that can\'t roll.'},
+  db_floor_press:{name:'Dumbbell Floor Press',e:'🏋️',m:['Chest','Triceps'],weight:true,start:'20 lbs each',steps:['Lie on the floor with knees bent, dumbbells above your chest.','Lower until your upper arms touch the floor.','Press back up.'],tip:'Great when you have no bench. The floor protects your shoulders.'},
+  // ---- Cable / functional trainer ----
+  cable_fly:{name:'Cable Fly',e:'🦋',m:['Chest'],weight:true,need:['cable','machines'],start:'15 lbs each',steps:['Set both pulleys at shoulder height and hold a handle in each hand.','Step forward with a small bend in your elbows.','Bring your hands together in front of your chest, then open slowly.'],tip:'Think "hug a big tree".'},
+  cable_curl:{name:'Cable Bicep Curls',e:'💪',m:['Biceps'],weight:true,need:['cable','machines'],start:'20 lbs',steps:['Attach a bar or rope to a low pulley.','Stand tall and curl it up to your shoulders.','Lower slowly until your arms are straight.'],tip:'Elbows stay by your sides.'},
+  cable_lateral_raise:{name:'Cable Lateral Raise',e:'🛫',m:['Shoulders'],weight:true,per:'each arm',need:['cable','machines'],start:'5 lbs',steps:['Stand side-on to a low pulley and hold the handle with the far hand.','Lift your arm out to the side to shoulder height.','Lower slowly.'],tip:'Go light. Lead with your elbow.'},
+  cable_kickback:{name:'Cable Glute Kickback',e:'🍑',m:['Glutes'],weight:true,per:'each leg',need:['cable','machines'],start:'10 lbs',steps:['Put an ankle strap on a low pulley and hold the machine.','Keep your leg nearly straight and push it back behind you.','Squeeze your bottom, then return slowly.'],tip:'Don\'t arch your back to kick higher.'},
+  cable_crunch:{name:'Cable Crunch',e:'🙇',m:['Abs'],weight:true,need:['cable','machines'],start:'30 lbs',steps:['Kneel facing a high pulley, holding a rope by your head.','Curl down, bringing your elbows towards your knees.','Come back up slowly.'],tip:'Your hips stay still. Only your tummy curls.'},
+  pallof_press:{name:'Pallof Press',e:'🧭',m:['Core','Obliques'],weight:true,per:'each side',need:['cable','machines'],start:'15 lbs',steps:['Stand side-on to a pulley at chest height, holding the handle at your chest.','Press it straight out in front and don\'t let it twist you.','Bring it back to your chest.'],tip:'Step further away to make it harder.'},
+  woodchop:{name:'Cable Woodchop',e:'🪓',m:['Obliques','Core'],weight:true,per:'each side',need:['cable','machines'],start:'15 lbs',steps:['Set a pulley high and hold the handle with both hands.','Pull it down and across your body to the opposite hip, turning your shoulders.','Return slowly.'],tip:'Turn from your middle and pivot your back foot.'},
+  straight_arm_pulldown:{name:'Straight-Arm Pulldown',e:'⬇️',m:['Back'],weight:true,need:['cable','machines'],start:'25 lbs',steps:['Hold a bar or rope on a high pulley with straight arms.','Lean forward a little and pull it down to your thighs.','Let it rise slowly.'],tip:'Keep your arms straight. Feel it under your armpits.'},
+  overhead_cable_ext:{name:'Overhead Cable Tricep Extension',e:'🙋',m:['Triceps'],weight:true,need:['cable','machines'],start:'20 lbs',steps:['Hold a rope on a low pulley and turn away from the machine, rope behind your head.','Straighten your arms forwards and up.','Bend your elbows slowly to come back.'],tip:'Elbows point forward and stay still.'},
+  cable_pull_through:{name:'Cable Pull-Through',e:'🔗',m:['Glutes','Hamstrings'],weight:true,need:['cable','machines'],start:'30 lbs',steps:['Stand facing away from a low pulley, rope between your legs.','Push your hips back with a flat back.','Squeeze your bottom to stand tall.'],tip:'It\'s a hip hinge, not a squat.'},
+  // ---- Machines ----
+  leg_curl:{name:'Leg Curl (machine)',e:'🦵',m:['Hamstrings'],weight:true,need:['machines'],start:'40 lbs',steps:['Lie face down on the machine with the pad just above your heels.','Curl your heels towards your bottom.','Lower slowly.'],tip:'Keep your hips pressed into the pad.'},
+  chest_press_machine:{name:'Chest Press (machine)',e:'🏢',m:['Chest','Triceps'],weight:true,need:['machines'],start:'40 lbs',steps:['Sit with your back flat on the pad, handles at chest height.','Push the handles forward until your arms are straight.','Bring them back slowly.'],tip:'A great safe way to learn pressing.'},
+  shoulder_press_machine:{name:'Shoulder Press (machine)',e:'🏢',m:['Shoulders','Triceps'],weight:true,need:['machines'],start:'30 lbs',steps:['Sit tall with the handles at shoulder height.','Press them up until your arms are straight.','Lower slowly.'],tip:'Keep your back on the pad.'},
+  assisted_pullup:{name:'Assisted Pull-Ups',e:'🤝',m:['Back','Biceps'],need:['machines','pullbar'],steps:['Use the assisted pull-up machine, or loop a strong band over a bar and put your knee in it.','Pull until your chin is over the bar.','Lower all the way down slowly.'],tip:'Use less help over time until you can do a real pull-up.'},
+  // ---- Barbell & EZ bar ----
+  good_morning:{name:'Good Morning (Barbell)',e:'🌅',m:['Hamstrings','Lower back','Glutes'],weight:true,bar:true,need:['barbell'],start:'45 lbs',steps:['Rest a light bar on your upper back, feet hip-width.','With soft knees and a flat back, push your hips back and lean forward.','Squeeze your bottom to stand back up.'],tip:'Go light. Stop when you feel a stretch in your hamstrings.'},
+  barbell_lunge:{name:'Barbell Reverse Lunge',e:'🦵',m:['Legs','Glutes'],weight:true,bar:true,per:'each leg',need:['barbell'],start:'65 lbs',steps:['Rest the bar on your upper back.','Step one foot back and lower your back knee towards the floor.','Push through your front foot to stand up.'],tip:'Use a rack with safety bars. Go slowly.'},
+  barbell_shrug:{name:'Barbell Shrugs',e:'🤷',m:['Upper back','Forearms'],weight:true,bar:true,need:['barbell'],start:'95 lbs',steps:['Hold the bar in front of your thighs.','Lift your shoulders straight up towards your ears.','Hold for a second and lower.'],tip:'Use straps if your grip gives out first.'},
+  ez_curl:{name:'EZ-Bar Bicep Curls',e:'〰️',m:['Biceps','Forearms'],weight:true,need:['ez','barbell'],start:'30 lbs',steps:['Hold the EZ bar on the angled grips, arms straight.','Curl it up to your shoulders.','Lower slowly.'],tip:'The angled grip is easier on your wrists.'},
+  ez_skull_crusher:{name:'EZ-Bar Skull Crushers',e:'💀',m:['Triceps'],weight:true,need:['ez','barbell'],start:'30 lbs',steps:['Lie on a bench holding the EZ bar above your chest.','Bend only your elbows to lower it towards your forehead.','Straighten your arms to lift it back up.'],tip:'Go slowly and have a spotter.'},
+});
+// Equipment versions are added by gear.js from `need`; bar lifts are Expert-only like the others.
+Object.assign(FIG,{
+  wall_pushup:['wallpush'],diamond_pushup:['pushup'],wide_pushup:['pushup'],pike_pushup:['pike'],jump_squat:['squat'],split_squat:['lunge'],
+  walking_lunge:['lunge'],curtsy_lunge:['lunge'],donkey_kick:['birddog'],fire_hydrant:['birddog'],bear_crawl:['climber'],plank_jack:['plank'],
+  reverse_crunch:['deadbug'],bicycle_crunch:['twist'],hollow_hold:['flutter'],skater_jump:['sidelunge'],inchworm:['burpee'],jump_rope:['march'],
+  butt_kicks:['march'],shadow_boxing:['punch'],inverted_row:['invrow'],nordic_curl:['nordic'],
+  backpack_press:['ohp',{t:'bag',at:'w'}],backpack_squat:['goblet',{t:'bag',at:'w'}],backpack_rdl:['hinge',{t:'bag',at:'w'}],
+  db_shrug:['shrug',{t:'db',at:'w'}],db_fly:['bench',{t:'db',at:'w'}],db_pullover:['pullover',{t:'db',at:'w'}],front_raise:['frontraise',{t:'db',at:'w'}],
+  reverse_fly:['row',{t:'db',at:'w'}],db_step_up:['stepup',{t:'db',at:'w'}],db_thruster:['pushpress',{t:'db',at:'w'}],db_overhead_ext:['ohext',{t:'db',at:'w'}],
+  concentration_curl:['curl',{t:'db',at:'w'}],renegade_row:['shouldertap',{t:'db',at:'w'}],db_floor_press:['floorpress',{t:'db',at:'w'}],
+  cable_fly:['cablefly',{t:'cable',from:[8,30]}],cable_curl:['curl',{t:'cable',from:[62,100]}],cable_lateral_raise:['frontraise',{t:'cable',from:[30,100]}],
+  cable_kickback:['kickback'],cable_crunch:['cablecrunch'],pallof_press:['pallof'],woodchop:['chop'],straight_arm_pulldown:['straightpull'],
+  overhead_cable_ext:['ohext',{t:'cable',from:[10,100]}],cable_pull_through:['hinge',{t:'cable',from:[0,100]}],
+  leg_curl:['legcurl'],chest_press_machine:['seatpress'],shoulder_press_machine:['dbpress'],assisted_pullup:['pullup'],
+  good_morning:['hinge',{t:'plate',at:'s'}],barbell_lunge:['lunge',{t:'plate',at:'s'}],barbell_shrug:['shrug',{t:'plate',at:'w'}],
+  ez_curl:['curl',{t:'plate',at:'w',r:7}],ez_skull_crusher:['skull',{t:'plate',at:'w',r:7}],
+});
+Object.assign(ALT,{
+  wall_pushup:['knee_pushup'],diamond_pushup:['knee_pushup','chair_dip'],wide_pushup:['knee_pushup'],pike_pushup:['shoulder_tap','knee_pushup'],
+  jump_squat:['squat'],split_squat:['reverse_lunge','squat'],walking_lunge:['reverse_lunge'],curtsy_lunge:['reverse_lunge'],donkey_kick:['glute_bridge'],
+  fire_hydrant:['glute_bridge'],bear_crawl:['plank'],plank_jack:['plank'],reverse_crunch:['dead_bug'],bicycle_crunch:['crunch','dead_bug'],
+  hollow_hold:['dead_bug'],skater_jump:['side_lunge'],inchworm:['plank'],jump_rope:['jumping_jacks'],butt_kicks:['high_knees'],shadow_boxing:['jumping_jacks'],
+  inverted_row:['backpack_row'],nordic_curl:['single_leg_bridge','glute_bridge'],backpack_press:['pike_pushup','shoulder_tap'],backpack_squat:['squat'],
+  backpack_rdl:['glute_bridge'],db_shrug:['farmer_carry'],db_fly:['db_bench','pushup'],db_pullover:['db_row'],front_raise:['lateral_raise'],
+  reverse_fly:['face_pull','superman'],db_step_up:['step_up'],db_thruster:['goblet_squat','db_press'],db_overhead_ext:['skull_crusher','chair_dip'],
+  concentration_curl:['db_curl'],renegade_row:['db_row','plank'],db_floor_press:['db_bench','pushup'],
+  cable_fly:['db_fly','pushup'],cable_curl:['db_curl'],cable_lateral_raise:['lateral_raise'],cable_kickback:['donkey_kick'],cable_crunch:['crunch'],
+  pallof_press:['side_plank'],woodchop:['russian_twist'],straight_arm_pulldown:['db_pullover','lat_pulldown'],overhead_cable_ext:['db_overhead_ext'],
+  cable_pull_through:['db_rdl','glute_bridge'],leg_curl:['single_leg_bridge','db_rdl'],chest_press_machine:['db_bench','pushup'],
+  shoulder_press_machine:['db_press'],assisted_pullup:['lat_pulldown','inverted_row'],good_morning:['db_rdl'],barbell_lunge:['db_lunge'],
+  barbell_shrug:['db_shrug'],ez_curl:['db_curl'],ez_skull_crusher:['skull_crusher'],
+});
 
 /* ===== js/store.js ===== */
 /* KinFit · Storage, people, data cleaning, helpers, badges and screen router. */
@@ -445,12 +562,18 @@ function sanitizeProfile(p){
   o.fives=(Array.isArray(p.fives)?p.fives:[]).slice(-20).filter(f=>f&&typeof f==='object').map(f=>({from:cleanText(f.from,24)||'Someone',av:AVATARS.includes(f.av)?f.av:'🙂',at:cleanNum(f.at,1e14)}));
   return o;
 }
+// A logged set: reps, weight, and optionally its type (w warm-up, d drop set, f to failure) and effort (RPE 6–10).
+const SET_TYPES=['w','d','f'];
+function cleanSet(x){const o={reps:cleanNum(x&&x.reps,1e5),weight:cleanNum(x&&x.weight,5000)};if(x&&SET_TYPES.includes(x.t))o.t=x.t;
+  const r=Number(x&&x.rpe);if(r>=6&&r<=10)o.rpe=Math.round(r*2)/2;return o}
+const workSets=sets=>(sets||[]).filter(s=>s.t!=='w'); // warm-up sets don't count for records or progression
 function sanitizeJournal(j){
   const out={};if(!j||typeof j!=='object'||Array.isArray(j))return out;
   Object.keys(j).forEach(d=>{if(!ISO_RE.test(d)||!Array.isArray(j[d]))return;
     const list=j[d].slice(0,300).filter(e=>e&&typeof e==='object'&&typeof e.exercise==='string').map(e=>{
       const o={id:typeof e.id==='number'?e.id:cleanText(e.id,40),exercise:cleanText(e.exercise,60),timestamp:cleanText(e.timestamp,16),unit:e.unit==='kg'?'kg':'lbs',
-        sets:(Array.isArray(e.sets)?e.sets:[]).slice(0,30).map(x=>({reps:cleanNum(x&&x.reps,1e5),weight:cleanNum(x&&x.weight,5000)}))};
+        sets:(Array.isArray(e.sets)?e.sets:[]).slice(0,30).map(cleanSet)};
+      if(typeof e.ss==='string'&&/^[A-H]$/.test(e.ss))o.ss=e.ss;
       if(['beginner','intermediate','expert'].includes(e.level))o.level=e.level;
       if(e.workout)o.workout=cleanText(e.workout,50);if(e.u)o.u=cleanNum(e.u,1e14);if([1,2,3].includes(e.effort))o.effort=e.effort;
       if(e.kind==='activity'){o.kind='activity';o.act=cleanText(e.act,20);o.minutes=cleanNum(e.minutes,1440);o.distance=cleanNum(e.distance,1000);o.dunit=e.dunit==='km'?'km':'mi'}
@@ -730,6 +853,7 @@ function renderToday(v){
     <div><h1>${hello()}${profile.name?', '+esc(profile.name):''}! ${esc(profile.avatar||'👋')}</h1><p class="muted" style="margin-top:4px">${now.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'})}</p></div>
     ${fivesCard()}
     ${heroHtml}
+    ${isWork&&!doneToday&&!(active&&active.level===profile.level)?recoveryCard(sched.k):''}
     ${backupCard()}
     ${streakCard()}
     ${habitsCard()}
@@ -808,13 +932,14 @@ function startWorkout(key){
 }
 function freshSets(id,n){
   const ex=EX[id],last=lastSession(ex.name);
-  let w='';if(ex.weight&&last){const mx=Math.max(...last.sets.map(s=>s.weight||0));if(mx>0)w=round1(toUnit(mx,last.unit))}
+  let w='';if(ex.weight&&last){const mx=Math.max(0,...workSets(last.sets).map(s=>s.weight||0));if(mx>0)w=round1(toUnit(mx,last.unit))}
   return Array.from({length:n},()=>({reps:'',weight:w,done:false}));
 }
 function progressHint(p,ex){
   const last=lastSession(ex.name);if(!last||!last.sets.length)return '';
-  const hitTop=last.sets.length>=p[1]&&last.sets.every(s=>s.reps>=p[3]);
-  if(!hitTop)return `<div class="hint">📋 Last time: ${last.sets.map(s=>s.reps+(ex.weight&&s.weight?' × '+round1(toUnit(s.weight,last.unit)):'')).join(', ')}. Try to beat it!</div>`;
+  const main=last.sets.filter(s=>!s.t||s.t==='f');if(!main.length)return '';
+  const hitTop=main.length>=p[1]&&main.every(s=>s.reps>=p[3]);
+  if(!hitTop)return `<div class="hint">📋 Last time: ${main.map(s=>s.reps+(ex.weight&&s.weight?' × '+round1(toUnit(s.weight,last.unit)):'')).join(', ')}. Try to beat it!</div>`;
   if(ex.weight)return `<div class="hint">🚀 You hit ${p[3]} reps on every set last time. Add ${profile.unit==='kg'?'2.5 kg':'5 lbs'} today!</div>`;
   return `<div class="hint">🚀 Crushed it last time! Try ${ex.time?'5 more seconds':'2 more reps'} per set${ex.time?'':' or a harder version'}.</div>`;
 }
@@ -827,10 +952,40 @@ function figPair(id){
 const howTo=id=>{const ex=EX[id];return `${gearNote(ex)}<details class="how"><summary>How to do it</summary>${figPair(id)}<ol>${ex.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol><div class="tip">💡 ${esc(ex.tip)}</div>
   <a class="btn sm secondary" style="margin-bottom:12px;text-decoration:none;display:inline-flex" href="${ex.video||YTS(ex.name)}" target="_blank" rel="noopener">▶ ${ex.ownVideo?'Watch my video':'Watch a video'}</a> <button class="btn sm secondary" style="margin-bottom:12px;display:inline-flex" data-say="${id}">🔊 Read aloud</button>
   <button class="link small" style="display:block" data-myvid="${id}">🔗 ${ex.ownVideo?'Change my video':'Use my own YouTube video'}</button></details>`};
+/* ---------- Set types, effort and supersets ---------- */
+// Supersets: it.link=true joins an exercise to the next one. Returns, per item index, {g:'A', pos, mem:[indexes]}.
+function ssGroups(a){
+  const out=[];let n=0,i=0;
+  while(i<a.items.length){let j=i;while(j<a.items.length-1&&a.items[j].link)j++;
+    if(j>i){const g='ABCDEFGH'[Math.min(n++,7)],mem=[];for(let k=i;k<=j;k++)mem.push(k);mem.forEach((k,pos)=>out[k]={g,pos,mem})}
+    i=j+1}
+  return out;
+}
+const STYPE={'':['Normal set','Counts for records and progress.'],w:['🔥 Warm-up','A lighter set to get ready. Not counted for records.'],
+  d:['⬇️ Drop set','Lower the weight and keep going with no rest.'],f:['💥 To failure','You did as many good reps as you could.']};
+const RPE=[[6,'😊 4+ more'],[7,'🙂 3 more'],[8,'💪 2 more'],[9,'😤 1 more'],[10,'🔥 0 more']];
+const setLabel=(sets,k)=>{const s=sets[k];if(s.t==='w')return 'Warm';return 'Set '+sets.slice(0,k+1).filter(x=>x.t!=='w').length};
+const setTags=s=>`${s.t==='d'?'<i class="stag">Drop</i>':s.t==='f'?'<i class="stag">Fail</i>':''}${s.rpe?`<i class="stag rpe">RPE ${s.rpe}</i>`:''}`;
+function setTypeSheet(it,k,done){
+  const s=it.sets[k],ex=EX[it.id];let t=s.t||'',r=s.rpe||0;
+  const types=Object.keys(STYPE).filter(x=>x!=='f'||!isKid()); // kids don't train to failure
+  const draw=()=>sheet(`<h2>${esc(ex.name)} · ${setLabel(it.sets,k)==='Warm'?'warm-up set':setLabel(it.sets,k).toLowerCase()}</h2>
+    <p class="small" style="font-weight:700">What kind of set?</p>
+    <div class="stack" style="gap:8px">${types.map(x=>`<button class="who" data-st="${x}" aria-pressed="${x===t}"><span style="flex:1;text-align:left"><b>${STYPE[x][0]}</b><br><span class="small muted">${STYPE[x][1]}</span></span><b aria-hidden="true">${x===t?'✓':''}</b></button>`).join('')}</div>
+    <p class="small" style="font-weight:700;margin-top:14px">How hard was it? <span class="muted">(optional)</span></p>
+    <p class="small muted">How many more good reps could you have done?</p>
+    <div class="chips">${RPE.map(([n,l])=>`<button class="${n===r?'on':''}" data-rp="${n}" aria-pressed="${n===r}">${l}</button>`).join('')}</div>
+    <button class="btn" id="ok">Done</button>`,()=>{
+    document.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{t=b.dataset.st;draw()});
+    document.querySelectorAll('[data-rp]').forEach(b=>b.onclick=()=>{const n=+b.dataset.rp;r=r===n?0:n;draw()});
+    $('#ok').onclick=()=>{if(t)s.t=t;else delete s.t;if(r)s.rpe=r;else delete s.rpe;closeLayer();done()};
+  });
+  draw();
+}
 function renderWorkout(v){
   const a=store.get(pKey('jams_active'),null);if(!a){go('today');return}
   const W=WORKOUTS[a.key]||{name:a.title,e:a.emoji},plan=a.plan||PLANS[a.level][a.key];
-  const total=a.items.reduce((s,it)=>s+it.sets.length,0),done=a.items.reduce((s,it)=>s+it.sets.filter(x=>x.done).length,0);
+  const SS=ssGroups(a),total=a.items.reduce((s,it)=>s+it.sets.length,0),done=a.items.reduce((s,it)=>s+it.sets.filter(x=>x.done).length,0);
   v.innerHTML=`<div class="topbar"><button class="link" id="back">← Back</button><span class="row" style="gap:6px"><button class="pill" id="voice" aria-label="Voice coach on or off">${voiceOn?'🔊':'🔇'}</button><input type="date" id="wdate" value="${a.date}" max="${isoLocal()}" class="num" style="width:auto;height:40px;font-size:15px;padding:0 10px" aria-label="Workout date"></span></div>
   <div class="stack-lg">
     <div><p class="muted" style="font-weight:700">${esc(profile.avatar)} ${esc(profile.name||'')} · ${lvl().emoji} ${lvl().name.toUpperCase()}</p><h1>${esc(W.e)} ${esc(W.name)}</h1>
@@ -839,14 +994,16 @@ function renderWorkout(v){
       :`<div class="card stack" style="background:var(--lvl-soft);border:0"><p>🔥 <b>Warm up first!</b> 5 easy minutes so your body is ready.</p><button class="btn sm" id="warm" style="width:100%">Start guided warm-up 🤸</button><button class="link" id="skipwarm" style="padding:0">I already warmed up</button></div>`}
     ${a.items.map((it,i)=>{const p=it.p||plan[i],ex=EX[it.id],orig=it.orig||it.id,canSwap=(ALT[orig]||[]).length&&!it.sets.some(s=>s.done);
       const cols=`${ex.weight?'wt':'nowt'}${ex.time?' timed':''}`;return `
-    <div class="card ex">
+    ${SS[i]&&SS[i].pos===0?`<p class="sshead">🔗 Superset ${SS[i].g}: do one set of each, then rest</p>`:''}
+    <div class="card ex${SS[i]?' ss':''}" id="ex${i}">
+      ${SS[i]?`<p class="small sslabel">🔗 ${SS[i].g}${SS[i].pos+1} of ${SS[i].mem.length}</p>`:''}
       <div class="ex-head"><div class="ex-emoji">${esc(ex.e)}</div><div style="flex:1"><div class="ex-title">${i+1}. ${esc(ex.name)}</div><div class="target">${repsText(p,ex)}</div>
         <div>${ex.m.map(m=>`<span class="chip">${esc(m)}</span>`).join('')}${ex.start&&!lastSession(ex.name)?`<span class="chip">Start ~${ex.start}</span>`:''}${it.orig?`<span class="chip">🔄 swapped</span>`:''}</div></div></div>
       ${progressHint(p,ex)}
       ${howTo(it.id)}
       <div class="sets">${it.sets.map((s,k)=>{const key=`${i},${k}`,editing=s.done&&setEditing===key,locked=s.done&&!editing,lk=locked?' disabled':'';return `
         <div class="set ${cols} ${s.done?'isdone':''} ${editing?'editing':''}">
-          <div class="n">Set ${k+1}${editing?`<button class="link undone" data-undone="${key}" aria-label="Mark set ${k+1} not done">Not done</button>`:''}</div>
+          <div class="n"><button class="stype" data-stype="${key}" aria-label="${setLabel(it.sets,k)}${s.t?' '+STYPE[s.t][0].slice(2):''}${s.rpe?', RPE '+s.rpe:''}. Tap to set type or effort">${setLabel(it.sets,k)}${setTags(s)}</button>${editing?`<button class="link undone" data-undone="${key}" aria-label="Mark set ${k+1} not done">Not done</button>`:''}</div>
           <div><label aria-hidden="true">${ex.time?'Seconds':'Reps'}</label><button class="num numbtn" data-pick="${i},${k},reps" aria-label="Set ${k+1} ${ex.time?'seconds':'reps'}: ${s.reps!==''?esc(s.reps):'not set'}.${locked?' Locked':' Tap to change'}"${lk}>${s.reps!==''?esc(s.reps):`<span class="ph">${p[2]===p[3]?p[2]:p[2]+'–'+p[3]}</span>`}</button></div>
           ${ex.weight?`<div><label><span aria-hidden="true">Weight (${profile.unit})</span>${ex.bar&&!locked?`<button class="plate-btn" data-plate="${i},${k}" aria-label="Plate calculator">🧮</button>`:''}</label><button class="num numbtn" data-pick="${i},${k},weight" aria-label="Set ${k+1} weight: ${s.weight!==''?esc(s.weight)+' '+profile.unit:'not set'}.${locked?' Locked':' Tap to change'}"${lk}>${s.weight!==''?esc(s.weight):`<span class="ph">${profile.unit}</span>`}</button></div>`:''}
           ${ex.time&&!s.done?`<button class="check go" data-time="${i},${k}" aria-label="Start ${esc(ex.name)} timer">⏱</button>`:ex.time?'<span></span>':''}
@@ -856,13 +1013,25 @@ function renderWorkout(v){
         </div>`}).join('')}</div>
       ${it.sets.length&&it.sets.every(s=>s.done)?`<div class="effort">${it.effort?`<span class="small">Felt: <b>${EFF[it.effort]}</b></span> <button class="link" data-eff="${i},0">change</button>`:`<p class="small" style="font-weight:700">How did that feel?</p><div class="seg">${[1,2,3].map(n=>`<button data-eff="${i},${n}">${EFF[n]}</button>`).join('')}</div>`}</div>`:''}
       <div class="row between" style="margin-top:8px"><span><button class="link" data-add="${i}">＋ Set</button>${it.sets.length>1?` <button class="link" style="color:var(--muted);margin-left:10px" data-rm="${i}">− Set</button>`:''}</span>${canSwap?`<button class="link" data-swap="${i}">🔄 Swap exercise</button>`:''}</div>
+      ${i<a.items.length-1?`<button class="link small sslink" data-link="${i}">${it.link?'✂️ Unlink from next exercise':'🔗 Superset with next exercise'}</button>`:''}
     </div>`}).join('')}
     <button class="btn" id="finish">Finish workout 🎉</button>
     <button class="btn ghost" id="quit">Cancel workout</button>
   </div>`;
   const save=()=>store.set(pKey('jams_active'),a);
   const rerender=()=>{const y=scrollY;renderWorkout(v);scrollTo(0,y)};
-  const markDone=(i,k)=>{const allDone=a.items.every(it=>it.sets.every(x=>x.done));if(allDone){hideTimer();toast('All sets done! Tap Finish 🎉');say('All sets done. Amazing work! Tap finish.')}else{nextSay=nextUp(a);say(`Nice! Rest ${restSecs()} seconds.`);startTimer(restSecs())}};
+  const markDone=(i,k)=>{
+    const allDone=a.items.every(it=>it.sets.every(x=>x.done));
+    if(allDone){hideTimer();toast('All sets done! Tap Finish 🎉');say('All sets done. Amazing work! Tap finish.');return}
+    const G=ssGroups(a)[i],s=a.items[i].sets[k];
+    // Superset: go straight to the next exercise in the group, rest after the last one.
+    const nxt=G?G.mem.find(j=>j>i&&a.items[j].sets[k]&&!a.items[j].sets[k].done):undefined;
+    if(nxt!=null){hideTimer();const n=EX[a.items[nxt].id].name;say(`Superset! Now ${n}.`);toast(`🔗 Now: ${n}`);const c=document.getElementById('ex'+nxt);if(c)c.scrollIntoView({behavior:'smooth',block:'start'});return}
+    const after=a.items[i].sets[k+1];
+    if(after&&after.t==='d'&&!after.done){hideTimer();say('Drop set! Lower the weight and go.');toast('⬇️ Drop set next: no rest');return}
+    const sec=s.t==='w'?Math.min(45,restSecs()):restSecs(); // short rest after a warm-up set
+    nextSay=nextUp(a);say(`Nice! Rest ${sec} seconds.`);startTimer(sec);
+  };
   v.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{
     const [i,k,f]=b.dataset.pick.split(','),it=a.items[+i],s=it.sets[+k],p=it.p||plan[+i],ex=EX[it.id],prev=it.sets[+k-1];
     if(s.done&&setEditing!==`${i},${k}`)return; // finished sets are locked until you tap Edit
@@ -882,6 +1051,8 @@ function renderWorkout(v){
     if(s.reps==='')s.reps=String(p[2]);
     s.done=true;setEditing=null;save();rerender();markDone(i,k);
   });
+  v.querySelectorAll('[data-stype]').forEach(b=>b.onclick=()=>{const [i,k]=b.dataset.stype.split(',').map(Number);setTypeSheet(a.items[i],k,()=>{save();rerender()})});
+  v.querySelectorAll('[data-link]').forEach(b=>b.onclick=()=>{const it=a.items[+b.dataset.link];it.link=!it.link;save();rerender();if(it.link)toast('🔗 Superset: one set of each, then rest')});
   v.querySelectorAll('[data-undone]').forEach(b=>b.onclick=()=>{const [i,k]=b.dataset.undone.split(',').map(Number);a.items[i].sets[k].done=false;setEditing=null;save();rerender()});
   v.querySelectorAll('[data-sedit]').forEach(b=>b.onclick=()=>{setEditing=b.dataset.sedit;rerender();
     const f=document.querySelector(`[data-pick="${setEditing},reps"]`);if(f)f.focus()});
@@ -916,11 +1087,12 @@ function finishWorkout(a){
   setEditing=null;
   const j=getJournal(),date=a.date||isoLocal(),before=recordsTable(j),fresh=[];let sets=0,vol=0;
   const time=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  const SS=ssGroups(a);
   a.items.forEach((it,i)=>{
     const ex=EX[it.id];
-    const done=it.sets.filter(s=>s.done).map(s=>({reps:parseInt(s.reps)||0,weight:ex.weight?(parseFloat(s.weight)||0):0})).filter(s=>s.reps>0||s.weight>0);
+    const done=it.sets.filter(s=>s.done).map(s=>cleanSet({reps:parseInt(s.reps)||0,weight:ex.weight?(parseFloat(s.weight)||0):0,t:s.t,rpe:s.rpe})).filter(s=>s.reps>0||s.weight>0);
     if(!done.length)return;
-    const en={id:Date.now()+i,exercise:ex.name,timestamp:time,sets:done,unit:profile.unit,level:a.level,workout:a.key,u:Date.now()};if(it.effort)en.effort=it.effort;(j[date]=j[date]||[]).push(en);fresh.push(en);
+    const en={id:Date.now()+i,exercise:ex.name,timestamp:time,sets:done,unit:profile.unit,level:a.level,workout:a.key,u:Date.now()};if(it.effort)en.effort=it.effort;if(SS[i])en.ss=SS[i].g;(j[date]=j[date]||[]).push(en);fresh.push(en);
     sets+=done.length;done.forEach(s=>vol+=s.reps*s.weight);
   });
   if(!sets){toast('Tap ✓ on at least one set first');return}
@@ -1025,14 +1197,14 @@ function historyHtml(j,dates){
   if(!dates.length)return `<div class="card empty"><div class="big-emoji">📒</div><p class="muted">No workouts yet. Your history will show up here.</p></div>`;
   return dates.slice().reverse().slice(0,30).map(d=>`<div><p class="small" style="font-weight:800;color:var(--lvl-text);margin-top:6px">${niceDate(d)}</p>
     ${j[d].map(e=>`<div class="hist"><div class="row between"><b>${esc(e.exercise)}</b><span style="white-space:nowrap"><span class="small muted">${esc(e.timestamp||'')}</span><button class="xbtn" data-edit="${d}|${esc(e.id)}" aria-label="Edit">✏️</button><button class="xbtn" data-del="${d}|${esc(e.id)}" aria-label="Delete">🗑️</button></span></div>
-      <div>${e.kind==='activity'?`<span class="badge">⏱ <b>${e.minutes}</b> min</span>${e.distance?`<span class="badge">📍 <b>${e.distance}</b> ${e.dunit||''}</span>`:''}`:''}${e.effort?`<span class="badge">${EFF[e.effort]}</span>`:''}${(e.sets||[]).map((s,i)=>`<span class="badge">${i+1}: <b>${Number(s.reps)||0}</b>${s.weight?` × <b>${round1(toUnit(Number(s.weight),e.unit))}</b> ${profile.unit}`:''}</span>`).join('')}</div></div>`).join('')}</div>`).join('')
+      <div>${e.kind==='activity'?`<span class="badge">⏱ <b>${e.minutes}</b> min</span>${e.distance?`<span class="badge">📍 <b>${e.distance}</b> ${e.dunit||''}</span>`:''}`:''}${e.ss?`<span class="badge">🔗 Superset ${e.ss}</span>`:''}${e.effort?`<span class="badge">${EFF[e.effort]}</span>`:''}${(e.sets||[]).map((s,i)=>`<span class="badge">${s.t==='w'?'W':s.t==='d'?'D':s.t==='f'?'F':i+1}: <b>${Number(s.reps)||0}</b>${s.weight?` × <b>${round1(toUnit(Number(s.weight),e.unit))}</b> ${profile.unit}`:''}${s.rpe?` <span class="small muted">@${s.rpe}</span>`:''}</span>`).join('')}</div></div>`).join('')}</div>`).join('')
     +(dates.length>30?`<p class="small muted center">Showing the latest 30 days. Download a backup to keep everything.</p>`:'');
 }
 function editEntry(d,id,after){
   const j=getJournal(),e=(j[d]||[]).find(x=>String(x.id)===id);if(!e)return;
   if(e.kind==='activity')return activitySheet({d,id});
   const hasW=e.sets.some(s=>s.weight)||Object.values(EX).some(x=>x.name===e.exercise&&x.weight);
-  let rows=e.sets.map(s=>({reps:s.reps,weight:s.weight?round1(toUnit(Number(s.weight),e.unit)):''}));
+  let rows=e.sets.map(s=>({reps:s.reps,weight:s.weight?round1(toUnit(Number(s.weight),e.unit)):'',t:s.t,rpe:s.rpe}));
   const draw=()=>sheet(`<h2>✏️ ${esc(e.exercise)}</h2><p class="small muted">${niceDate(d)}</p>
     <div>${rows.map((r,i)=>`<div class="set ${hasW?'wt':'nowt'}" style="grid-template-columns:54px 1fr ${hasW?'1fr ':''}44px"><div class="n">Set ${i+1}</div>
       <div><label>Reps</label><input class="num" type="number" inputmode="numeric" min="0" value="${r.reps}" data-r="${i}"></div>
@@ -1044,7 +1216,7 @@ function editEntry(d,id,after){
     $('#cancel').onclick=closeLayer;
     $('#addrow').onclick=()=>{read();rows.push({reps:'',weight:rows.length?rows[rows.length-1].weight:''});draw()};
     document.querySelectorAll('[data-x]').forEach(x=>x.onclick=()=>{read();rows.splice(+x.dataset.x,1);draw()});
-    $('#save').onclick=()=>{read();const sets=rows.map(r=>({reps:parseInt(r.reps)||0,weight:parseFloat(r.weight)||0})).filter(s=>s.reps>0||s.weight>0);
+    $('#save').onclick=()=>{read();const sets=rows.map(r=>cleanSet({reps:parseInt(r.reps)||0,weight:parseFloat(r.weight)||0,t:r.t,rpe:r.rpe})).filter(s=>s.reps>0||s.weight>0);
       if(!sets.length){toast('Add at least one set, or delete the entry instead');return}
       e.sets=sets;e.unit=profile.unit;e.u=Date.now();setJournal(j);closeLayer();toast('Saved ✅');after&&after();syncNow(true)};
   });
@@ -1556,7 +1728,7 @@ function exCard(id,target,editable){
 const e1rm=(w,r)=>w>0&&r>0?(r===1?w:w*(1+Math.min(r,12)/30)):0;
 function bestOf(sets,unit){
   let w=0,er=0,reps=0,wr=0;
-  (sets||[]).forEach(s=>{const kg=toUnit(Number(s.weight)||0,unit),r=Number(s.reps)||0;if(kg>w||(kg===w&&r>wr)){w=kg;wr=r}er=Math.max(er,e1rm(kg,r));reps=Math.max(reps,r)});
+  workSets(sets).forEach(s=>{const kg=toUnit(Number(s.weight)||0,unit),r=Number(s.reps)||0;if(kg>w||(kg===w&&r>wr)){w=kg;wr=r}er=Math.max(er,e1rm(kg,r));reps=Math.max(reps,r)});
   return {w,wr,er,reps};
 }
 function recordsTable(j=getJournal()){
@@ -1590,17 +1762,29 @@ function muscleStats(){
   workoutDates(j).forEach(d=>{const thisWeek=parseIso(d)>=ws;
     j[d].forEach(e=>{const ex=EX[exByName(e.exercise)];if(!ex||e.kind==='activity')return;
       const keys=[...new Set(ex.m.flatMap(m=>MUSCLE_KEYS[m]||[]))];
-      const vol=(e.sets||[]).reduce((t,x)=>t+(Number(x.reps)||0)*toUnit(Number(x.weight)||0,e.unit),0);
+      const ws=workSets(e.sets),vol=ws.reduce((t,x)=>t+(Number(x.reps)||0)*toUnit(Number(x.weight)||0,e.unit),0);
       const b=bestOf(e.sets,e.unit);
       keys.forEach(k=>{
-        if(thisWeek){sets[k]=(sets[k]||0)+(e.sets||[]).length;load[k]=(load[k]||0)+vol}
+        if(thisWeek){sets[k]=(sets[k]||0)+ws.length;load[k]=(load[k]||0)+vol}
         if(b.er>0&&(!best[k]||b.er>best[k].er))best[k]={er:b.er,w:b.w,wr:b.wr,ex:e.exercise,d};
       })})});
   return {sets,load,best};
 }
 function weekMuscles(){return muscleStats().sets}
+const mmSeg=()=>`<div class="seg">${[['sets','Sets'],['load',`${profile.unit} lifted`],['best','Strength'],['ready','Ready?']].map(o=>`<button class="${o[0]===muscleMode?'on':''}" data-mm="${o[0]}">${o[1]}</button>`).join('')}</div>`;
+// "Ready?" tab: which muscles are rested enough to train hard again.
+function readyCard(){
+  const R=muscleReady(),rows=readyRows();
+  const tip=k=>`${MUSCLE_NAMES[k]}: ${readyText(R[k]).slice(2)}`;
+  return `<div class="card stack" id="mmcard"><h2 class="h3">💪 Muscle power</h2>${mmSeg()}
+    ${bodyMap(k=>1-R[k],{cls:'mmap',tip,label:'Body map of tired muscles'})}
+    ${rows.length?`<div class="stack" style="gap:8px">${rows.map(([k,r])=>{const h=r<READY?hoursUntilReady(k):0;return `<div><div class="row between small"><b>${MUSCLE_NAMES[k]}</b><span>${readyText(r)}${h?` <span class="muted">· ready in ~${h<24?h+' h':plural(Math.round(h/24),'day')}</span>`:''}</span></div><div class="famBar"><i style="width:${Math.round((1-r)*100)}%"></i></div></div>`}).join('')}</div>`
+      :`<p class="small muted">All muscles are rested and ready. 💚</p>`}
+    <p class="small muted">Darker = more tired. Big muscles like legs and back need about 2–3 days after a hard workout; arms, calves and core recover faster. Hard sets and "Too hard" ratings count more.</p></div>`;
+}
 function muscleMap(){
   const st=muscleStats(),m=muscleMode;
+  if(m==='ready')return readyCard();
   const val=k=>m==='sets'?(st.sets[k]||0):m==='load'?Math.round(st.load[k]||0):Math.round((st.best[k]||{}).er||0);
   const max=Math.max(1,...Object.keys(MUSCLE_NAMES).map(val));
   const unit=profile.unit,fmt=n=>n.toLocaleString();
@@ -1610,7 +1794,7 @@ function muscleMap(){
     :m==='load'?`Weight × reps for every set this week. Each muscle counts the full weight of the exercises that use it (so a bench press adds to chest, shoulders and triceps).`
     :'Each muscle\'s strongest lift ever, as an estimated 1-rep max: the most it could lift once. A score to watch grow, not a weight to try!';
   return `<div class="card stack" id="mmcard"><h2 class="h3">💪 Muscle power</h2>
-    <div class="seg">${[['sets','Sets'],['load',`${unit} lifted`],['best','Strength']].map(o=>`<button class="${o[0]===m?'on':''}" data-mm="${o[0]}">${o[1]}</button>`).join('')}</div>
+    ${mmSeg()}
     ${bodyMap(k=>{const n=val(k);return n?n/max:0},{cls:'mmap',tip,label:'Body map of muscles worked'})}
     ${rows.length?`<div class="stack" style="gap:8px">${rows.map(([k,n])=>`<div><div class="row between small"><b>${MUSCLE_NAMES[k]}</b><span>${m==='sets'?plural(n,'set'):fmt(n)+' '+unit}${m==='best'?` <span class="muted">· ${esc(st.best[k].ex)}</span>`:''}</span></div><div class="famBar"><i style="width:${n/max*100}%"></i></div></div>`).join('')}</div>`
       :`<p class="small muted">${m==='sets'?'Finish a workout and the muscles you worked light up here.':m==='load'?`No weights lifted this week yet. Bodyweight moves count in Sets. Weighted exercises show here in ${unit}.`:'Lift with weights (dumbbells, machines or a barbell) to see each muscle\'s strength score.'}</p>`}
@@ -1829,6 +2013,8 @@ const GEAR_REQ={
   push_press:['barbell'],sumo_deadlift:['barbell'],barbell_hip_thrust:['barbell'],
   pullup:['pullbar','machines'],chin_up:['pullbar','machines'],weighted_pullup:['pullbar'],
 };
+// Newer exercises list their equipment in EX[id].need.
+Object.keys(EX).forEach(id=>{if(EX[id].need&&!GEAR_REQ[id])GEAR_REQ[id]=EX[id].need});
 const SMITH_SAFE='Set the safety stoppers first so the bar can never come down on you.';
 // Other ways to do the exercise, tried in order. {use:'id'} borrows another exercise's steps.
 const GEAR_VARIANTS={
@@ -2192,7 +2378,7 @@ async function restoreHistorySheet(){
 }
 
 /* ---------- Today: one compact "This week" card, and optional rows ---------- */
-const TODAY_ROWS={habits:'🌱 Daily habits',phase:'📅 6-month plan',challenge:'🏆 Monthly challenge',goal:'🎯 Goals',family:'👨‍👩‍👧 Family challenge',badges:'🏅 Badges',tip:'💡 Tip of the day'};
+const TODAY_ROWS={recovery:'😴 Muscle recovery tips',habits:'🌱 Daily habits',phase:'📅 6-month plan',challenge:'🏆 Monthly challenge',goal:'🎯 Goals',family:'👨‍👩‍👧 Family challenge',badges:'🏅 Badges',tip:'💡 Tip of the day'};
 const todayHidden=k=>(profile.todayHide||[]).includes(k);
 function weekRow(icon,title,value,pct,go='progress'){
   return `<button class="wrow" data-go="${go}"><span class="wi" aria-hidden="true">${icon}</span><span class="wt"><b>${title}</b>${pct!=null?`<span class="mini" aria-hidden="true"><i style="width:${Math.max(0,Math.min(100,pct))}%"></i></span>`:''}</span><span class="wv">${value}</span></button>`;
@@ -2252,12 +2438,12 @@ function undoable(msg,undo,commit){
 
 /* ---------- Workout builder ---------- */
 // Equipment each exercise needs (beyond a wall, chair, step or backpack).
-const NEEDS_BAR_OR_RACK=new Set(['pullup','dips','knee_raise','leg_raise','chin_up','weighted_pullup']);
+const NEEDS_BAR_OR_RACK=new Set(['pullup','inverted_row','dips','knee_raise','leg_raise','chin_up','weighted_pullup']);
 const MACHINES=new Set(['lat_pulldown','leg_extension','cable_row','tricep_pushdown','leg_press','face_pull']);
-const homeOk=id=>id.startsWith('backpack_')||(!EX[id].weight&&!NEEDS_BAR_OR_RACK.has(id)&&id!=='ab_wheel');
+const homeOk=id=>!EX[id].need&&(id.startsWith('backpack_')||!EX[id].weight&&!NEEDS_BAR_OR_RACK.has(id)&&id!=='ab_wheel');
 function equipOk(id,equip){
   if(equip==='none')return homeOk(id);
-  if(equip==='dumbbells')return homeOk(id)||(EX[id].weight&&!EX[id].bar&&!MACHINES.has(id));
+  if(equip==='dumbbells')return homeOk(id)||(EX[id].weight&&!EX[id].bar&&!EX[id].need&&!MACHINES.has(id));
   return true;
 }
 const levelOk=id=>profile.level==='expert'||!EX[id].bar;
@@ -2268,7 +2454,9 @@ function buildPool(equip){return Object.keys(EX).filter(id=>!id.startsWith('_')&
 function buildWorkout({mins=15,focus='full',equip,sport}={}){
   equip=equip||(profile.level==='beginner'?'none':profile.level==='intermediate'?'dumbbells':'gym');
   const count=Math.max(3,Math.min(8,Math.round(mins/3.5))),sets=mins<=10?2:3,beg=profile.level==='beginner';
-  const pool=buildPool(equip);let picks=[];
+  let pool=buildPool(equip);let picks=[];
+  // Prefer muscles that are rested, if that still leaves plenty to choose from.
+  try{const R=muscleReady(),fresh=pool.filter(id=>planMuscles([[id]]).every(k=>(R[k]??1)>=TIRED));if(fresh.length>=count*2)pool=fresh}catch(e){}
   if(sport){const S=SPORTS.find(s=>s.id===sport);if(S)picks=shuffle(S.items.map(x=>x[0]).filter(id=>pool.includes(id)))}
   if(picks.length<count){
     const groups=FOCUS[focus]&&FOCUS[focus].m?[FOCUS[focus].m]:[['Legs','Glutes'],['Chest','Shoulders'],['Back'],['Core'],['Heart'],['Arms']];
@@ -2472,6 +2660,75 @@ function goalPeek(){
   const n=goalProgress(g),pct=Math.min(100,Math.round(n/g.target*100));
   return `<button class="card row" data-go="progress" style="width:100%;text-align:left"><span class="big-emoji">🎯</span><div style="flex:1"><b>${esc(goalTitle(g))}</b><div class="progress" style="margin-top:6px"><i style="width:${pct}%"></i></div></div><b>${pct}%</b></button>`;
 }
+
+/* ===== js/recovery.js ===== */
+/* KinFit · Muscle recovery: how rested each muscle is, based on recent sets, effort and activities.
+   Used by the Today screen ("your legs are still recovering, try Upper B instead"), the
+   Muscle power card (Ready tab) and the workout builder (skips tired muscles when it can). */
+
+// Hours a muscle needs to fully recover from a hard session. Big muscles take longer.
+const RECOVER_H={quads:72,hams:72,glutes:72,lowerback:72,upperback:60,chest:60,shoulders:48,biceps:48,triceps:48,forearms:36,abs:36,calves:36};
+const TIRED_AT=10;   // about 10 hard sets on a muscle right now = fully tired
+const READY=.7,TIRED=.4;
+// Sports and activities: which muscles they work, per 10 minutes, in "sets".
+const ACT_LOAD={Run:{quads:.6,hams:.6,calves:.8,glutes:.4},Walk:{calves:.2},Bike:{quads:.6,glutes:.3},Swim:{upperback:.5,shoulders:.5},
+  Soccer:{quads:.6,hams:.6,calves:.6},Basketball:{quads:.6,calves:.7},Cricket:{shoulders:.3,quads:.3},Tennis:{shoulders:.4,quads:.4,calves:.4},
+  Pickleball:{quads:.3,calves:.3},Dance:{quads:.3,calves:.4},'Martial arts':{quads:.4,abs:.3},Intervals:{quads:.4,abs:.2}};
+
+// Each muscle's tiredness (in sets) at time `now`.
+function muscleFatigue(now=Date.now(),j=getJournal()){
+  const out={},from=now-4*864e5;
+  const add=(k,sets,t)=>{const h=(now-t)/36e5,left=1-h/(RECOVER_H[k]||48);if(h>=0&&left>0)out[k]=(out[k]||0)+sets*left};
+  Object.keys(j).forEach(d=>{const day=parseIso(d).getTime();if(day<from-864e5)return;
+    j[d].forEach(e=>{
+      const t=e.u&&e.u<=now?e.u:day+18*36e5;if(t<from)return;
+      if(e.kind==='activity'){const L=ACT_LOAD[e.act];if(L)Object.keys(L).forEach(k=>add(k,L[k]*(e.minutes||0)/10,t));return}
+      const ex=EX[exByName(e.exercise)];if(!ex)return;
+      const ws=workSets(e.sets);if(!ws.length)return;
+      const rpe=ws.filter(s=>s.rpe).map(s=>s.rpe),hard=rpe.length?rpe.reduce((a,b)=>a+b,0)/rpe.length>=9:false;
+      const n=ws.length*(e.effort===3?1.3:e.effort===1?.8:1)*(hard?1.15:1);
+      (ex.m||[]).forEach((m,i)=>(MUSCLE_KEYS[m]||[]).forEach(k=>add(k,n*(i===0?1:.5),t)));
+    })});
+  return out;
+}
+// 0 (very tired) … 1 (fully rested) for every muscle.
+function muscleReady(now=Date.now(),j){
+  const f=muscleFatigue(now,j),out={};
+  Object.keys(RECOVER_H).forEach(k=>out[k]=Math.max(0,1-(f[k]||0)/TIRED_AT));
+  return out;
+}
+// Hours until a muscle is ready again (0 if ready now).
+function hoursUntilReady(k){
+  const j=getJournal();
+  for(let h=0;h<=96;h+=3)if(muscleReady(Date.now()+h*36e5,j)[k]>=READY)return h;
+  return 96;
+}
+// The main muscles a list of plan items works (first muscle of each exercise).
+const planMuscles=plan=>[...new Set(plan.flatMap(p=>{const ex=EX[p[0]];return ex?(MUSCLE_KEYS[ex.m[0]]||[]):[]}))];
+const planReadiness=(plan,R)=>{const ks=planMuscles(plan);return ks.length?Math.min(...ks.map(k=>R[k]??1)):1};
+const muscleList=ks=>{const n=ks.map(k=>MUSCLE_LABEL[k].toLowerCase());return n.length>1?n.slice(0,-1).join(', ')+' and '+n[n.length-1]:n[0]||''};
+
+// Today: if today's workout hits muscles that are still tired, say so and offer a fresher workout.
+function recoveryCard(schedKey){
+  if(todayHidden('recovery')||!(schedKey in WORKOUTS))return '';
+  const R=muscleReady(),plan=phasePlan(PLANS[profile.level][schedKey]);
+  const tired=planMuscles(plan).filter(k=>R[k]<TIRED);
+  if(!tired.length)return '';
+  const alt=Object.keys(WORKOUTS).filter(k=>k!==schedKey).map(k=>({k,r:planReadiness(phasePlan(PLANS[profile.level][k]),R)}))
+    .filter(x=>x.r>=READY).sort((a,b)=>b.r-a.r)[0];
+  const hrs=Math.max(...tired.map(hoursUntilReady)),when=hrs<=12?'later today':hrs<=30?'tomorrow':'in a couple of days';
+  return `<div class="card stack recov-card"><p style="font-weight:800">😴 Your ${esc(muscleList(tired))} ${tired.length>1||/s$/.test(MUSCLE_LABEL[tired[0]])?'are':'is'} still recovering</p>
+    <p class="small muted">Muscles get stronger while they rest. They should feel ready ${when}.</p>
+    ${alt?`<button class="btn sm" data-start="${alt.k}" style="width:100%">Do ${WORKOUTS[alt.k].e} ${esc(WORKOUTS[alt.k].name)} instead ▶</button>`
+      :`<button class="btn sm ghost-light" data-stretch="mob" style="width:100%">🧘 Do stretch & mobility instead</button>`}
+    <p class="small muted">Feeling good? You can still do today's workout. Use a little less weight and stop if anything hurts.</p></div>`;
+}
+// Muscle power card, "Ready" tab: tiredness per muscle (higher = more tired).
+function readyRows(){
+  const R=muscleReady();
+  return Object.keys(MUSCLE_NAMES).map(k=>[k,R[k]]).filter(r=>r[1]<.999).sort((a,b)=>a[1]-b[1]);
+}
+const readyText=r=>r>=READY?'✅ Ready':r>=TIRED?'🟡 Recovering':'😴 Tired';
 
 /* ===== js/habits.js ===== */
 /* KinFit · Daily habits: water, sleep, stretching, screen-free time and your own, each with a streak. */
