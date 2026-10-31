@@ -56,8 +56,8 @@ function routineSheet(r){
     document.querySelectorAll('[data-rx]').forEach(b=>b.onclick=()=>{read();r.items.splice(+b.dataset.rx,1);draw()});
     $('#radd').onclick=()=>{read();pickExercise(id=>{const ex=EX[id];r.items.push([id,3,ex.time?20:8,ex.time?40:12]);draw()},draw)};
     $('#rsave').onclick=()=>{read();if(!r.name){toast('Give your workout a name');return}if(!r.items.length){toast('Add at least one exercise');return}
-      const list=(profile.routines||[]).filter(x=>x.id!==r.id);list.push(r);profile.routines=list;saveProfile();closeLayer();toast('⭐ Workout saved');syncNow(true);if(route==='library')render()};
-    if($('#rdel'))$('#rdel').onclick=()=>confirmBox('Delete this workout?','Your history stays. Only the saved workout is removed.','Delete',()=>{profile.routines=(profile.routines||[]).filter(x=>x.id!==r.id);saveProfile();syncNow(true);render()},true);
+      const list=(profile.routines||[]).filter(x=>x.id!==r.id);list.push(r);profile.routines=list;saveProfile();closeLayer();toast('⭐ Workout saved');syncSoon();if(route==='library')render()};
+    if($('#rdel'))$('#rdel').onclick=()=>confirmBox('Delete this workout?','Your history stays. Only the saved workout is removed.','Delete',()=>{profile.routines=(profile.routines||[]).filter(x=>x.id!==r.id);saveProfile();syncSoon();render()},true);
   });
   draw();
 }
@@ -98,9 +98,9 @@ function exerciseSheet(id){
     $('#xsave').onclick=()=>{read();if(!cur.name){toast('Give it a name');return}
       if(Object.keys(EX).some(k=>k!==id&&EX[k].name.toLowerCase()===cur.name.toLowerCase())){toast('An exercise with that name already exists');return}
       if(!cur.m.length)cur.m=['Other'];if(!cur.steps.length)cur.steps=['Move slowly and with control.'];if(!cur.tip)cur.tip='Stop if anything hurts.';
-      profile.customEx=Object.assign({},profile.customEx||{},{[id||newId('c_')]:cur});saveProfile();loadCustom();closeLayer();toast('⭐ Exercise saved');syncNow(true);render()};
+      profile.customEx=Object.assign({},profile.customEx||{},{[id||newId('c_')]:cur});saveProfile();loadCustom();closeLayer();toast('⭐ Exercise saved');syncSoon();render()};
     if($('#xdel'))$('#xdel').onclick=()=>confirmBox('Delete this exercise?','It will be removed from your saved workouts. Your history stays.','Delete',()=>{
-      const c=Object.assign({},profile.customEx);delete c[id];profile.customEx=c;(profile.routines||[]).forEach(r=>r.items=r.items.filter(p=>p[0]!==id));saveProfile();loadCustom();syncNow(true);render()},true);
+      const c=Object.assign({},profile.customEx);delete c[id];profile.customEx=c;(profile.routines||[]).forEach(r=>r.items=r.items.filter(p=>p[0]!==id));saveProfile();loadCustom();syncSoon();render()},true);
   });
   draw();
 }
@@ -288,9 +288,9 @@ function activitySheet(edit){
         timestamp:e?e.timestamp:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),level:profile.level,u:Date.now()};
       (jj[st.date]=jj[st.date]||[]).push(entry);setJournal(jj);closeLayer();toast(e?'Saved ✅':`${st.e} ${min} minutes logged!`);
       if(!e){say(`Nice! ${min} minutes of ${st.act.toLowerCase()} logged.`);const nb=newBadges();if(nb.length)setTimeout(()=>toast(`🏅 New badge: ${nb[0].e} ${nb[0].n}!`),1200)}
-      syncNow(true);render()};
+      syncSoon();render()};
     if($('#adel'))$('#adel').onclick=()=>{const jj=getJournal();jj[edit.d]=(jj[edit.d]||[]).filter(x=>String(x.id)!==String(e.id));if(!jj[edit.d].length)delete jj[edit.d];setJournal(jj);closeLayer();render();
-      undoable(`${e.exercise} deleted`,()=>{const j2=getJournal();(j2[edit.d]=j2[edit.d]||[]).push(e);setJournal(j2);render()},()=>{addTomb(e.id);syncNow(true)})};
+      undoable(`${e.exercise} deleted`,()=>{const j2=getJournal();(j2[edit.d]=j2[edit.d]||[]).push(e);setJournal(j2);render()},()=>{addTomb(e.id);syncSoon()})};
   });
   draw();
 }
@@ -324,7 +324,7 @@ function bodySheet(){
     <button class="btn" id="bsave">Save</button><button class="btn ghost" id="cancel">Cancel</button>`,()=>{
     $('#cancel').onclick=closeLayer;
     $('#bsave').onclick=()=>{const w=parseFloat($('#bw').value)||0,wa=parseFloat($('#bwa').value)||0;if(!w&&!wa){toast('Enter a weight or waist measurement');return}
-      profile.body=[...(profile.body||[]),{id:newId('b'),d:$('#bd').value||isoLocal(),w,unit:profile.unit,waist:wa,lu}];saveProfile();closeLayer();toast('Saved ✅');syncNow(true);render()};
+      profile.body=[...(profile.body||[]),{id:newId('b'),d:$('#bd').value||isoLocal(),w,unit:profile.unit,waist:wa,lu}];saveProfile();closeLayer();toast('Saved ✅');syncSoon();render()};
   });
 }
 function miniChart(pts,label){
@@ -349,7 +349,7 @@ function bindFamily(v){
   v.querySelectorAll('[data-five]').forEach(b=>b.onclick=()=>{
     const t=DB.list.find(p=>p.id===b.dataset.five);if(!t)return;
     t.fives=[...(t.fives||[]),{from:profile.name||'Someone',av:profile.avatar||'🙂',at:Date.now()}].slice(-20);t.updated=Date.now();saveDB();
-    toast(`🙌 High-five sent to ${t.name||'them'}!`);say(`High five sent to ${t.name||'them'}!`);syncNow(true)});
+    toast(`🙌 High-five sent to ${t.name||'them'}!`);say(`High five sent to ${t.name||'them'}!`);syncSoon()});
 }
 function fivesCard(){
   const seen=profile.fivesSeen||0,f=(profile.fives||[]).filter(x=>x.at>seen);

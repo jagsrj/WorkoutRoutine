@@ -57,7 +57,7 @@ function runIntervals(c){
     if(mins<1){if(!finished)toast('Stopped. Less than a minute, so nothing was logged.');return}
     const j=getJournal(),d=isoLocal();
     (j[d]=j[d]||[]).push({id:Date.now(),exercise:'⏱️ Intervals',kind:'activity',act:'Intervals',minutes:mins,distance:0,dunit:'km',effort:2,sets:[],timestamp:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),level:profile.level,u:Date.now()});
-    setJournal(j);syncNow(true);toast(`⏱️ ${plural(mins,'minute')} of intervals logged!`);
+    setJournal(j);syncSoon();toast(`⏱️ ${plural(mins,'minute')} of intervals logged!`);
     if(finished){const nb=newBadges();if(nb.length)setTimeout(()=>toast(`🏅 New badge: ${nb[0].e} ${nb[0].n}!`),1400)}
     if(route!=='workout')render()};
   runSequence(intervalSteps(c),{closeText:'Stop',onFinish:st=>log(st,true),onStop:st=>log(st,false)});

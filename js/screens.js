@@ -134,7 +134,7 @@ function renderToday(v){
     ${fivesCard()}
     ${heroHtml}
     ${isWork&&!doneToday&&!(active&&active.level===profile.level)?recoveryCard(sched.k):''}
-    ${backupCard()}
+    ${backupCard()||installCard()}
     ${streakCard()}
     ${habitsCard()}
     ${weekCard(strip,earned)}
@@ -153,7 +153,7 @@ function renderToday(v){
   v.querySelectorAll('.wrow[data-go]').forEach(b=>b.onclick=()=>b.dataset.go==='chal'?challengeSheet():go(b.dataset.go));
   if($('#fiveok'))$('#fiveok').onclick=()=>{profile.fivesSeen=Date.now();saveProfile();render()};
   if($('#morew'))$('#morew').onclick=()=>{libTab='mine';go('library')};
-  bindBackup();
+  bindBackup();bindInstall();
   maybeTour();
   checkChallenge();checkGoals();
 }
@@ -380,7 +380,7 @@ function finishWorkout(a){
   const mins=Math.max(1,Math.round((Date.now()-a.started)/60000));
   const nb=newBadges(),prs=findPRs(before,fresh),Wd=WORKOUTS[a.key]||{name:a.title,e:a.emoji};lastDone={title:Wd.name,e:Wd.e,sets,mins:Math.max(1,Math.round((Date.now()-a.started)/60000)),prs,badges:nb};
   celebrate(sets,mins,vol,nb,prs);
-  syncNow(true);
+  syncSoon();
 }
 function badgeRow(list){return list.length?`<div class="card stack"><h2 class="h3">🎉 New ${list.length>1?'badges':'badge'}!</h2><div class="badges">${list.map(b=>`<div class="badge-i on"><span>${b.e}</span><b>${b.n}</b></div>`).join('')}</div></div>`:''}
 function showNewBadges(){const nb=newBadges();if(nb.length)sheet(`${badgeRow(nb)}<button class="btn" id="ok">Awesome!</button>`,()=>$('#ok').onclick=closeLayer)}
@@ -466,12 +466,12 @@ function renderProgress(v){
   if($('#logact'))$('#logact').onclick=()=>activitySheet();
   if($('#badd'))$('#badd').onclick=bodySheet;
   v.querySelectorAll('[data-bdel]').forEach(b=>b.onclick=()=>{const before=(profile.body||[]).slice();profile.body=before.filter(x=>x.id!==b.dataset.bdel);saveProfile();renderProgress(v);
-    undoable('Measurement deleted',()=>{profile.body=before;saveProfile();renderProgress(v)},()=>syncNow(true))});
+    undoable('Measurement deleted',()=>{profile.body=before;saveProfile();renderProgress(v)},()=>syncSoon())});
   v.querySelectorAll('[data-b]').forEach(b=>b.onclick=()=>{const B=BADGES.find(x=>x.id===b.dataset.b);toast(`${earned.has(B.id)?B.e+' Earned: ':'🔒 To unlock: '}${B.d}`)});
   v.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const [d,id]=b.dataset.del.split('|');
     const jj=getJournal(),entry=(jj[d]||[]).find(e=>String(e.id)===id);if(!entry)return;
     jj[d]=jj[d].filter(e=>String(e.id)!==id);if(!jj[d].length)delete jj[d];setJournal(jj);renderProgress(v);
-    undoable(`${entry.exercise} deleted`,()=>{const j2=getJournal();(j2[d]=j2[d]||[]).push(entry);setJournal(j2);renderProgress(v)},()=>{addTomb(id);syncNow(true)})});
+    undoable(`${entry.exercise} deleted`,()=>{const j2=getJournal();(j2[d]=j2[d]||[]).push(entry);setJournal(j2);renderProgress(v)},()=>{addTomb(id);syncSoon()})});
   v.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{const [d,id]=b.dataset.edit.split('|');editEntry(d,id,()=>renderProgress(v))});
 }
 function historyHtml(j,dates){
@@ -499,7 +499,7 @@ function editEntry(d,id,after){
     document.querySelectorAll('[data-x]').forEach(x=>x.onclick=()=>{read();rows.splice(+x.dataset.x,1);draw()});
     $('#save').onclick=()=>{read();const sets=rows.map(r=>cleanSet({reps:parseInt(r.reps)||0,weight:parseFloat(r.weight)||0,t:r.t,rpe:r.rpe})).filter(s=>s.reps>0||s.weight>0);
       if(!sets.length){toast('Add at least one set, or delete the entry instead');return}
-      e.sets=sets;e.unit=profile.unit;e.u=Date.now();setJournal(j);closeLayer();toast('Saved ✅');after&&after();syncNow(true)};
+      e.sets=sets;e.unit=profile.unit;e.u=Date.now();setJournal(j);closeLayer();toast('Saved ✅');after&&after();syncSoon()};
   });
   draw();
 }

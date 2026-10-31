@@ -91,7 +91,7 @@ function runStretch(kind){
   runSequence(steps,{closeText:'Stop',onFinish:()=>{
     const j=getJournal(),d=isoLocal();
     (j[d]=j[d]||[]).push({id:Date.now(),exercise:'🧘 Stretch',kind:'activity',act:'Stretch',minutes:mins,distance:0,dunit:'km',sets:[],timestamp:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),level:profile.level,u:Date.now()});
-    setJournal(j);toast(`🧘 ${mins} minutes of stretching logged!`);say('Great stretching. Your muscles say thank you!');syncNow(true);if(route!=='workout')render()}});
+    setJournal(j);toast(`🧘 ${mins} minutes of stretching logged!`);say('Great stretching. Your muscles say thank you!');syncSoon();if(route!=='workout')render()}});
 }
 function stretchCard(){
   return `<div class="card stack"><div class="row"><span class="ex-emoji">🧘</span><div style="flex:1"><b>Stretch & mobility</b><p class="small muted">Guided, with a timer. Great after workouts and on rest days.</p></div></div>

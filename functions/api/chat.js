@@ -3,17 +3,18 @@
 // Setup (one time): Cloudflare dashboard → this Pages project → Settings → Bindings
 //   → Add → Workers AI → Variable name: AI → Save, then redeploy.
 // Optional: add an environment variable MODEL to try a specific Workers AI model first.
-// Limits protect the free daily AI allowance: 20 questions per hour per person (IP)
-// and 300 per day for the whole site. Limits are shared across servers when the
-// STORE (KV) binding is set up (the same one cloud sync uses).
-import { overLimit, clientIp, json, sameOrigin } from '../_lib/limit.js';
+// Limits protect the free daily AI allowance (10,000 "neurons" a day, about 40–60 per question
+// with the safety checks): 20 questions per hour per person (IP, counted in memory) and
+// AI_DAILY_CAP (default 200) per day for the whole site, counted in KV only for questions
+// that actually reach the AI. Change the cap with an AI_DAILY_CAP environment variable.
+import { overLimit, overSharedLimit, clientIp, json, sameOrigin } from '../_lib/limit.js';
 import { topicCheck, safetyCheck, isSelfHarm, signer, OFF_TOPIC_REPLY, CRISIS_REPLY, UNSAFE_REPLY } from '../_lib/guard.js';
 
 // Tried in order. If one is retired or busy, the next is used.
 // (@cf/meta/llama-3.1-8b-instruct was retired by Cloudflare on 2026-05-30.)
 const MODELS = ['@cf/meta/llama-3.1-8b-instruct-fast', '@cf/meta/llama-3.3-70b-instruct-fp8-fast', '@cf/zai-org/glm-4.7-flash'];
 const MAX_MSG_CHARS = 600;
-const MAX_HISTORY = 8;
+const MAX_HISTORY = 6;
 
 const SYSTEM = `You are "Coach", the friendly helper inside KinFit, a workout app that kids (as young as 12), teens and adults use.
 
@@ -35,7 +36,10 @@ Stay safe:
 
 const clean = (s, n) => String(s || '').replace(/[\u0000-\u001f]/g, ' ').slice(0, n);
 
-const PER_HOUR = 20, PER_DAY = 300;
+const PER_HOUR = 20;
+const dailyCap = env => Math.max(0, parseInt(env.AI_DAILY_CAP, 10) || 200);
+// Counts one AI question against today's site-wide budget. True = budget used up.
+const overBudget = env => overSharedLimit(env, `chatday:${new Date().toISOString().slice(0, 10)}`, dailyCap(env), 90000);
 
 export async function onRequestPost({ request, env }) {
   // Only accept requests from this site's own pages.
@@ -43,9 +47,8 @@ export async function onRequestPost({ request, env }) {
 
   if (!env.AI) return json({ error: 'not_configured' }, 503);
 
-  const hour = Math.floor(Date.now() / 3600000), day = new Date().toISOString().slice(0, 10);
+  const hour = Math.floor(Date.now() / 3600000);
   if (await overLimit(env, `chat:${clientIp(request)}:${hour}`, PER_HOUR, 3700)) return json({ error: 'rate_limited' }, 429);
-  if (await overLimit(env, `chatday:${day}`, PER_DAY, 90000)) return json({ error: 'rate_limited' }, 429);
 
   let body;
   try { body = await request.json(); } catch { return json({ error: 'bad_request' }, 400); }
@@ -79,6 +82,7 @@ export async function onRequestPost({ request, env }) {
   // "Build me a workout": the model may only pick exercise ids from the app's own list, and must answer in JSON.
   // The app double-checks every id and number before using the result.
   if (body.mode === 'build') {
+    if (await overBudget(env)) return json({ error: 'rate_limited' }, 429);
     const catalog = clean(body.catalog, 4000), request = clean(body.request, 300);
     const sys = `You design short, safe workouts for KinFit, a family fitness app (users may be kids). The user is on the ${level} level.${kid ? ' This user is a child or teen: keep it bodyweight-friendly, fun and moderate.' : ''}
 Reply with ONLY a JSON object and nothing else, in this exact shape:
@@ -112,6 +116,8 @@ Match the request (time, focus, sport). Balance muscle groups and start gentle.`
   if (!inSafe.safe) return fixed(UNSAFE_REPLY);
   if (topic !== 'FITNESS') return fixed(OFF_TOPIC_REPLY);
 
+  // Only questions that pass the guardrails count against the daily AI budget.
+  if (await overBudget(env)) return json({ error: 'rate_limited' }, 429);
   const models = env.MODEL ? [env.MODEL, ...MODELS] : MODELS;
   let lastError = '';
   for (const model of models) {

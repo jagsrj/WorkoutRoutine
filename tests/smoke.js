@@ -114,6 +114,19 @@ const check = (ok, what) => { console.log(`${ok ? '✅' : '❌'} ${what}`); if (
       return r;
     });
     Object.entries(rec).forEach(([k, v]) => check(v, 'Unit: ' + k));
+    // Home Screen reminder (iPhone instructions) and backup change detection
+    const hs = await page.evaluate(() => {
+      const r = {};
+      r.canonIgnoresKeyOrder = canon({ b: 1, a: { d: 1, c: [2, 1] } }) === canon({ a: { c: [2, 1], d: 1 }, b: 1 });
+      r.canonSeesChanges = canon({ a: 1 }) !== canon({ a: 2 });
+      syncCfg.snooze = Date.now() + 864e5; store.del('jams_home');
+      Object.defineProperty(navigator, 'userAgent', { get: () => 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)', configurable: true });
+      go('today'); r.iphoneCardShows = !!document.querySelector('#hscard') && document.querySelector('#hscard').textContent.includes('Add to Home Screen');
+      document.querySelector('#hsdone').click(); r.cardGoneAfterDone = !document.querySelector('#hscard');
+      delete syncCfg.snooze;
+      return r;
+    });
+    Object.entries(hs).forEach(([k, v]) => check(v, 'Unit: ' + k));
     await page.click('[data-go="progress"]'); await page.click('[data-mm="ready"]'); await page.waitForTimeout(150);
     check((await page.textContent('#mmcard')).includes('Ready'), 'Muscle "Ready?" tab shows');
     // Security: booby-trapped saved data must never run as code

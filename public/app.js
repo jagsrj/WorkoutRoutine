@@ -854,7 +854,7 @@ function renderToday(v){
     ${fivesCard()}
     ${heroHtml}
     ${isWork&&!doneToday&&!(active&&active.level===profile.level)?recoveryCard(sched.k):''}
-    ${backupCard()}
+    ${backupCard()||installCard()}
     ${streakCard()}
     ${habitsCard()}
     ${weekCard(strip,earned)}
@@ -873,7 +873,7 @@ function renderToday(v){
   v.querySelectorAll('.wrow[data-go]').forEach(b=>b.onclick=()=>b.dataset.go==='chal'?challengeSheet():go(b.dataset.go));
   if($('#fiveok'))$('#fiveok').onclick=()=>{profile.fivesSeen=Date.now();saveProfile();render()};
   if($('#morew'))$('#morew').onclick=()=>{libTab='mine';go('library')};
-  bindBackup();
+  bindBackup();bindInstall();
   maybeTour();
   checkChallenge();checkGoals();
 }
@@ -1100,7 +1100,7 @@ function finishWorkout(a){
   const mins=Math.max(1,Math.round((Date.now()-a.started)/60000));
   const nb=newBadges(),prs=findPRs(before,fresh),Wd=WORKOUTS[a.key]||{name:a.title,e:a.emoji};lastDone={title:Wd.name,e:Wd.e,sets,mins:Math.max(1,Math.round((Date.now()-a.started)/60000)),prs,badges:nb};
   celebrate(sets,mins,vol,nb,prs);
-  syncNow(true);
+  syncSoon();
 }
 function badgeRow(list){return list.length?`<div class="card stack"><h2 class="h3">🎉 New ${list.length>1?'badges':'badge'}!</h2><div class="badges">${list.map(b=>`<div class="badge-i on"><span>${b.e}</span><b>${b.n}</b></div>`).join('')}</div></div>`:''}
 function showNewBadges(){const nb=newBadges();if(nb.length)sheet(`${badgeRow(nb)}<button class="btn" id="ok">Awesome!</button>`,()=>$('#ok').onclick=closeLayer)}
@@ -1186,12 +1186,12 @@ function renderProgress(v){
   if($('#logact'))$('#logact').onclick=()=>activitySheet();
   if($('#badd'))$('#badd').onclick=bodySheet;
   v.querySelectorAll('[data-bdel]').forEach(b=>b.onclick=()=>{const before=(profile.body||[]).slice();profile.body=before.filter(x=>x.id!==b.dataset.bdel);saveProfile();renderProgress(v);
-    undoable('Measurement deleted',()=>{profile.body=before;saveProfile();renderProgress(v)},()=>syncNow(true))});
+    undoable('Measurement deleted',()=>{profile.body=before;saveProfile();renderProgress(v)},()=>syncSoon())});
   v.querySelectorAll('[data-b]').forEach(b=>b.onclick=()=>{const B=BADGES.find(x=>x.id===b.dataset.b);toast(`${earned.has(B.id)?B.e+' Earned: ':'🔒 To unlock: '}${B.d}`)});
   v.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const [d,id]=b.dataset.del.split('|');
     const jj=getJournal(),entry=(jj[d]||[]).find(e=>String(e.id)===id);if(!entry)return;
     jj[d]=jj[d].filter(e=>String(e.id)!==id);if(!jj[d].length)delete jj[d];setJournal(jj);renderProgress(v);
-    undoable(`${entry.exercise} deleted`,()=>{const j2=getJournal();(j2[d]=j2[d]||[]).push(entry);setJournal(j2);renderProgress(v)},()=>{addTomb(id);syncNow(true)})});
+    undoable(`${entry.exercise} deleted`,()=>{const j2=getJournal();(j2[d]=j2[d]||[]).push(entry);setJournal(j2);renderProgress(v)},()=>{addTomb(id);syncSoon()})});
   v.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{const [d,id]=b.dataset.edit.split('|');editEntry(d,id,()=>renderProgress(v))});
 }
 function historyHtml(j,dates){
@@ -1219,7 +1219,7 @@ function editEntry(d,id,after){
     document.querySelectorAll('[data-x]').forEach(x=>x.onclick=()=>{read();rows.splice(+x.dataset.x,1);draw()});
     $('#save').onclick=()=>{read();const sets=rows.map(r=>cleanSet({reps:parseInt(r.reps)||0,weight:parseFloat(r.weight)||0,t:r.t,rpe:r.rpe})).filter(s=>s.reps>0||s.weight>0);
       if(!sets.length){toast('Add at least one set, or delete the entry instead');return}
-      e.sets=sets;e.unit=profile.unit;e.u=Date.now();setJournal(j);closeLayer();toast('Saved ✅');after&&after();syncNow(true)};
+      e.sets=sets;e.unit=profile.unit;e.u=Date.now();setJournal(j);closeLayer();toast('Saved ✅');after&&after();syncSoon()};
   });
   draw();
 }
@@ -1285,19 +1285,26 @@ function applyPayload(P){
   saveDB();
   const cur=DB.list.find(p=>p.id===DB.current);profile=Object.assign({},DEFAULT_P,cur||{});
 }
-let syncing=false;
+let syncing=false,syncTimer=null;
+// Same data → same text, whatever order the keys were written in.
+const canon=x=>JSON.stringify(x,(k,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.keys(v).sort().reduce((o,key)=>(o[key]=v[key],o),{}):v);
+// Background sync after a change: waits 20 seconds so a burst of taps becomes one sync.
+function syncSoon(){if(!syncCfg.code)return;clearTimeout(syncTimer);syncTimer=setTimeout(()=>syncNow(true),20000)}
+addEventListener('pagehide',()=>{if(syncTimer){clearTimeout(syncTimer);syncTimer=null;syncNow(true)}});
 async function syncNow(silent){
   if(!syncCfg.code||syncing)return false;syncing=true;
   try{
     const call=async body=>{const r=await fetch('api/sync',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'failed');return d};
     const remote=await call({code:syncCfg.code,op:'get'});
-    const merged=mergePayload(localPayload(),remote.data);
-    await call({code:syncCfg.code,op:'put',data:merged});
-    applyPayload(merged);syncCfg.last=Date.now();saveSync();
+    applyPayload(mergePayload(localPayload(),remote.data));
+    // Only upload when something changed: cloud writes are limited per day (see docs, section 9).
+    const out=localPayload();
+    if(!remote.data||canon(out)!==canon(remote.data))await call({code:syncCfg.code,op:'put',data:out});
+    syncCfg.last=Date.now();saveSync();
     if(!silent){toast('☁️ Synced!');render()}
     return true;
   }catch(e){
-    if(!silent)toast(e.message==='not_configured'?'Sync isn\'t switched on for this website yet':e.message==='rate_limited'?'Too many syncs. Try again in a bit':'Couldn\'t reach the backup. Check your internet');
+    if(!silent)toast(e.message==='storage_busy'?'Backup is busy right now. Your workouts are safe on this phone and will back up later':e.message==='not_configured'?'Sync isn\'t switched on for this website yet':e.message==='rate_limited'?'Too many syncs. Try again in a bit':'Couldn\'t reach the backup. Check your internet');
     return false;
   }finally{syncing=false}
 }
@@ -1621,8 +1628,8 @@ function routineSheet(r){
     document.querySelectorAll('[data-rx]').forEach(b=>b.onclick=()=>{read();r.items.splice(+b.dataset.rx,1);draw()});
     $('#radd').onclick=()=>{read();pickExercise(id=>{const ex=EX[id];r.items.push([id,3,ex.time?20:8,ex.time?40:12]);draw()},draw)};
     $('#rsave').onclick=()=>{read();if(!r.name){toast('Give your workout a name');return}if(!r.items.length){toast('Add at least one exercise');return}
-      const list=(profile.routines||[]).filter(x=>x.id!==r.id);list.push(r);profile.routines=list;saveProfile();closeLayer();toast('⭐ Workout saved');syncNow(true);if(route==='library')render()};
-    if($('#rdel'))$('#rdel').onclick=()=>confirmBox('Delete this workout?','Your history stays. Only the saved workout is removed.','Delete',()=>{profile.routines=(profile.routines||[]).filter(x=>x.id!==r.id);saveProfile();syncNow(true);render()},true);
+      const list=(profile.routines||[]).filter(x=>x.id!==r.id);list.push(r);profile.routines=list;saveProfile();closeLayer();toast('⭐ Workout saved');syncSoon();if(route==='library')render()};
+    if($('#rdel'))$('#rdel').onclick=()=>confirmBox('Delete this workout?','Your history stays. Only the saved workout is removed.','Delete',()=>{profile.routines=(profile.routines||[]).filter(x=>x.id!==r.id);saveProfile();syncSoon();render()},true);
   });
   draw();
 }
@@ -1663,9 +1670,9 @@ function exerciseSheet(id){
     $('#xsave').onclick=()=>{read();if(!cur.name){toast('Give it a name');return}
       if(Object.keys(EX).some(k=>k!==id&&EX[k].name.toLowerCase()===cur.name.toLowerCase())){toast('An exercise with that name already exists');return}
       if(!cur.m.length)cur.m=['Other'];if(!cur.steps.length)cur.steps=['Move slowly and with control.'];if(!cur.tip)cur.tip='Stop if anything hurts.';
-      profile.customEx=Object.assign({},profile.customEx||{},{[id||newId('c_')]:cur});saveProfile();loadCustom();closeLayer();toast('⭐ Exercise saved');syncNow(true);render()};
+      profile.customEx=Object.assign({},profile.customEx||{},{[id||newId('c_')]:cur});saveProfile();loadCustom();closeLayer();toast('⭐ Exercise saved');syncSoon();render()};
     if($('#xdel'))$('#xdel').onclick=()=>confirmBox('Delete this exercise?','It will be removed from your saved workouts. Your history stays.','Delete',()=>{
-      const c=Object.assign({},profile.customEx);delete c[id];profile.customEx=c;(profile.routines||[]).forEach(r=>r.items=r.items.filter(p=>p[0]!==id));saveProfile();loadCustom();syncNow(true);render()},true);
+      const c=Object.assign({},profile.customEx);delete c[id];profile.customEx=c;(profile.routines||[]).forEach(r=>r.items=r.items.filter(p=>p[0]!==id));saveProfile();loadCustom();syncSoon();render()},true);
   });
   draw();
 }
@@ -1853,9 +1860,9 @@ function activitySheet(edit){
         timestamp:e?e.timestamp:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),level:profile.level,u:Date.now()};
       (jj[st.date]=jj[st.date]||[]).push(entry);setJournal(jj);closeLayer();toast(e?'Saved ✅':`${st.e} ${min} minutes logged!`);
       if(!e){say(`Nice! ${min} minutes of ${st.act.toLowerCase()} logged.`);const nb=newBadges();if(nb.length)setTimeout(()=>toast(`🏅 New badge: ${nb[0].e} ${nb[0].n}!`),1200)}
-      syncNow(true);render()};
+      syncSoon();render()};
     if($('#adel'))$('#adel').onclick=()=>{const jj=getJournal();jj[edit.d]=(jj[edit.d]||[]).filter(x=>String(x.id)!==String(e.id));if(!jj[edit.d].length)delete jj[edit.d];setJournal(jj);closeLayer();render();
-      undoable(`${e.exercise} deleted`,()=>{const j2=getJournal();(j2[edit.d]=j2[edit.d]||[]).push(e);setJournal(j2);render()},()=>{addTomb(e.id);syncNow(true)})};
+      undoable(`${e.exercise} deleted`,()=>{const j2=getJournal();(j2[edit.d]=j2[edit.d]||[]).push(e);setJournal(j2);render()},()=>{addTomb(e.id);syncSoon()})};
   });
   draw();
 }
@@ -1889,7 +1896,7 @@ function bodySheet(){
     <button class="btn" id="bsave">Save</button><button class="btn ghost" id="cancel">Cancel</button>`,()=>{
     $('#cancel').onclick=closeLayer;
     $('#bsave').onclick=()=>{const w=parseFloat($('#bw').value)||0,wa=parseFloat($('#bwa').value)||0;if(!w&&!wa){toast('Enter a weight or waist measurement');return}
-      profile.body=[...(profile.body||[]),{id:newId('b'),d:$('#bd').value||isoLocal(),w,unit:profile.unit,waist:wa,lu}];saveProfile();closeLayer();toast('Saved ✅');syncNow(true);render()};
+      profile.body=[...(profile.body||[]),{id:newId('b'),d:$('#bd').value||isoLocal(),w,unit:profile.unit,waist:wa,lu}];saveProfile();closeLayer();toast('Saved ✅');syncSoon();render()};
   });
 }
 function miniChart(pts,label){
@@ -1914,7 +1921,7 @@ function bindFamily(v){
   v.querySelectorAll('[data-five]').forEach(b=>b.onclick=()=>{
     const t=DB.list.find(p=>p.id===b.dataset.five);if(!t)return;
     t.fives=[...(t.fives||[]),{from:profile.name||'Someone',av:profile.avatar||'🙂',at:Date.now()}].slice(-20);t.updated=Date.now();saveDB();
-    toast(`🙌 High-five sent to ${t.name||'them'}!`);say(`High five sent to ${t.name||'them'}!`);syncNow(true)});
+    toast(`🙌 High-five sent to ${t.name||'them'}!`);say(`High five sent to ${t.name||'them'}!`);syncSoon()});
 }
 function fivesCard(){
   const seen=profile.fivesSeen||0,f=(profile.fives||[]).filter(x=>x.at>seen);
@@ -2123,8 +2130,8 @@ function videoSheet(id){
     ${own?'<button class="btn danger" id="vdel">Remove my video</button>':''}<button class="btn ghost" id="cancel">Cancel</button>`,()=>{
     $('#cancel').onclick=closeLayer;
     $('#vsave').onclick=()=>{const v=ytId($('#vurl').value);if(!v){toast('That doesn\'t look like a YouTube link');return}
-      profile.videos=Object.assign({},profile.videos,{[id]:v});saveProfile();closeLayer();render();toast('▶ Video saved');syncNow(true)};
-    if($('#vdel'))$('#vdel').onclick=()=>{const o=Object.assign({},profile.videos);delete o[id];profile.videos=o;saveProfile();closeLayer();render();toast('Video removed');syncNow(true)};
+      profile.videos=Object.assign({},profile.videos,{[id]:v});saveProfile();closeLayer();render();toast('▶ Video saved');syncSoon()};
+    if($('#vdel'))$('#vdel').onclick=()=>{const o=Object.assign({},profile.videos);delete o[id];profile.videos=o;saveProfile();closeLayer();render();toast('Video removed');syncSoon()};
   });
 }
 document.addEventListener('click',e=>{const b=e.target.closest('[data-myvid]');if(b)videoSheet(b.dataset.myvid)});
@@ -2157,7 +2164,7 @@ function gearSheet(){
       if(all)DB.list.forEach(p=>{if(p.id!==profile.id){setFor(p);p.updated=Date.now()}});
       setFor(profile);saveProfile();if(all)saveDB();
       // A workout already in progress keeps its exercises; only the instructions change.
-      closeLayer();render();toast('🏠 Equipment saved');syncNow(true)};
+      closeLayer();render();toast('🏠 Equipment saved');syncSoon()};
   });
   draw();
 }
@@ -2257,7 +2264,7 @@ function runStretch(kind){
   runSequence(steps,{closeText:'Stop',onFinish:()=>{
     const j=getJournal(),d=isoLocal();
     (j[d]=j[d]||[]).push({id:Date.now(),exercise:'🧘 Stretch',kind:'activity',act:'Stretch',minutes:mins,distance:0,dunit:'km',sets:[],timestamp:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),level:profile.level,u:Date.now()});
-    setJournal(j);toast(`🧘 ${mins} minutes of stretching logged!`);say('Great stretching. Your muscles say thank you!');syncNow(true);if(route!=='workout')render()}});
+    setJournal(j);toast(`🧘 ${mins} minutes of stretching logged!`);say('Great stretching. Your muscles say thank you!');syncSoon();if(route!=='workout')render()}});
 }
 function stretchCard(){
   return `<div class="card stack"><div class="row"><span class="ex-emoji">🧘</span><div style="flex:1"><b>Stretch & mobility</b><p class="small muted">Guided, with a timer. Great after workouts and on rest days.</p></div></div>
@@ -2505,7 +2512,7 @@ async function buildWithCoach(q){
 }
 function workoutText(w){return `Here's your **${w.e} ${w.name}**:\n${w.items.map((p,i)=>`${i+1}. ${EX[p[0]].name}: ${repsText(p,EX[p[0]])}`).join('\n')}\nWarm up first, and stop if anything hurts. Have fun! 💪`}
 function saveBuilt(w,start){
-  const list=(profile.routines||[]).filter(x=>x.id!==w.id);list.push({id:w.id,name:w.name,e:w.e,items:w.items});profile.routines=list.slice(-50);saveProfile();syncNow(true);
+  const list=(profile.routines||[]).filter(x=>x.id!==w.id);list.push({id:w.id,name:w.name,e:w.e,items:w.items});profile.routines=list.slice(-50);saveProfile();syncSoon();
   if(start)startCustom('r',w.id);else toast('⭐ Saved to My workouts');
 }
 function builderSheet(){
@@ -2569,7 +2576,7 @@ function challengeExercise(c){
 function logChallengeSet(id,amount){
   const j=getJournal(),d=isoLocal(),ex=EX[id];
   (j[d]=j[d]||[]).push({id:Date.now(),exercise:ex.name,timestamp:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),sets:[{reps:amount}],unit:profile.unit,level:profile.level,u:Date.now()});
-  setJournal(j);syncNow(true);
+  setJournal(j);syncSoon();
   const c=currentChallenge(),n=challengeProgress(c);
   toast(`${c.e} +${amount} ${ex.time?'sec':''} · ${Math.min(n,c.target)}/${c.target}${n>=c.target?' 🏆':''}`);
   if(typeof checkChallenge==='function')checkChallenge();
@@ -2600,7 +2607,7 @@ function challengeSheet(){
 document.addEventListener('click',e=>{if(e.target.closest('[data-chal]'))challengeSheet()});
 function checkChallenge(){
   const c=currentChallenge();if((profile.chDone||[]).includes(c.id))return;
-  if(challengeProgress(c)>=c.target){profile.chDone=[...(profile.chDone||[]),c.id].slice(-60);saveProfile();setTimeout(()=>{toast(`🏆 ${c.name} challenge complete!`);say(`Challenge complete! You are a ${c.name} champion!`)},500);syncNow(true)}
+  if(challengeProgress(c)>=c.target){profile.chDone=[...(profile.chDone||[]),c.id].slice(-60);saveProfile();setTimeout(()=>{toast(`🏆 ${c.name} challenge complete!`);say(`Challenge complete! You are a ${c.name} champion!`)},500);syncSoon()}
 }
 
 /* ---------- Goals ---------- */
@@ -2625,7 +2632,7 @@ function goalsCard(){
 }
 function checkGoals(){
   let changed=false;(profile.goals||[]).forEach(g=>{if(!g.done&&goalProgress(g)>=g.target){g.done=isoLocal();changed=true;const t=goalTitle(g);setTimeout(()=>{toast(`🎯 Goal reached: ${t}!`);say('Goal reached! Amazing work!')},700)}});
-  if(changed){saveProfile();syncNow(true)}
+  if(changed){saveProfile();syncSoon()}
 }
 function goalSheet(){
   const in8=isoLocal(new Date(Date.now()+56*864e5));
@@ -2647,14 +2654,14 @@ function goalSheet(){
       if((st.type==='lift'||st.type==='reps')&&!st.ex){toast('Pick an exercise');return}
       if(!(t>0)){toast('Enter a target');return}
       profile.goals=[...(profile.goals||[]),{id:newId('g'),type:st.type,ex:st.ex,target:t,start:isoLocal(),by:st.by,done:null}].slice(-20);
-      saveProfile();closeLayer();toast('🎯 Goal set. You\'ve got this!');syncNow(true);checkGoals();render()};
+      saveProfile();closeLayer();toast('🎯 Goal set. You\'ve got this!');syncSoon();checkGoals();render()};
   });
   draw();
 }
 function bindGoals(v){
   if($('#goalnew'))$('#goalnew').onclick=goalSheet;
   v.querySelectorAll('[data-gdel]').forEach(b=>b.onclick=()=>{const before=(profile.goals||[]).slice();profile.goals=before.filter(g=>g.id!==b.dataset.gdel);saveProfile();render();
-    undoable('Goal deleted',()=>{profile.goals=before;saveProfile();render()},()=>syncNow(true))});
+    undoable('Goal deleted',()=>{profile.goals=before;saveProfile();render()},()=>syncSoon())});
 }
 function goalPeek(){
   const g=(profile.goals||[]).find(x=>!x.done);if(!g)return '';
@@ -2790,9 +2797,9 @@ function bindHabits(v){
     if(!before&&habits().every(x=>habitDone(x))){toast('🌟 All your habits are done today!');say('All your habits are done today. Amazing!')}
     else if(habitDone(h)&&c<h.t)toast(`${h.e} ${h.n}: done!`);
     const nb=newBadges();if(nb.length)setTimeout(()=>toast(`🏅 New badge: ${nb[0].e} ${nb[0].n}!`),1200);
-    render();syncNow(true);
+    render();syncSoon();
   });
-  v.querySelectorAll('[data-habm]').forEach(b=>b.onclick=()=>{const id=b.dataset.habm;setHabitCount(id,Math.max(0,habitCount(id)-1));render();syncNow(true)});
+  v.querySelectorAll('[data-habm]').forEach(b=>b.onclick=()=>{const id=b.dataset.habm;setHabitCount(id,Math.max(0,habitCount(id)-1));render();syncSoon()});
 }
 function habitsSheet(){
   const draw=()=>{
@@ -2807,7 +2814,7 @@ function habitsSheet(){
         profile.habits=b.checked?[...habits(),Object.assign({},p)].slice(0,HABIT_MAX):habits().filter(h=>h.id!==p.id);saveProfile();draw()});
       document.querySelectorAll('[data-hrm]').forEach(b=>b.onclick=()=>{profile.habits=habits().filter(h=>h.id!==b.dataset.hrm);saveProfile();draw()});
       if($('#hnew'))$('#hnew').onclick=()=>customHabitSheet(draw);
-      $('#hdone').onclick=()=>{closeLayer();render();syncNow(true)};
+      $('#hdone').onclick=()=>{closeLayer();render();syncSoon()};
     });
   };
   draw();
@@ -2899,7 +2906,7 @@ function runIntervals(c){
     if(mins<1){if(!finished)toast('Stopped. Less than a minute, so nothing was logged.');return}
     const j=getJournal(),d=isoLocal();
     (j[d]=j[d]||[]).push({id:Date.now(),exercise:'⏱️ Intervals',kind:'activity',act:'Intervals',minutes:mins,distance:0,dunit:'km',effort:2,sets:[],timestamp:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),level:profile.level,u:Date.now()});
-    setJournal(j);syncNow(true);toast(`⏱️ ${plural(mins,'minute')} of intervals logged!`);
+    setJournal(j);syncSoon();toast(`⏱️ ${plural(mins,'minute')} of intervals logged!`);
     if(finished){const nb=newBadges();if(nb.length)setTimeout(()=>toast(`🏅 New badge: ${nb[0].e} ${nb[0].n}!`),1400)}
     if(route!=='workout')render()};
   runSequence(intervalSteps(c),{closeText:'Stop',onFinish:st=>log(st,true),onStop:st=>log(st,false)});
@@ -3022,7 +3029,7 @@ function renderMe(v){
   if($('#rmp'))$('#rmp').onclick=()=>requirePin(()=>confirmBox(`Remove ${esc(profile.name||'this person')}?`,`Their workouts and badges will be deleted from this phone${syncCfg.code?' and from your synced devices':''}. Download a backup first if you want to keep them.`,'Remove',()=>{
     const p=profile;delPhotosFor(p.id).catch(()=>{});['workout_journal','jams_active','jams_chat','jams_tomb'].forEach(k=>store.del(pKey(k,p)));
     DB.list=DB.list.filter(x=>x.id!==p.id);DB.deleted.push(p.id);if(DB.legacyId===p.id)DB.legacyId=null;saveDB();
-    switchProfile(DB.list[0].id);syncNow(true)},true),'A parent PIN is needed to remove a person.');
+    switchProfile(DB.list[0].id);syncSoon()},true),'A parent PIN is needed to remove a person.');
   $('#reset').onclick=()=>requirePin(()=>confirmBox('Erase everything?','All people, workouts and settings on this phone will be deleted. Synced copies stay in the cloud.','Erase all',()=>{
     clearPhotos();DB.list.forEach(p=>['workout_journal','jams_active','jams_chat','jams_tomb'].forEach(k=>store.del(pKey(k,p))));
     ['workout_journal','jams_active','jams_chat','jams_profile','jams_profiles','jams_sync','jams_tomb','jams_pin','jams_remind','jams_voice','jams_bar'].forEach(k=>store.del(k));unlockedUntil=0;
@@ -3128,6 +3135,31 @@ function backupNudge(){
   return '';
 }
 function bindBackupNudge(){const b=$('#cbk');if(b)b.onclick=()=>{const save=!!syncCfg.code;closeLayer();go('progress');if(save)saveCodeSheet();else turnOnBackup()}}
+/* ---------- "Add to Home Screen" reminder ----------
+   Android/Chrome: the browser's own install prompt. iPhone/iPad: step-by-step instructions (Safari has no prompt).
+   Hidden once the app is opened from the Home Screen, after "I did it", or for 7 days after "Later". */
+let installEvt=null;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();installEvt=e;if(route==='today'&&!$('#layer').innerHTML)render()});
+addEventListener('appinstalled',()=>{installEvt=null;store.set('jams_home',{done:true});if(route==='today')render()});
+const isStandalone=()=>{try{return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true}catch(e){return false}};
+const isIOS=()=>/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const isAndroid=()=>/Android/.test(navigator.userAgent);
+function installCard(){
+  const h=store.get('jams_home',{});
+  if(isStandalone()||h.done||(h.snooze&&Date.now()<h.snooze))return '';
+  const head=`<div class="card stack backup" id="hscard"><div class="row"><span class="big-emoji">📲</span><div style="flex:1"><b>Put KinFit on your Home Screen</b><p class="small muted">Open it in one tap like a real app, full screen, even with no internet.${isIOS()?' On iPhone it also helps keep your workouts saved.':''}</p></div></div>`;
+  const later=`<button class="btn sm ghost" id="hslater">Later</button>`;
+  if(installEvt)return `${head}<div class="row" style="gap:8px"><button class="btn sm" id="hsadd" style="flex:1">Add to Home Screen</button>${later}</div></div>`;
+  const steps=isIOS()?['Open this page in <b>Safari</b> (if you came from WhatsApp, Messages or Instagram, tap <b>Open in Safari</b> first).','Tap the <b>Share</b> button <span aria-hidden="true">⬆️</span> (a square with an arrow).','Scroll down and tap <b>Add to Home Screen</b>, then <b>Add</b>.']
+    :isAndroid()?['Tap the <b>⋮</b> menu at the top right of Chrome.','Tap <b>Add to Home screen</b> or <b>Install app</b>.','Tap <b>Add</b> or <b>Install</b>.']:null;
+  if(!steps)return '';
+  return `${head}<ol class="small hssteps">${steps.map(s=>`<li>${s}</li>`).join('')}</ol><div class="row" style="gap:8px"><button class="btn sm" id="hsdone" style="flex:1">I did it ✅</button>${later}</div></div>`;
+}
+function bindInstall(){
+  if($('#hsadd'))$('#hsadd').onclick=async()=>{const e=installEvt;if(!e)return;e.prompt();try{const c=await e.userChoice;if(c&&c.outcome==='accepted')store.set('jams_home',{done:true})}catch(x){}installEvt=null;render()};
+  if($('#hsdone'))$('#hsdone').onclick=()=>{store.set('jams_home',{done:true});render();toast('📲 Great! Open KinFit from your Home Screen next time')};
+  if($('#hslater'))$('#hslater').onclick=()=>{store.set('jams_home',{snooze:Date.now()+7*864e5});render()};
+}
 function bindBackup(){
   if($('#bkon'))$('#bkon').onclick=turnOnBackup;
   if($('#bksave'))$('#bksave').onclick=saveCodeSheet;
@@ -3148,7 +3180,7 @@ function importBackup(e){
     Object.keys(incoming).forEach(k=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(k)||!Array.isArray(incoming[k]))return;
       const have=new Set((j[k]||[]).map(x=>String(x.id)));
       incoming[k].forEach(en=>{if(en&&typeof en.exercise==='string'&&Array.isArray(en.sets)&&!have.has(String(en.id))){(j[k]=j[k]||[]).push(en);added++}})});
-    setJournal(j);toast(`Restored ${added} entries ✅`);syncNow(true);
+    setJournal(j);toast(`Restored ${added} entries ✅`);syncSoon();
   }catch(err){toast('That file is not a KinFit backup')}};
   r.readAsText(f);
 }

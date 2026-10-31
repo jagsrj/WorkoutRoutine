@@ -134,8 +134,8 @@ function videoSheet(id){
     ${own?'<button class="btn danger" id="vdel">Remove my video</button>':''}<button class="btn ghost" id="cancel">Cancel</button>`,()=>{
     $('#cancel').onclick=closeLayer;
     $('#vsave').onclick=()=>{const v=ytId($('#vurl').value);if(!v){toast('That doesn\'t look like a YouTube link');return}
-      profile.videos=Object.assign({},profile.videos,{[id]:v});saveProfile();closeLayer();render();toast('▶ Video saved');syncNow(true)};
-    if($('#vdel'))$('#vdel').onclick=()=>{const o=Object.assign({},profile.videos);delete o[id];profile.videos=o;saveProfile();closeLayer();render();toast('Video removed');syncNow(true)};
+      profile.videos=Object.assign({},profile.videos,{[id]:v});saveProfile();closeLayer();render();toast('▶ Video saved');syncSoon()};
+    if($('#vdel'))$('#vdel').onclick=()=>{const o=Object.assign({},profile.videos);delete o[id];profile.videos=o;saveProfile();closeLayer();render();toast('Video removed');syncSoon()};
   });
 }
 document.addEventListener('click',e=>{const b=e.target.closest('[data-myvid]');if(b)videoSheet(b.dataset.myvid)});
@@ -168,7 +168,7 @@ function gearSheet(){
       if(all)DB.list.forEach(p=>{if(p.id!==profile.id){setFor(p);p.updated=Date.now()}});
       setFor(profile);saveProfile();if(all)saveDB();
       // A workout already in progress keeps its exercises; only the instructions change.
-      closeLayer();render();toast('🏠 Equipment saved');syncNow(true)};
+      closeLayer();render();toast('🏠 Equipment saved');syncSoon()};
   });
   draw();
 }

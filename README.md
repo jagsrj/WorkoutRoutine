@@ -15,7 +15,7 @@ Simple workout plans for every level. Pick your level, follow the plan and watch
 | `AI` | Workers AI | AI answers in the Coach chat |
 | `STORE` | KV namespace (create one first under Storage & Databases → KV) | Cloud sync, and Coach limits shared across servers |
 
-Redeploy after adding bindings. Coach allows 20 AI questions per hour per person and 300 per day for the whole site, to stay inside the free allowance.
+Redeploy after adding bindings. Coach allows 20 AI questions per hour per person and 200 per day for the whole site (set `AI_DAILY_CAP` to change it), to stay inside the free AI allowance. The design fits about 100 active users on Cloudflare's free plan: see `docs/SOLUTION_ARCHITECTURE.md`, section 9.
 
 **Turning on AI answers in the Coach chat:** in the Cloudflare dashboard open the Pages project, then **Settings → Bindings → Add → Workers AI**, set the variable name to `AI`, save, and redeploy. Without it, Coach still answers from its built-in answers. The server code is in `functions/api/chat.js`.
 
@@ -41,6 +41,7 @@ Redeploy after adding bindings. Coach allows 20 AI questions per hour per person
 - **Animated drawings:** every exercise has a moving figure.
 - **Swap an exercise:** switch to an easier or no-equipment move.
 - **Edit history:** fix past entries.
+- **Add to Home Screen reminder:** Today shows how to install KinFit (Android uses the browser's install prompt; iPhone shows the Share → Add to Home Screen steps) until it's opened from the Home Screen.
 - **Backup & sync (on by default):** a private recovery code backs up people and workouts and restores them after a browser clear or on a new device. The code can be saved to the phone's password manager (`/api/saved`).
 - **Progress photos (optional):** off by default; photos stay on the device only, with a timeline and a before/after slider.
 - **Streak:** a weekly streak card on Today and a 🔥 counter at the top of every screen.

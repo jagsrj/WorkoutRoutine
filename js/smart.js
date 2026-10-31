@@ -68,7 +68,7 @@ async function buildWithCoach(q){
 }
 function workoutText(w){return `Here's your **${w.e} ${w.name}**:\n${w.items.map((p,i)=>`${i+1}. ${EX[p[0]].name}: ${repsText(p,EX[p[0]])}`).join('\n')}\nWarm up first, and stop if anything hurts. Have fun! 💪`}
 function saveBuilt(w,start){
-  const list=(profile.routines||[]).filter(x=>x.id!==w.id);list.push({id:w.id,name:w.name,e:w.e,items:w.items});profile.routines=list.slice(-50);saveProfile();syncNow(true);
+  const list=(profile.routines||[]).filter(x=>x.id!==w.id);list.push({id:w.id,name:w.name,e:w.e,items:w.items});profile.routines=list.slice(-50);saveProfile();syncSoon();
   if(start)startCustom('r',w.id);else toast('⭐ Saved to My workouts');
 }
 function builderSheet(){
@@ -132,7 +132,7 @@ function challengeExercise(c){
 function logChallengeSet(id,amount){
   const j=getJournal(),d=isoLocal(),ex=EX[id];
   (j[d]=j[d]||[]).push({id:Date.now(),exercise:ex.name,timestamp:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),sets:[{reps:amount}],unit:profile.unit,level:profile.level,u:Date.now()});
-  setJournal(j);syncNow(true);
+  setJournal(j);syncSoon();
   const c=currentChallenge(),n=challengeProgress(c);
   toast(`${c.e} +${amount} ${ex.time?'sec':''} · ${Math.min(n,c.target)}/${c.target}${n>=c.target?' 🏆':''}`);
   if(typeof checkChallenge==='function')checkChallenge();
@@ -163,7 +163,7 @@ function challengeSheet(){
 document.addEventListener('click',e=>{if(e.target.closest('[data-chal]'))challengeSheet()});
 function checkChallenge(){
   const c=currentChallenge();if((profile.chDone||[]).includes(c.id))return;
-  if(challengeProgress(c)>=c.target){profile.chDone=[...(profile.chDone||[]),c.id].slice(-60);saveProfile();setTimeout(()=>{toast(`🏆 ${c.name} challenge complete!`);say(`Challenge complete! You are a ${c.name} champion!`)},500);syncNow(true)}
+  if(challengeProgress(c)>=c.target){profile.chDone=[...(profile.chDone||[]),c.id].slice(-60);saveProfile();setTimeout(()=>{toast(`🏆 ${c.name} challenge complete!`);say(`Challenge complete! You are a ${c.name} champion!`)},500);syncSoon()}
 }
 
 /* ---------- Goals ---------- */
@@ -188,7 +188,7 @@ function goalsCard(){
 }
 function checkGoals(){
   let changed=false;(profile.goals||[]).forEach(g=>{if(!g.done&&goalProgress(g)>=g.target){g.done=isoLocal();changed=true;const t=goalTitle(g);setTimeout(()=>{toast(`🎯 Goal reached: ${t}!`);say('Goal reached! Amazing work!')},700)}});
-  if(changed){saveProfile();syncNow(true)}
+  if(changed){saveProfile();syncSoon()}
 }
 function goalSheet(){
   const in8=isoLocal(new Date(Date.now()+56*864e5));
@@ -210,14 +210,14 @@ function goalSheet(){
       if((st.type==='lift'||st.type==='reps')&&!st.ex){toast('Pick an exercise');return}
       if(!(t>0)){toast('Enter a target');return}
       profile.goals=[...(profile.goals||[]),{id:newId('g'),type:st.type,ex:st.ex,target:t,start:isoLocal(),by:st.by,done:null}].slice(-20);
-      saveProfile();closeLayer();toast('🎯 Goal set. You\'ve got this!');syncNow(true);checkGoals();render()};
+      saveProfile();closeLayer();toast('🎯 Goal set. You\'ve got this!');syncSoon();checkGoals();render()};
   });
   draw();
 }
 function bindGoals(v){
   if($('#goalnew'))$('#goalnew').onclick=goalSheet;
   v.querySelectorAll('[data-gdel]').forEach(b=>b.onclick=()=>{const before=(profile.goals||[]).slice();profile.goals=before.filter(g=>g.id!==b.dataset.gdel);saveProfile();render();
-    undoable('Goal deleted',()=>{profile.goals=before;saveProfile();render()},()=>syncNow(true))});
+    undoable('Goal deleted',()=>{profile.goals=before;saveProfile();render()},()=>syncSoon())});
 }
 function goalPeek(){
   const g=(profile.goals||[]).find(x=>!x.done);if(!g)return '';

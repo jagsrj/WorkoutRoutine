@@ -2,7 +2,7 @@
 // Stores each family's data under a private sync code (only a hash of the code is kept).
 // Setup (one time): Cloudflare dashboard → Storage & Databases → KV → Create namespace (e.g. "jams-store"),
 //   then this Pages project → Settings → Bindings → Add → KV namespace → Variable name: STORE → pick it → Save, then redeploy.
-import { overLimit, clientIp, json, sameOrigin } from '../_lib/limit.js';
+import { overLimit, safePut, clientIp, json, sameOrigin } from '../_lib/limit.js';
 
 const CODE_RE = /^[A-HJ-NP-Z2-9]{4}(-[A-HJ-NP-Z2-9]{4}){3}$/;
 const MAX_BYTES = 2_000_000;
@@ -62,13 +62,14 @@ export async function onRequestPost({ request, env }) {
   if (body.op === 'put') {
     const d = body.data;
     if (!validPayload(d)) return json({ error: 'bad_request' }, 400);
+    // KV writes are the scarce resource (1,000 a day on the free plan), so nothing is written
+    // when the data hasn't changed. The app also skips the call in that case.
+    const next = JSON.stringify(d), current = await env.STORE.get(key);
+    if (current === next) return json({ ok: true, unchanged: true });
     // Keep one copy per day (the state before the day's first change) for 30 days.
     const snapKey = snapPrefix + new Date().toISOString().slice(0, 10);
-    if (!(await env.STORE.get(snapKey))) {
-      const current = await env.STORE.get(key);
-      if (current) await env.STORE.put(snapKey, current, { expirationTtl: 30 * 86400 });
-    }
-    await env.STORE.put(key, JSON.stringify(d), { metadata: { updated: Date.now() } });
+    if (current && !(await env.STORE.get(snapKey))) await safePut(env, snapKey, current, { expirationTtl: 30 * 86400 });
+    if (!(await safePut(env, key, next, { metadata: { updated: Date.now() } }))) return json({ error: 'storage_busy' }, 503);
     return json({ ok: true });
   }
   if (body.op === 'delete') {
