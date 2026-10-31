@@ -86,7 +86,7 @@ function compareSheet(list){
     const gap=Math.round((parseIso(b.date)-parseIso(a.date))/864e5);
     const dw=a.w&&b.w?round1(toUnit(b.w,b.unit)-toUnit(a.w,a.unit)):null;
     sheet(`<h2>Before & after ↔️</h2>
-      <div class="row" style="gap:8px"><select class="sel" id="ca">${opts(a)}</select><select class="sel" id="cb">${opts(b)}</select></div>
+      <div class="row" style="gap:8px"><select class="sel" id="ca" aria-label="First photo">${opts(a)}</select><select class="sel" id="cb" aria-label="Second photo">${opts(b)}</select></div>
       <div class="cmp" id="cmp"><img src="${blobUrl(b)}" alt="After"><div class="cmp-a" id="cma"><img src="${blobUrl(a)}" alt="Before"></div><div class="cmp-h" id="cmh"></div>
         <span class="cmp-l">Before</span><span class="cmp-r">After</span></div>
       <input type="range" id="cr" min="0" max="100" value="50" aria-label="Slide to compare" class="range">
