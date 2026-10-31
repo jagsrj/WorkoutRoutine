@@ -108,6 +108,7 @@ const check = (ok, what) => { console.log(`${ok ? '✅' : '❌'} ${what}`); if (
       const ids = Object.keys(EX).filter(k => !k.startsWith('_') && !k.startsWith('c_'));
       r.bigLibrary = ids.length >= 120;
       r.everyMoveDrawn = ids.every(k => figSvg(k) && EX[k].steps.length >= 3 && EX[k].tip);
+      r.hideRecoveryKept = sanitizeProfile({ id: 'pz', todayHide: ['recovery', 'bogus'] }).todayHide.join() === 'recovery';
       r.cableNotAtHome = !buildPool('none').includes('cable_fly') && !buildPool('dumbbells').includes('cable_fly') && buildPool('dumbbells').includes('db_fly');
       return r;
     });
