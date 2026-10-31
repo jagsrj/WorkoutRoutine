@@ -2700,7 +2700,7 @@ function renderMe(v){
       <label class="btn secondary" style="cursor:pointer">⬆️ Restore from backup<input type="file" id="imp" accept="application/json,.json" hidden></label>
       ${others.length?`<button class="btn danger" id="rmp">Remove ${esc(profile.name||'this person')} from this phone</button>`:''}
       <button class="btn danger" id="reset">Erase everything on this phone</button></div>
-    <p class="small muted center">KinFit · Made for every level 💙<br><a href="privacy.html" class="footlink">Privacy policy</a> · <a href="/workouts" class="footlink">Workout plans &amp; exercises</a></p>
+    <p class="small muted center">KinFit · Made for every level 💙<br><a href="/about" class="footlink">About KinFit</a> · <a href="privacy.html" class="footlink">Privacy policy</a> · <a href="/workouts" class="footlink">Workout plans &amp; exercises</a></p>
   </div>`;
   v.querySelectorAll('[data-pid]').forEach(b=>b.onclick=()=>{if(b.dataset.pid!==profile.id)switchProfile(b.dataset.pid)});
   $('#addp').onclick=addPerson;
