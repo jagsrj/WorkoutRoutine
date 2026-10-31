@@ -707,7 +707,7 @@ function renderToday(v){
   bindFamily(v);bindHabits(v);
   if($('#logact'))$('#logact').onclick=()=>activitySheet();
   if($('#tcust'))$('#tcust').onclick=customizeToday;
-  v.querySelectorAll('.wrow[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+  v.querySelectorAll('.wrow[data-go]').forEach(b=>b.onclick=()=>b.dataset.go==='chal'?challengeSheet():go(b.dataset.go));
   if($('#fiveok'))$('#fiveok').onclick=()=>{profile.fivesSeen=Date.now();saveProfile();render()};
   if($('#morew'))$('#morew').onclick=()=>{libTab='mine';go('library')};
   bindBackup();
@@ -2164,7 +2164,7 @@ function weekCard(strip,earned){
   const rows=[];
   const info=phaseInfo();
   if(info&&!todayHidden('phase'))rows.push(info.done?weekRow('🎓','6-month plan complete!','',null,'me'):weekRow(info.ph.e,`Week ${info.w} of 24 · ${info.ph.name}${info.recovery?' (recovery week)':''}`,`${Math.round(info.w/24*100)}%`,info.w/24*100,'me'));
-  if(!todayHidden('challenge')){const c=currentChallenge(),n=challengeProgress(c);rows.push(weekRow(c.e,`${c.name}: ${c.target} ${c.what.split(' (')[0]}`,n>=c.target?'🏆':`${n}/${c.target}`,n/c.target*100))}
+  if(!todayHidden('challenge')){const c=currentChallenge(),n=challengeProgress(c);rows.push(weekRow(c.e,`${c.name}: ${c.target} ${c.what.split(' (')[0]}`,n>=c.target?'🏆':`${n}/${c.target}`,n/c.target*100,'chal'))}
   const g=(profile.goals||[]).find(x=>!x.done);
   if(g&&!todayHidden('goal')){const n=goalProgress(g);rows.push(weekRow('🎯',esc(goalTitle(g)),`${Math.min(100,Math.round(n/g.target*100))}%`,n/g.target*100))}
   if(DB.list.length>1&&!todayHidden('family')){const ws=weekStart(new Date());const r=DB.list.map(p=>({p,n:workoutDates(getJournal(p)).filter(d=>parseIso(d)>=ws).length})).sort((a,b)=>b.n-a.n);
@@ -2332,8 +2332,46 @@ function challengeCard(){
   const fam=DB.list.length>1?DB.list.filter(p=>p.id!==profile.id).map(p=>{const pc=currentChallenge(p),pn=challengeProgress(pc,p);return `<span class="badge">${esc(p.avatar||'🙂')} ${esc(p.name||'')} ${Math.min(100,Math.round(pn/pc.target*100))}%</span>`}).join(''):'';
   return `<div class="card stack chal"><div class="row between"><b>${c.e} ${c.month} challenge: ${c.name}</b>${done?'<span>🏆</span>':''}</div>
     <p class="small muted">${done?`You did it! ${n} ${c.what}. Amazing! 🎉`:`Do <b>${c.target}</b> ${c.what} this month. ${c.daysLeft} ${c.daysLeft===1?'day':'days'} left!`}</p>
-    <div class="progress"><i style="width:${pct}%"></i></div><p class="small"><b>${n}</b> / ${c.target}</p>${fam?`<div>${fam}</div>`:''}</div>`;
+    <div class="progress"><i style="width:${pct}%"></i></div><p class="small"><b>${n}</b> / ${c.target}</p>${fam?`<div>${fam}</div>`:''}
+    <button class="btn sm secondary" data-chal>${c.match?(c.k==='plank'?'⏱ Do a plank now':'＋ Add some now'):'How to count'}</button></div>`;
 }
+// The exercise each rep/second challenge logs when you do some "right now".
+function challengeExercise(c){
+  const kid=profile.level==='beginner';
+  return {plank:'plank',push:kid?'knee_pushup':'pushup',squat:'squat',lunge:'reverse_lunge'}[c.k];
+}
+function logChallengeSet(id,amount){
+  const j=getJournal(),d=isoLocal(),ex=EX[id];
+  (j[d]=j[d]||[]).push({id:Date.now(),exercise:ex.name,timestamp:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),sets:[{reps:amount}],unit:profile.unit,level:profile.level,u:Date.now()});
+  setJournal(j);syncNow(true);
+  const c=currentChallenge(),n=challengeProgress(c);
+  toast(`${c.e} +${amount} ${ex.time?'sec':''} · ${Math.min(n,c.target)}/${c.target}${n>=c.target?' 🏆':''}`);
+  if(typeof checkChallenge==='function')checkChallenge();
+  const nb=newBadges();if(nb.length)setTimeout(()=>toast(`🏅 New badge: ${nb[0].e} ${nb[0].n}!`),1400);
+  render();
+}
+function challengeSheet(){
+  const c=currentChallenge(),n=challengeProgress(c),id=c.match&&challengeExercise(c),ex=id&&EX[id];
+  const left=Math.max(0,c.target-n);
+  sheet(`<h2>${c.e} ${c.name}</h2>
+    <p class="muted">${n>=c.target?`Done! ${n} ${c.what} this month. 🎉`:`<b>${n} / ${c.target}</b> ${c.what}. ${left} to go, ${c.daysLeft} ${c.daysLeft===1?'day':'days'} left.`}</p>
+    <div class="progress"><i style="width:${Math.min(100,n/c.target*100)}%"></i></div>
+    ${ex?(ex.time?`<p class="small muted">Pick how long, then follow the countdown. Tap ✓ Done early if you need to stop: only the seconds you held count.</p>
+        <div class="chips" style="justify-content:center">${[20,30,45,60,90].map(s=>`<button data-chs="${s}">${s} sec</button>`).join('')}</div>`
+      :`<p class="small muted">Did some ${esc(ex.name.toLowerCase())}? Add them here.</p><button class="btn" id="chreps">＋ Add ${esc(ex.name)}</button>`)
+      :`<p class="small muted">${c.metric==='days'?'Every day you do a workout, sport or stretch counts.':'Workouts, sports and stretching all add minutes.'}</p>
+        <button class="btn" id="chact">🏃 Log an activity</button>`}
+    ${ex?`<p class="small muted">${{plank:'Planks',push:'Push-ups',squat:'Squats',lunge:'Lunges'}[c.k]} in your workouts count too.</p>`:''}
+    <button class="btn ghost" id="cancel">Close</button>`,()=>{
+    $('#cancel').onclick=closeLayer;
+    if($('#chact'))$('#chact').onclick=()=>{closeLayer();activitySheet()};
+    if($('#chreps'))$('#chreps').onclick=()=>pickNumber({title:`${esc(ex.name)}: how many?`,value:10,step:1,min:1,max:500,quick:[5,10,15,20,25],unit:ex.per?'reps '+ex.per:'reps'},v=>{const r=parseInt(v,10);if(r>0)logChallengeSet(id,r)});
+    document.querySelectorAll('[data-chs]').forEach(b=>b.onclick=()=>{const secs=+b.dataset.chs;closeLayer();
+      runSequence([{n:'Get ready…',s:5,ready:true,tip:ex.tip},{n:ex.name,s:secs,fig:id,tip:'Straight line from head to heels. Breathe!'}],{doneBtn:true,closeText:'Cancel',
+        onFinish:st=>{const held=st.stoppedAt!=null&&st.i===1?st.stoppedAt:secs;if(held>0)logChallengeSet(id,held)}})});
+  });
+}
+document.addEventListener('click',e=>{if(e.target.closest('[data-chal]'))challengeSheet()});
 function checkChallenge(){
   const c=currentChallenge();if((profile.chDone||[]).includes(c.id))return;
   if(challengeProgress(c)>=c.target){profile.chDone=[...(profile.chDone||[]),c.id].slice(-60);saveProfile();setTimeout(()=>{toast(`🏆 ${c.name} challenge complete!`);say(`Challenge complete! You are a ${c.name} champion!`)},500);syncNow(true)}

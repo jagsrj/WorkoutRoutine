@@ -222,7 +222,7 @@ function weekCard(strip,earned){
   const rows=[];
   const info=phaseInfo();
   if(info&&!todayHidden('phase'))rows.push(info.done?weekRow('🎓','6-month plan complete!','',null,'me'):weekRow(info.ph.e,`Week ${info.w} of 24 · ${info.ph.name}${info.recovery?' (recovery week)':''}`,`${Math.round(info.w/24*100)}%`,info.w/24*100,'me'));
-  if(!todayHidden('challenge')){const c=currentChallenge(),n=challengeProgress(c);rows.push(weekRow(c.e,`${c.name}: ${c.target} ${c.what.split(' (')[0]}`,n>=c.target?'🏆':`${n}/${c.target}`,n/c.target*100))}
+  if(!todayHidden('challenge')){const c=currentChallenge(),n=challengeProgress(c);rows.push(weekRow(c.e,`${c.name}: ${c.target} ${c.what.split(' (')[0]}`,n>=c.target?'🏆':`${n}/${c.target}`,n/c.target*100,'chal'))}
   const g=(profile.goals||[]).find(x=>!x.done);
   if(g&&!todayHidden('goal')){const n=goalProgress(g);rows.push(weekRow('🎯',esc(goalTitle(g)),`${Math.min(100,Math.round(n/g.target*100))}%`,n/g.target*100))}
   if(DB.list.length>1&&!todayHidden('family')){const ws=weekStart(new Date());const r=DB.list.map(p=>({p,n:workoutDates(getJournal(p)).filter(d=>parseIso(d)>=ws).length})).sort((a,b)=>b.n-a.n);
