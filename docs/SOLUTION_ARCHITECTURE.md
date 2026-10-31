@@ -190,9 +190,9 @@ flowchart TB
 
 | Element | Where it runs | Configuration |
 |---|---|---|
-| Static site | Cloudflare edge (Pages) | Project `kinfit`; build command `exit 0`; output directory `/` |
+| Static site | Cloudflare edge (Pages) | Project `kinfit`; build command `exit 0`; build output directory `public` |
 | Functions | Cloudflare Workers runtime (Pages Functions) | `functions/` folder; bindings `STORE` (KV `jams-store`) and `AI` (Workers AI); optional variables `MODEL` and `CHAT_SECRET` |
-| Security headers | Edge | `_headers` file |
+| Security headers | Edge | `public/_headers` file |
 | CI | GitHub Actions (`ubuntu-latest`, Node 22) | `.github/workflows/test.yml` |
 | Preview deploys | Cloudflare Pages | Every branch and PR gets `<branch>.kinfit.pages.dev` |
 
@@ -316,26 +316,27 @@ sequenceDiagram
 ### 7.1 Source layout
 
 ```
-index.html            App shell: markup, all app CSS, loads js/errors.js then app.js
-app.js                GENERATED bundle (do not edit)
-js/                   App source, joined in this order:
+public/               EVERYTHING the website serves (Cloudflare build output directory)
+  index.html          App shell: markup, all app CSS, loads js/errors.js then app.js
+  app.js              GENERATED bundle (do not edit)
+  js/errors.js        Loaded separately and first: global error reporter
+  sw.js               Service worker
+  _headers            Security headers
+  exercises/ plans/ guides/ workouts.html sitemap.xml   GENERATED SEO pages
+  about.html privacy.html pages.css icon.svg og.jpg manifest.webmanifest robots.txt
+js/                   App source (not published), joined in this order:
   data.js store.js screens.js sync.js coach.js photos.js features.js
   gear.js extras.js smart.js recovery.js habits.js more.js me.js
-js/errors.js          Loaded separately and first: global error reporter
-sw.js                 Service worker
 functions/api/        chat.js sync.js log.js feedback.js calendar.js saved.js
 functions/_lib/       limit.js (rate limit, JSON, same-origin), guard.js (Coach guardrails)
-functions/docs/       Blocks /docs/* from being served
-scripts/              build.js (bundle + pages), pages.js (SEO page generator)
-exercises/ plans/ guides/ workouts.html sitemap.xml   GENERATED SEO pages
-tests/                smoke.js (Playwright), chat-guard.test.mjs (Node)
-_headers              Security headers
+scripts/              build.js (bundle + pages → public/), pages.js (SEO page generator)
+tests/                smoke.js (Playwright, serves public/), chat-guard.test.mjs (Node)
 docs/                 Design documents (this file)
 ```
 
 ### 7.2 Build pipeline
 
-1. `node scripts/build.js` reads `js/<name>.js` in the fixed `ORDER` and joins them under a "GENERATED FILE" header into `app.js`.
+1. `node scripts/build.js` reads `js/<name>.js` in the fixed `ORDER` and joins them under a "GENERATED FILE" header into `public/app.js`. All generated output goes to `public/`.
 2. `scripts/pages.js` loads `js/data.js` and `js/gear.js` in a Node `vm` sandbox and renders the hub, level and sport plan pages, one page per exercise and per equipment variant, the home-gym guide and `sitemap.xml`. Slugs come from exercise names; duplicates get a suffix.
 3. `--check` mode compares every generated file with what is committed and fails CI if anything is stale or orphaned.
 
@@ -617,7 +618,7 @@ Cloudflare dashboard → Pages → `kinfit` → Deployments → pick the previou
 | T5 | No way to rotate the recovery code | A leaked code can't be revoked | Add "change my code" (copy data to a new key, delete the old) |
 | T6 | Rate limits keyed by IP | Shared IPs (schools) hit limits; attackers can rotate IPs | Turnstile on the Coach; per-code limits |
 | T7 | KV counters for rate limiting | One write per request; not atomic | Use Cloudflare Rate Limiting rules or Durable Objects |
-| T8 | Whole repo is the deployed site | Files such as README, tests and scripts are publicly served (docs/ is now blocked) | Move the site into a `public/` output folder |
+| T8 | ~~Whole repo is the deployed site~~ | Fixed: only `public/` is published | Done (PR moving the site into `public/`) |
 | T9 | Model-based guardrails | False positives and negatives | Log guarded outcomes (counts only); review monthly; tune prompts |
 | T10 | Videos are YouTube searches | Off-site, variable quality | Curate verified video IDs per exercise |
 | T11 | Recovery model is a heuristic | Not medically validated | Keep wording advisory; let users adjust |
@@ -629,7 +630,7 @@ Cloudflare dashboard → Pages → `kinfit` → Deployments → pick the previou
 
 | Horizon | Item |
 |---|---|
-| Near term | `exId` in journal entries (T1); code rotation (T5); `public/` output folder (T8); WebKit in CI (T12) |
+| Near term | `exId` in journal entries (T1); code rotation (T5); WebKit in CI (T12) |
 | Medium | Optional accounts (passkeys) with D1 storage; CSV export; Health Connect and Apple Health via a native wrapper; French localisation |
 | Longer | Curated in-app demo videos; proven programmes (5/3/1, GZCLP); coach-to-athlete sharing for teams and schools |
 
@@ -655,3 +656,4 @@ Cloudflare dashboard → Pages → `kinfit` → Deployments → pick the previou
 | Version | Date | Change |
 |---|---|---|
 | 1.0 | 2026-10-31 | First version, covering the code as of PR #30 |
+| 1.1 | 2026-10-31 | Site moved into `public/`; backup reminder on the workout-done screen |
