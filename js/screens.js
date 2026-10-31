@@ -7,7 +7,6 @@ function renderOnboard(v){
   if(s===0){
     v.innerHTML=`${topbar()}
     <div class="stack-lg" style="padding-top:20px">
-      ${onOldHost()?`<a class="card moved" href="${NEW_HOME}" style="text-decoration:none;color:inherit"><b>🚚 KinFit has moved to kinfit.pages.dev ↗</b></a>`:''}
       <div class="center"><div style="font-size:72px">🏋️‍♀️</div><h1 style="margin-top:10px">Get stronger,<br>one step at a time</h1>
       <p class="muted" style="margin-top:10px">Easy-to-follow workouts for <b>Beginner</b>, <b>Intermediate</b> and <b>Expert</b>. We'll help you pick the right one.</p></div>
       <div class="stack">
@@ -129,7 +128,6 @@ function renderToday(v){
   v.innerHTML=`${topbar(levelPill())}
   <div class="stack-lg">
     <div><h1>${hello()}${profile.name?', '+esc(profile.name):''}! ${esc(profile.avatar||'👋')}</h1><p class="muted" style="margin-top:4px">${now.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'})}</p></div>
-    ${movedCard()}
     ${fivesCard()}
     ${heroHtml}
     ${backupCard()}
