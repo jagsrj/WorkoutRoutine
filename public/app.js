@@ -3144,14 +3144,30 @@ addEventListener('appinstalled',()=>{installEvt=null;store.set('jams_home',{done
 const isStandalone=()=>{try{return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true}catch(e){return false}};
 const isIOS=()=>/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 const isAndroid=()=>/Android/.test(navigator.userAgent);
+// Install steps for the phone and browser being used (each browser puts the button somewhere else).
+function installSteps(){
+  const ua=navigator.userAgent,share='<b>Share</b> button <span aria-hidden="true">⬆️</span> (a square with an arrow)';
+  if(isIOS()){
+    if(/FBAN|FBAV|Instagram|Line\/|Snapchat|TikTok|GSA\//.test(ua))return ['This page is open inside another app. Tap <b>⋯</b> or the compass icon and choose <b>Open in Safari</b> (or <b>Open in browser</b>).','In Safari, tap the '+share+'.','Tap <b>Add to Home Screen</b>, then <b>Add</b>.'];
+    if(/CriOS|EdgiOS/.test(ua))return ['Tap the '+share+' in the address bar at the top.','Tap <b>Add to Home Screen</b>.','Tap <b>Add</b>.'];
+    if(/FxiOS/.test(ua))return ['Tap the <b>☰</b> menu at the bottom right.','Tap <b>Share</b>, then <b>Add to Home Screen</b>.','Tap <b>Add</b>.'];
+    return ['Tap the '+share+' at the bottom of Safari (on iPad: at the top).','Scroll down and tap <b>Add to Home Screen</b>.','Tap <b>Add</b>.'];
+  }
+  if(isAndroid()){
+    if(/SamsungBrowser/.test(ua))return ['Tap the <b>☰</b> menu at the bottom right of Samsung Internet.','Tap <b>Add page to</b>, then <b>Home screen</b>.','Tap <b>Add</b>.'];
+    if(/Firefox/.test(ua))return ['Tap the <b>⋮</b> menu.','Tap <b>Add to Home screen</b> (or <b>Install</b>).','Tap <b>Add</b>.'];
+    if(/; wv\)|FBAN|FBAV|Instagram/.test(ua))return ['This page is open inside another app. Tap <b>⋮</b> and choose <b>Open in Chrome</b> (or <b>Open in browser</b>).','In Chrome, tap the <b>⋮</b> menu at the top right.','Tap <b>Add to Home screen</b> or <b>Install app</b>, then <b>Install</b>.'];
+    return ['Tap the <b>⋮</b> menu at the top right of Chrome.','Tap <b>Add to Home screen</b> or <b>Install app</b>.','Tap <b>Install</b> or <b>Add</b>.'];
+  }
+  return null; // computers: the browser's own install button (shown when Chrome or Edge offers it)
+}
 function installCard(){
   const h=store.get('jams_home',{});
   if(isStandalone()||h.done||(h.snooze&&Date.now()<h.snooze))return '';
   const head=`<div class="card stack backup" id="hscard"><div class="row"><span class="big-emoji">📲</span><div style="flex:1"><b>Put KinFit on your Home Screen</b><p class="small muted">Open it in one tap like a real app, full screen, even with no internet.${isIOS()?' On iPhone it also helps keep your workouts saved.':''}</p></div></div>`;
   const later=`<button class="btn sm ghost" id="hslater">Later</button>`;
   if(installEvt)return `${head}<div class="row" style="gap:8px"><button class="btn sm" id="hsadd" style="flex:1">Add to Home Screen</button>${later}</div></div>`;
-  const steps=isIOS()?['Open this page in <b>Safari</b> (if you came from WhatsApp, Messages or Instagram, tap <b>Open in Safari</b> first).','Tap the <b>Share</b> button <span aria-hidden="true">⬆️</span> (a square with an arrow).','Scroll down and tap <b>Add to Home Screen</b>, then <b>Add</b>.']
-    :isAndroid()?['Tap the <b>⋮</b> menu at the top right of Chrome.','Tap <b>Add to Home screen</b> or <b>Install app</b>.','Tap <b>Add</b> or <b>Install</b>.']:null;
+  const steps=installSteps();
   if(!steps)return '';
   return `${head}<ol class="small hssteps">${steps.map(s=>`<li>${s}</li>`).join('')}</ol><div class="row" style="gap:8px"><button class="btn sm" id="hsdone" style="flex:1">I did it ✅</button>${later}</div></div>`;
 }
