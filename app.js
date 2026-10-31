@@ -579,6 +579,7 @@ function renderOnboard(v){
       <button class="btn ghost" id="pick">I already know my level</button>
       <p class="small muted center">🔒 Your workouts stay on your phone. <a href="privacy.html" style="color:var(--lvl-text)">Privacy</a> · <a href="about.html" style="color:var(--lvl-text)">About</a></p>
       <button class="link" id="joinsync" style="width:100%">☁️ Used KinFit before? Restore with your recovery code</button>
+      <p class="small muted center"><a href="/workouts" style="color:var(--lvl-text)">📚 Browse the free workout plans and exercise library</a></p>
     </div>`;
     $('#joinsync').onclick=()=>joinSheet();
     $('#start').onclick=()=>{ob.step=1;render()};
@@ -2697,7 +2698,7 @@ function renderMe(v){
       <label class="btn secondary" style="cursor:pointer">⬆️ Restore from backup<input type="file" id="imp" accept="application/json,.json" hidden></label>
       ${others.length?`<button class="btn danger" id="rmp">Remove ${esc(profile.name||'this person')} from this phone</button>`:''}
       <button class="btn danger" id="reset">Erase everything on this phone</button></div>
-    <p class="small muted center">KinFit · Made for every level 💙<br><a href="privacy.html" class="footlink">Privacy policy</a></p>
+    <p class="small muted center">KinFit · Made for every level 💙<br><a href="privacy.html" class="footlink">Privacy policy</a> · <a href="/workouts" class="footlink">Workout plans &amp; exercises</a></p>
   </div>`;
   v.querySelectorAll('[data-pid]').forEach(b=>b.onclick=()=>{if(b.dataset.pid!==profile.id)switchProfile(b.dataset.pid)});
   $('#addp').onclick=addPerson;

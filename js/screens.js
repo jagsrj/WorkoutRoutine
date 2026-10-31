@@ -18,6 +18,7 @@ function renderOnboard(v){
       <button class="btn ghost" id="pick">I already know my level</button>
       <p class="small muted center">🔒 Your workouts stay on your phone. <a href="privacy.html" style="color:var(--lvl-text)">Privacy</a> · <a href="about.html" style="color:var(--lvl-text)">About</a></p>
       <button class="link" id="joinsync" style="width:100%">☁️ Used KinFit before? Restore with your recovery code</button>
+      <p class="small muted center"><a href="/workouts" style="color:var(--lvl-text)">📚 Browse the free workout plans and exercise library</a></p>
     </div>`;
     $('#joinsync').onclick=()=>joinSheet();
     $('#start').onclick=()=>{ob.step=1;render()};
