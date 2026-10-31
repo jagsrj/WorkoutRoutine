@@ -62,6 +62,7 @@ const check = (ok, what) => { console.log(`${ok ? '✅' : '❌'} ${what}`); if (
     await page.click('[data-eff="0,2"]');
     await page.click('#finish'); await page.waitForTimeout(500);
     check(await page.isVisible('.celebrate'), 'Celebration screen shows');
+    check(await page.isVisible('.celebrate #cbk'), 'Workout-done screen asks to turn on backup');
     await page.click('#done'); await page.waitForTimeout(300);
     check((await page.textContent('.stat b')).trim() === '1', 'Progress counts 1 workout');
     check(await page.isVisible('.mmap'), 'Muscle map shows');

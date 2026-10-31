@@ -393,11 +393,12 @@ function celebrate(sets,mins,vol,badges,prs=[]){
     <div class="stats"><div class="stat"><b>${sets}</b><span>sets</span></div><div class="stat"><b>${mins}</b><span>${mins===1?'minute':'minutes'}</span></div><div class="stat"><b>${weekStreak()}</b><span>week streak 🔥</span></div></div>
     ${prs.length?`<div class="card stack" style="text-align:left"><h2 class="h3">🏆 New personal ${prs.length>1?'records':'record'}!</h2>${prs.map(p=>`<p>⭐ ${esc(p)}</p>`).join('')}</div>`:''}
     ${badgeRow(badges)}
+    ${backupNudge()}
     ${vol>0?`<p class="muted">You moved <b>${Math.round(vol).toLocaleString()} ${profile.unit}</b> in total! 💪</p>`:'<p class="muted">Every rep makes you stronger. See you next time!</p>'}
     <div class="row" style="gap:8px"><button class="btn secondary" id="cshare" style="flex:1">📤 Share</button><button class="btn secondary" id="ccool" style="flex:1">🧘 Cool-down</button></div>
     <button class="btn" id="done">Done</button></div></div>`;
   $('#done').onclick=()=>{closeLayer();go('progress')};
-  $('#cshare').onclick=()=>shareWorkout();
+  $('#cshare').onclick=()=>shareWorkout();bindBackupNudge();
   $('#ccool').onclick=()=>{closeLayer();go('progress');runStretch('cool')};
   say(praise+(prs.length?' And you set a new personal record!':''));
 }
