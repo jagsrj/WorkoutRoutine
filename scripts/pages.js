@@ -58,7 +58,7 @@ ${body}
 `;
 }
 
-const cta = (text = 'Start this free in KinFit') => `<p><a class="cta" href="/">${esc(text)} →</a></p><p class="small">Free, no sign-up. Timers, rest countdowns, streaks and badges. Works on any phone.</p>`;
+const cta = (text = 'Start this free in KinFit') => `<p><a class="cta" href="/">${esc(text)} →</a></p><p class="small">Free · No sign-up · No ads · Made for families. Timers, rest countdowns, streaks and badges on any phone. <a href="/about">Why KinFit?</a></p>`;
 
 function exItem(D, id, p) {
   const ex = D.EX[id];
@@ -216,6 +216,9 @@ ${groups.map(g => { const list = ids.filter(id => inGroup(D.EX[id], g)).sort((a,
 <p class="lead">Simple weekly plans for the whole family, from no-equipment beginner workouts to barbell training. Pick a plan, or let the 5-question quiz in the app choose for you.</p>
 <div class="grid">${levels.map(L => { const V = D.LEVELS[L]; return `<a class="card tile" style="--c:${LEVEL_COLOR[L]};--cd:${DARK[LEVEL_COLOR[L]]}" href="/plans/${L}"><span class="big">${V.emoji}</span><b>${esc(V.name)} plan</b><span class="small">${esc(V.tagline)}</span></a>`; }).join('')}</div>
 <h2>Workouts for sports</h2><div class="grid">${D.SPORTS.map(s => `<a class="card tile" href="/plans/${s.id}-workout"><span class="big">${s.e}</span><b>${esc(s.name)}</b><span class="small">${esc(s.sub)}</span></a>`).join('')}</div>
+<h2>Why KinFit?</h2>
+<ul class="why"><li>✅ <b>Free</b>, with no sign-up and no ads</li><li>👨‍👩‍👧 <b>Made for families</b>: profiles for everyone, high-fives and a family leader</li><li>🧒 <b>Safe for kids</b>: bodyweight start, child profiles and a parent PIN</li><li>🏠 <b>Fits your equipment</b>: exercises adapt to what you have at home</li><li>⏱️ <b>Guided</b>: rest timers, countdowns, moving drawings and a friendly AI coach</li><li>🔒 <b>Private</b>: your data stays on your phone and it works offline</li></ul>
+<p class="small"><a href="/about">More about KinFit</a></p>
 <h2>Guides</h2><ul><li><a href="/guides/home-gym-functional-trainer">Home gym workouts with a functional trainer, Smith machine and dumbbells</a></li><li><a href="/exercises/">Exercise library (${ids.length} exercises)</a></li></ul>
 ${cta('Open KinFit free')}`,
     }));
