@@ -146,7 +146,7 @@ function renderToday(v){
   bindFamily(v);bindHabits(v);
   if($('#logact'))$('#logact').onclick=()=>activitySheet();
   if($('#tcust'))$('#tcust').onclick=customizeToday;
-  v.querySelectorAll('.wrow[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+  v.querySelectorAll('.wrow[data-go]').forEach(b=>b.onclick=()=>b.dataset.go==='chal'?challengeSheet():go(b.dataset.go));
   if($('#fiveok'))$('#fiveok').onclick=()=>{profile.fivesSeen=Date.now();saveProfile();render()};
   if($('#morew'))$('#morew').onclick=()=>{libTab='mine';go('library')};
   bindBackup();
