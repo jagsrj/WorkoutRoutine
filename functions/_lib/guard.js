@@ -64,7 +64,13 @@ export async function safetyCheck(ai, messages) {
 export const isSelfHarm = cats => cats.includes('S11');
 
 // ---- Signed replies ----
+let cachedKey = null; // one KV read per server, not per question
 async function hmacKey(env) {
+  if (cachedKey) return cachedKey;
+  cachedKey = await loadKey(env);
+  return cachedKey;
+}
+async function loadKey(env) {
   let secret = env.CHAT_SECRET;
   if (!secret && env.STORE) {
     secret = await env.STORE.get('chat:hmac');

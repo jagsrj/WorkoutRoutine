@@ -35,19 +35,26 @@ function applyPayload(P){
   saveDB();
   const cur=DB.list.find(p=>p.id===DB.current);profile=Object.assign({},DEFAULT_P,cur||{});
 }
-let syncing=false;
+let syncing=false,syncTimer=null;
+// Same data → same text, whatever order the keys were written in.
+const canon=x=>JSON.stringify(x,(k,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.keys(v).sort().reduce((o,key)=>(o[key]=v[key],o),{}):v);
+// Background sync after a change: waits 20 seconds so a burst of taps becomes one sync.
+function syncSoon(){if(!syncCfg.code)return;clearTimeout(syncTimer);syncTimer=setTimeout(()=>syncNow(true),20000)}
+addEventListener('pagehide',()=>{if(syncTimer){clearTimeout(syncTimer);syncTimer=null;syncNow(true)}});
 async function syncNow(silent){
   if(!syncCfg.code||syncing)return false;syncing=true;
   try{
     const call=async body=>{const r=await fetch('api/sync',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'failed');return d};
     const remote=await call({code:syncCfg.code,op:'get'});
-    const merged=mergePayload(localPayload(),remote.data);
-    await call({code:syncCfg.code,op:'put',data:merged});
-    applyPayload(merged);syncCfg.last=Date.now();saveSync();
+    applyPayload(mergePayload(localPayload(),remote.data));
+    // Only upload when something changed: cloud writes are limited per day (see docs, section 9).
+    const out=localPayload();
+    if(!remote.data||canon(out)!==canon(remote.data))await call({code:syncCfg.code,op:'put',data:out});
+    syncCfg.last=Date.now();saveSync();
     if(!silent){toast('☁️ Synced!');render()}
     return true;
   }catch(e){
-    if(!silent)toast(e.message==='not_configured'?'Sync isn\'t switched on for this website yet':e.message==='rate_limited'?'Too many syncs. Try again in a bit':'Couldn\'t reach the backup. Check your internet');
+    if(!silent)toast(e.message==='storage_busy'?'Backup is busy right now. Your workouts are safe on this phone and will back up later':e.message==='not_configured'?'Sync isn\'t switched on for this website yet':e.message==='rate_limited'?'Too many syncs. Try again in a bit':'Couldn\'t reach the backup. Check your internet');
     return false;
   }finally{syncing=false}
 }

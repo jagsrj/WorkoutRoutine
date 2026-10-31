@@ -88,7 +88,7 @@ function renderMe(v){
   if($('#rmp'))$('#rmp').onclick=()=>requirePin(()=>confirmBox(`Remove ${esc(profile.name||'this person')}?`,`Their workouts and badges will be deleted from this phone${syncCfg.code?' and from your synced devices':''}. Download a backup first if you want to keep them.`,'Remove',()=>{
     const p=profile;delPhotosFor(p.id).catch(()=>{});['workout_journal','jams_active','jams_chat','jams_tomb'].forEach(k=>store.del(pKey(k,p)));
     DB.list=DB.list.filter(x=>x.id!==p.id);DB.deleted.push(p.id);if(DB.legacyId===p.id)DB.legacyId=null;saveDB();
-    switchProfile(DB.list[0].id);syncNow(true)},true),'A parent PIN is needed to remove a person.');
+    switchProfile(DB.list[0].id);syncSoon()},true),'A parent PIN is needed to remove a person.');
   $('#reset').onclick=()=>requirePin(()=>confirmBox('Erase everything?','All people, workouts and settings on this phone will be deleted. Synced copies stay in the cloud.','Erase all',()=>{
     clearPhotos();DB.list.forEach(p=>['workout_journal','jams_active','jams_chat','jams_tomb'].forEach(k=>store.del(pKey(k,p))));
     ['workout_journal','jams_active','jams_chat','jams_profile','jams_profiles','jams_sync','jams_tomb','jams_pin','jams_remind','jams_voice','jams_bar'].forEach(k=>store.del(k));unlockedUntil=0;
@@ -194,6 +194,31 @@ function backupNudge(){
   return '';
 }
 function bindBackupNudge(){const b=$('#cbk');if(b)b.onclick=()=>{const save=!!syncCfg.code;closeLayer();go('progress');if(save)saveCodeSheet();else turnOnBackup()}}
+/* ---------- "Add to Home Screen" reminder ----------
+   Android/Chrome: the browser's own install prompt. iPhone/iPad: step-by-step instructions (Safari has no prompt).
+   Hidden once the app is opened from the Home Screen, after "I did it", or for 7 days after "Later". */
+let installEvt=null;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();installEvt=e;if(route==='today'&&!$('#layer').innerHTML)render()});
+addEventListener('appinstalled',()=>{installEvt=null;store.set('jams_home',{done:true});if(route==='today')render()});
+const isStandalone=()=>{try{return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true}catch(e){return false}};
+const isIOS=()=>/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const isAndroid=()=>/Android/.test(navigator.userAgent);
+function installCard(){
+  const h=store.get('jams_home',{});
+  if(isStandalone()||h.done||(h.snooze&&Date.now()<h.snooze))return '';
+  const head=`<div class="card stack backup" id="hscard"><div class="row"><span class="big-emoji">📲</span><div style="flex:1"><b>Put KinFit on your Home Screen</b><p class="small muted">Open it in one tap like a real app, full screen, even with no internet.${isIOS()?' On iPhone it also helps keep your workouts saved.':''}</p></div></div>`;
+  const later=`<button class="btn sm ghost" id="hslater">Later</button>`;
+  if(installEvt)return `${head}<div class="row" style="gap:8px"><button class="btn sm" id="hsadd" style="flex:1">Add to Home Screen</button>${later}</div></div>`;
+  const steps=isIOS()?['Open this page in <b>Safari</b> (if you came from WhatsApp, Messages or Instagram, tap <b>Open in Safari</b> first).','Tap the <b>Share</b> button <span aria-hidden="true">⬆️</span> (a square with an arrow).','Scroll down and tap <b>Add to Home Screen</b>, then <b>Add</b>.']
+    :isAndroid()?['Tap the <b>⋮</b> menu at the top right of Chrome.','Tap <b>Add to Home screen</b> or <b>Install app</b>.','Tap <b>Add</b> or <b>Install</b>.']:null;
+  if(!steps)return '';
+  return `${head}<ol class="small hssteps">${steps.map(s=>`<li>${s}</li>`).join('')}</ol><div class="row" style="gap:8px"><button class="btn sm" id="hsdone" style="flex:1">I did it ✅</button>${later}</div></div>`;
+}
+function bindInstall(){
+  if($('#hsadd'))$('#hsadd').onclick=async()=>{const e=installEvt;if(!e)return;e.prompt();try{const c=await e.userChoice;if(c&&c.outcome==='accepted')store.set('jams_home',{done:true})}catch(x){}installEvt=null;render()};
+  if($('#hsdone'))$('#hsdone').onclick=()=>{store.set('jams_home',{done:true});render();toast('📲 Great! Open KinFit from your Home Screen next time')};
+  if($('#hslater'))$('#hslater').onclick=()=>{store.set('jams_home',{snooze:Date.now()+7*864e5});render()};
+}
 function bindBackup(){
   if($('#bkon'))$('#bkon').onclick=turnOnBackup;
   if($('#bksave'))$('#bksave').onclick=saveCodeSheet;
@@ -214,7 +239,7 @@ function importBackup(e){
     Object.keys(incoming).forEach(k=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(k)||!Array.isArray(incoming[k]))return;
       const have=new Set((j[k]||[]).map(x=>String(x.id)));
       incoming[k].forEach(en=>{if(en&&typeof en.exercise==='string'&&Array.isArray(en.sets)&&!have.has(String(en.id))){(j[k]=j[k]||[]).push(en);added++}})});
-    setJournal(j);toast(`Restored ${added} entries ✅`);syncNow(true);
+    setJournal(j);toast(`Restored ${added} entries ✅`);syncSoon();
   }catch(err){toast('That file is not a KinFit backup')}};
   r.readAsText(f);
 }

@@ -56,9 +56,9 @@ function bindHabits(v){
     if(!before&&habits().every(x=>habitDone(x))){toast('🌟 All your habits are done today!');say('All your habits are done today. Amazing!')}
     else if(habitDone(h)&&c<h.t)toast(`${h.e} ${h.n}: done!`);
     const nb=newBadges();if(nb.length)setTimeout(()=>toast(`🏅 New badge: ${nb[0].e} ${nb[0].n}!`),1200);
-    render();syncNow(true);
+    render();syncSoon();
   });
-  v.querySelectorAll('[data-habm]').forEach(b=>b.onclick=()=>{const id=b.dataset.habm;setHabitCount(id,Math.max(0,habitCount(id)-1));render();syncNow(true)});
+  v.querySelectorAll('[data-habm]').forEach(b=>b.onclick=()=>{const id=b.dataset.habm;setHabitCount(id,Math.max(0,habitCount(id)-1));render();syncSoon()});
 }
 function habitsSheet(){
   const draw=()=>{
@@ -73,7 +73,7 @@ function habitsSheet(){
         profile.habits=b.checked?[...habits(),Object.assign({},p)].slice(0,HABIT_MAX):habits().filter(h=>h.id!==p.id);saveProfile();draw()});
       document.querySelectorAll('[data-hrm]').forEach(b=>b.onclick=()=>{profile.habits=habits().filter(h=>h.id!==b.dataset.hrm);saveProfile();draw()});
       if($('#hnew'))$('#hnew').onclick=()=>customHabitSheet(draw);
-      $('#hdone').onclick=()=>{closeLayer();render();syncNow(true)};
+      $('#hdone').onclick=()=>{closeLayer();render();syncSoon()};
     });
   };
   draw();

@@ -5,7 +5,7 @@
 | **System** | KinFit family workout web app (https://kinfit.pages.dev) |
 | **Repository** | `jagsrj/WorkoutRoutine` |
 | **Owner** | Jagadish (JAMS family) |
-| **Version** | 1.0 |
+| **Version** | 1.2 |
 | **Date** | 31 October 2026 |
 | **Status** | Draft for owner review |
 | **Covers** | Code on `main` after PR #30 (Coach guardrails, muscle recovery, 128-exercise library, set types and supersets) |
@@ -444,14 +444,17 @@ erDiagram
 Shared behaviour (`functions/_lib/limit.js`):
 
 - `sameOrigin()`: rejects requests whose `Origin` header names another host (requests with no `Origin` are allowed).
-- `overLimit(env, key, max, ttl)`: a fixed-window counter in KV (`rl:<key>`), with an in-memory fallback if KV isn't bound.
+- `overLimit(env, key, max, ttl)`: a fixed-window counter **in memory** per Cloudflare server (no KV writes), used for per-person limits.
+- `overSharedLimit(env, key, max, ttl)`: a KV counter (`rl:<key>`) shared by all servers, used only for the site-wide AI budget; falls back to memory if KV is unavailable.
+- `safePut()`: KV write that returns false instead of throwing when the daily write allowance is used up.
+- `seenRecently()`: in-memory de-duplication (error reports).
 - `json()`: JSON response with `cache-control: no-store`.
 
 | Endpoint | Method | Request | Response | Limits and storage |
 |---|---|---|---|---|
-| `/api/chat` | POST | `{messages[], level, kid, today?, history?}` or `{mode:'build', request, catalog, level, kid}` | `{reply, sig?}` / `{reply, guarded:true}` / `{plan}` / `{error}` 400/403/429/502/503 | 20 per hour per IP and 300 per day for the site; up to 8 history turns of at most 600 characters each |
-| `/api/sync` | POST | `{code, op}`; op is `get`, `put` (+`data`), `delete`, `snapshots` or `snapshot` (+`date`) | `{data}` / `{ok}` / `{dates}` / `{error}` | 60 per hour per IP; body up to 2 MB; code `XXXX-XXXX-XXXX-XXXX` from a 31-character alphabet |
-| `/api/log` | POST | `{m, s, l, r, v, d}` (message, file, line, route, version, device type) | 204, 400 or 429 | 30 per hour per IP; KV `err:<date>:<id>`, kept 30 days |
+| `/api/chat` | POST | `{messages[], level, kid, today?, history?}` or `{mode:'build', request, catalog, level, kid}` | `{reply, sig?}` / `{reply, guarded:true}` / `{plan}` / `{error}` 400/403/429/502/503 | 20 per hour per IP (memory); `AI_DAILY_CAP` (default 200) guarded questions per day for the site (KV); up to 6 history turns of at most 600 characters each |
+| `/api/sync` | POST | `{code, op}`; op is `get`, `put` (+`data`), `delete`, `snapshots` or `snapshot` (+`date`) | `{data}` / `{ok, unchanged?}` / `{dates}` / `{error}` incl. 503 `storage_busy` | 60 per hour per IP (memory); body up to 2 MB; identical saves skipped; code `XXXX-XXXX-XXXX-XXXX` from a 31-character alphabet |
+| `/api/log` | POST | `{m, s, l, r, v, d}` (message, file, line, route, version, device type) | 204, 400 or 429 | 30 per hour per IP (memory); same error stored once per server per day, max 100 per server per day; KV `err:<date>:<id>`, kept 30 days |
 | `/api/feedback` | POST | `{kind, text, …}` | `{ok}` or error | 5 per hour per IP; KV `fb:<date>:<id>`, kept 180 days |
 | `/api/calendar` | GET | `?days=MO,TU,…&t=HHMM&name=` | `text/calendar` repeating event with an alert | Nothing stored |
 | `/api/saved` | POST | Form post | Redirect back to the app | Lets iPhones offer "Save password" for the recovery code; nothing stored |
@@ -462,7 +465,7 @@ Shared behaviour (`functions/_lib/limit.js`):
 |---|---|---|---|
 | `sync:<sha256>` | sync | Latest family payload (metadata `updated`) | none |
 | `snap:<sha256>:<date>` | sync | Copy taken before the day's first write | 30 days |
-| `rl:<endpoint>:<ip>:<hour>` / `rl:chatday:<date>` | all | Counter | about 1 hour / about 1 day |
+| `rl:chatday:<date>` | chat | Site-wide AI question counter | about 1 day |
 | `chat:hmac` | chat | Generated HMAC secret (if `CHAT_SECRET` isn't set) | none |
 | `err:<date>:<id>` | log | Error report | 30 days |
 | `fb:<date>:<id>` | feedback | Feedback | 180 days |
@@ -516,6 +519,7 @@ This is a document-level last-write-wins model with per-entry granularity. Concu
 | `AI` | Workers AI binding | For AI Coach answers | Without it the Coach uses built-in answers only |
 | `MODEL` | Variable | No | A Workers AI model to try first |
 | `CHAT_SECRET` | Secret | No | HMAC key for signing Coach replies (otherwise one is generated and stored in KV) |
+| `AI_DAILY_CAP` | Variable | No | Guarded Coach questions allowed per day for the whole site (default 200) |
 | `APP_VERSION` | Constant in `js/errors.js` | — | Tags error reports |
 
 ---
@@ -563,13 +567,51 @@ This is a document-level last-write-wins model with per-entry granularity. Concu
 
 ## 9. Performance, scalability and cost
 
-- **Client:** one roughly 310 KB script plus inline CSS, compressed by the CDN. All screens render from memory; heavy computations (records, recovery) scan at most a few thousand entries.
-- **Edge:** functions are stateless and scale automatically. KV reads are served from the edge; writes are eventually consistent, typically visible within about a minute globally. That suits this backup-style use.
-- **Hot paths:** `/api/chat` (3–4 model calls) and `/api/sync` (2 calls per sync, plus 1 snapshot write per day).
-- **Cost drivers:** Workers AI usage, which is capped by the daily limit, and KV writes (syncs and rate-limit counters). Static hosting and Functions requests fit comfortably in free tiers at family and small-community scale. *Check Cloudflare's current free-tier limits before any public launch; they change.*
-- **Scaling to a public product:** the first bottlenecks would be KV-backed rate-limit counters (one write per request), the global AI cap, and `localStorage` size for very long histories. See the roadmap.
+### 9.1 Target: 100 active users on Cloudflare's free plan
 
----
+The app itself runs on each phone, so the number of users only matters for the server-side free allowances. The binding limits are:
+
+| Resource (free plan, per day, reset 00:00 UTC) | Allowance | Used by |
+|---|---|---|
+| KV writes | 1,000 | Backup saves and snapshots, the AI daily counter, error reports, feedback |
+| KV reads | 100,000 | Backup reads, AI counter reads, HMAC key (once per server) |
+| Workers AI | 10,000 neurons | Coach (about 40–60 neurons per question including the safety checks) |
+| Workers / Functions requests | 100,000 | Every `/api` call |
+| Static requests | Unlimited | Pages, app files |
+
+### 9.2 Design for scale (version 1.2)
+
+| Change | Before | After |
+|---|---|---|
+| Per-person rate limits (chat, sync, log, feedback) | KV counter: 1 write per request | Counted in memory per Cloudflare server: **0 writes** |
+| Site-wide AI budget | KV counter on every question, including refused ones | KV counter only for questions that pass the guardrails; cap set by `AI_DAILY_CAP` (default 200, which matches the neuron allowance) |
+| Backup upload | Every sync uploaded the whole family file (1 write + 1 counter write) | The app compares the merged data with the cloud copy (`canon()` = key-order-independent JSON) and **skips the upload when nothing changed**; the server also skips identical saves |
+| Background syncs | One sync per tap (habit ticks, goals, edits…) | `syncSoon()` waits 20 s so a burst of changes becomes one sync; flushed when the page is hidden |
+| Error reports | Every report written | The same error is written once per server per day, at most 100 per server per day |
+| KV out of writes | Request crashed (500) | `safePut()` returns `storage_busy` (503); the app says "Backup is busy… your workouts are safe on this phone" and retries later |
+| HMAC key for Coach signatures | Read from KV on every question | Cached in memory per server |
+| Coach context | 8 history turns | 6 turns (fewer tokens per question) |
+
+### 9.3 Capacity estimate for 100 users (about 35 families)
+
+| Item | Assumption | KV writes per day |
+|---|---|---|
+| Backup saves | 60 active people × about 3 changed sessions each | ~180 |
+| Daily snapshots | 1 per family that changed something | ~35 |
+| AI budget counter | Up to the 200-question cap | ≤ 200 |
+| Error reports | Distinct errors only | ~10–50 |
+| Feedback | Occasional | < 10 |
+| **Total** | | **~450–500 of 1,000** (about 2× headroom) |
+
+AI: 200 guarded questions × ~50 neurons ≈ 10,000 neurons, the full free allowance. When either the cap or the allowance is reached, the Coach falls back to its built-in answers until the reset. Raise `AI_DAILY_CAP` only after moving to Workers Paid.
+
+### 9.4 When to upgrade
+
+Move to the Workers Paid plan if the Cloudflare dashboard shows KV writes regularly above about 700 a day, or users often hit the Coach cap. Paid includes 1 million KV writes a month and bills AI beyond the free allocation. Beyond a few hundred active users, consider D1 for per-entry sync (fewer bytes per write, true merges) and Cloudflare Rate Limiting rules instead of in-memory counters.
+
+### 9.5 Client performance
+
+One script of about 310 KB plus inline CSS, compressed by the CDN. All screens render from memory; heavy computations (records, recovery) scan at most a few thousand entries.
 
 ## 10. Operations
 
@@ -617,7 +659,7 @@ Cloudflare dashboard → Pages → `kinfit` → Deployments → pick the previou
 | T4 | Device storage limits and Safari eviction | Data loss without sync | Turn sync on by default (already prompted); offer export |
 | T5 | No way to rotate the recovery code | A leaked code can't be revoked | Add "change my code" (copy data to a new key, delete the old) |
 | T6 | Rate limits keyed by IP | Shared IPs (schools) hit limits; attackers can rotate IPs | Turnstile on the Coach; per-code limits |
-| T7 | KV counters for rate limiting | One write per request; not atomic | Use Cloudflare Rate Limiting rules or Durable Objects |
+| T7 | In-memory rate limits are per Cloudflare server | A determined user hitting many servers gets more than the limit | Acceptable at family scale; use Cloudflare Rate Limiting rules if abused |
 | T8 | ~~Whole repo is the deployed site~~ | Fixed: only `public/` is published | Done (PR moving the site into `public/`) |
 | T9 | Model-based guardrails | False positives and negatives | Log guarded outcomes (counts only); review monthly; tune prompts |
 | T10 | Videos are YouTube searches | Off-site, variable quality | Curate verified video IDs per exercise |
@@ -657,3 +699,4 @@ Cloudflare dashboard → Pages → `kinfit` → Deployments → pick the previou
 |---|---|---|
 | 1.0 | 2026-10-31 | First version, covering the code as of PR #30 |
 | 1.1 | 2026-10-31 | Site moved into `public/`; backup reminder on the workout-done screen |
+| 1.2 | 2026-10-31 | Scaled for 100 users on the free plan (section 9); Home Screen reminder; PNG app icons |
