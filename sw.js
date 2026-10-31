@@ -1,7 +1,7 @@
 // KinFit service worker (bump CACHE when adding or renaming files): lets the app open without internet.
 // Everything loads fresh from the network when online (so updates show right away)
 // and falls back to the saved copy when offline. /api/ calls are never cached.
-const CACHE = 'jams-v21';
+const CACHE = 'jams-v22';
 // Cloudflare serves the app at ./ (index.html redirects there), so the page is cached under ./
 // The app's code is bundled into app.js by scripts/build.js; errors.js stays separate.
 const JS = ['js/errors.js', 'app.js'];
@@ -16,9 +16,11 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request, url = new URL(req.url);
   if (req.method !== 'GET' || url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
-  const key = req.mode === 'navigate' ? './' : req;
+  // Only the app itself is cached as ./ ; other pages (plans, exercises, guides) are cached under their own address.
+  const isApp = req.mode === 'navigate' && (url.pathname === '/' || url.pathname === '/index.html');
+  const key = isApp ? './' : req;
   e.respondWith(fetch(req).then(res => {
     if (res.ok && !res.redirected) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(key, copy)); }
     return res;
-  }).catch(() => caches.match(key).then(hit => hit || caches.match('./'))));
+  }).catch(() => caches.match(key).then(hit => hit || (isApp || req.mode !== 'navigate' ? caches.match('./') : Response.error()))));
 });
