@@ -25,6 +25,8 @@ const GEAR_REQ={
   push_press:['barbell'],sumo_deadlift:['barbell'],barbell_hip_thrust:['barbell'],
   pullup:['pullbar','machines'],chin_up:['pullbar','machines'],weighted_pullup:['pullbar'],
 };
+// Newer exercises list their equipment in EX[id].need.
+Object.keys(EX).forEach(id=>{if(EX[id].need&&!GEAR_REQ[id])GEAR_REQ[id]=EX[id].need});
 const SMITH_SAFE='Set the safety stoppers first so the bar can never come down on you.';
 // Other ways to do the exercise, tried in order. {use:'id'} borrows another exercise's steps.
 const GEAR_VARIANTS={

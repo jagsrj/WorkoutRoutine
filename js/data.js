@@ -340,7 +340,7 @@ Object.assign(ALT,{
   lateral_shuffle:['side_lunge'],
 });
 const MUSCLE_FILTERS=['Chest','Back','Shoulders','Arms','Core','Legs','Glutes','Heart'];
-const exMatches=(ex,f)=>!f||ex.m.some(m=>m===f||(f==='Arms'&&/Biceps|Triceps|Forearms|Arms/.test(m))||(f==='Legs'&&/Legs|Quads|Hamstrings|Calves/.test(m))||(f==='Core'&&/Core|Abs|Obliques/.test(m))||(f==='Shoulders'&&/Shoulders/.test(m))||(f==='Chest'&&/Chest/.test(m))||(f==='Back'&&/Back/.test(m))||(f==='Heart'&&/Heart|Whole body/.test(m)));
+const exMatches=(ex,f)=>!f||ex.m.some(m=>m===f||(f==='Arms'&&/Biceps|Triceps|Forearms|Arms/.test(m))||(f==='Legs'&&/Legs|Quads|Hamstrings|Calves/.test(m))||(f==='Core'&&/Core|Abs|Obliques/.test(m))||(f==='Shoulders'&&/Shoulders/.test(m))||(f==='Chest'&&/Chest/.test(m))||(f==='Back'&&/Back|back/.test(m))||(f==='Heart'&&/Heart|Whole body/.test(m)));
 
 /* ---------- Sport plans (built from the library) ---------- */
 const SPORTS=[
@@ -351,7 +351,7 @@ const SPORTS=[
   {id:'basketball',e:'🏀',name:'Basketball',sub:'Jumping power and quick moves',items:[['jumping_jacks',3,20,30],['squat',3,12,15],['step_up',3,8,10],['lateral_shuffle',3,20,30],['calf_raise_bw',3,15,20],['burpee',3,6,10],['plank',3,20,40]]},
 ];
 const ACTIVITIES=[['🚶','Walk'],['🏃','Run'],['🚴','Bike'],['🏊','Swim'],['🏏','Cricket'],['⚽','Soccer'],['🏀','Basketball'],['🎾','Tennis'],['🏓','Pickleball'],['💃','Dance'],['🧘','Yoga'],['🥋','Martial arts'],['🧘','Stretch'],['⏱️','Intervals'],['⭐','Other']];
-const MUSCLE_KEYS={Chest:['chest'],'Upper Chest':['chest'],Shoulders:['shoulders'],'Rear shoulders':['shoulders','upperback'],Back:['upperback','lowerback'],'Upper back':['upperback'],'Whole back side':['upperback','lowerback','glutes','hams'],
+const MUSCLE_KEYS={Chest:['chest'],'Upper Chest':['chest'],Shoulders:['shoulders'],'Rear shoulders':['shoulders','upperback'],Back:['upperback','lowerback'],'Upper back':['upperback'],'Lower back':['lowerback'],'Whole back side':['upperback','lowerback','glutes','hams'],
   Biceps:['biceps'],Triceps:['triceps'],Arms:['biceps','triceps'],Forearms:['forearms'],Grip:['forearms'],Core:['abs'],Abs:['abs'],Obliques:['abs'],'Hip flexors':['quads'],
   Legs:['quads','hams','calves'],Quads:['quads'],Hamstrings:['hams'],Glutes:['glutes'],Calves:['calves'],'Whole body':['quads','chest','upperback','abs'],Agility:['quads','calves'],Heart:[]};
 
@@ -390,3 +390,120 @@ function exBodyMap(ex,cls){
   const main=keys.filter(k=>lv[k]>=1).map(k=>MUSCLE_LABEL[k]),help=keys.filter(k=>lv[k]<1).map(k=>MUSCLE_LABEL[k]);
   return bodyMap(k=>lv[k],{cls:cls||'bodymap',label:`Muscles worked. Main: ${main.join(', ')}${help.length?'. Also: '+help.join(', '):''}`,tip:k=>lv[k]?`${MUSCLE_LABEL[k]}: ${lv[k]>=1?'main muscle':'helps'}`:''});
 }
+
+/* ---------- Library expansion 2: more bodyweight, dumbbell, cable, machine and barbell moves ----------
+   need: equipment the exercise requires (any one is enough); used by "My equipment" and the workout builder. */
+POSES.wallpush={a:'h:66,24 s:62,34 e:74,36 w:85,34 p:52,64 k:46,82 f:40,100',b:'h:76,26 s:70,36 e:72,48 w:85,34 p:56,66 k:48,83 f:40,100',props:[{t:'wall',x:88}]};
+POSES.pike={a:'h:84,80 s:80,70 e:83,85 w:85,100 p:58,50 k:44,75 f:30,100',b:'h:86,94 s:80,82 e:72,88 w:85,100 p:56,56 k:43,78 f:30,100'};
+POSES.invrow={a:'h:74,78 s:63,76 e:63,58 w:64,40 p:40,86 k:24,93 f:8,100',b:'h:74,56 s:63,54 e:52,50 w:64,40 p:40,76 k:24,89 f:8,100',props:[{t:'hbar',y:40}]};
+POSES.shrug={a:'h:55,20 s:55,30 e:56,45 w:57,60 p:55,60 k:56,80 f:55,100',b:'h:55,17 s:55,25 e:56,40 w:57,55 p:55,60 k:56,80 f:55,100',dur:1.6};
+POSES.frontraise={a:'h:55,20 s:55,30 e:56,45 w:57,60 p:55,60 k:56,80 f:55,100',b:'h:55,20 s:55,30 e:69,31 w:83,31 p:55,60 k:56,80 f:55,100'};
+POSES.ohext={a:'h:55,22 s:55,32 e:58,14 w:50,28 p:55,62 k:56,81 f:55,100',b:'h:55,22 s:55,32 e:58,14 w:61,-2 p:55,62 k:56,81 f:55,100'};
+POSES.pullover={a:'h:28,74 s:38,77 e:40,62 w:40,48 p:66,78 k:82,80 f:86,100',b:'h:28,74 s:38,77 e:25,70 w:12,72 p:66,78 k:82,80 f:86,100',props:[{t:'bench',x:20,y:81,w:54}]};
+POSES.floorpress={a:'h:20,93 s:30,96 e:32,82 w:32,68 p:60,97 k:74,80 f:86,100',b:'h:20,93 s:30,96 e:26,96 w:32,84 p:60,97 k:74,80 f:86,100'};
+POSES.cablefly={a:'h:55,20 s:55,30 e:44,36 w:34,42 p:55,60 k:56,80 f:55,100 k2:66,80 f2:70,100',b:'h:55,20 s:55,30 e:68,36 w:82,40 p:55,60 k:56,80 f:55,100 k2:66,80 f2:70,100'};
+POSES.cablecrunch={a:'h:62,36 s:60,46 e:66,42 w:64,34 p:56,72 k:56,100 f:36,100',b:'h:84,62 s:76,64 e:84,70 w:84,62 p:54,76 k:56,100 f:36,100',props:[{t:'cable',from:[66,0]}]};
+POSES.pallof={a:'h:55,20 s:55,30 e:60,44 w:66,40 p:55,60 k:52,80 f:50,100 k2:62,80 f2:66,100',b:'h:55,20 s:55,30 e:70,38 w:84,38 p:55,60 k:52,80 f:50,100 k2:62,80 f2:66,100',props:[{t:'cable',from:[115,40]}]};
+POSES.chop={a:'h:52,20 s:54,30 e:66,20 w:78,8 p:55,60 k:56,80 f:54,100 k2:64,80 f2:68,100',b:'h:50,30 s:52,40 e:46,52 w:38,64 p:54,66 k:52,84 f:50,100 k2:64,84 f2:68,100',props:[{t:'cable',from:[110,0]}]};
+POSES.straightpull={a:'h:57,22 s:56,32 e:68,22 w:80,14 p:52,62 k:54,80 f:52,100',b:'h:57,22 s:56,32 e:60,46 w:63,60 p:52,62 k:54,80 f:52,100',props:[{t:'cable',from:[104,0]}]};
+POSES.legcurl={a:'h:16,72 s:26,76 e:24,88 w:22,80 p:60,78 k:80,78 f:100,78',b:'h:16,72 s:26,76 e:24,88 w:22,80 p:60,78 k:80,78 f:90,58',props:[{t:'bench',x:14,y:82,w:74},{t:'pad',at:'f'}]};
+POSES.seatpress={a:'h:44,30 s:44,40 e:44,56 w:58,48 p:46,72 k:66,74 f:68,100',b:'h:44,30 s:44,40 e:60,44 w:76,44 p:46,72 k:66,74 f:68,100',props:[{t:'seat',x:30,y:74,w:30}]};
+POSES.nordic={a:'h:58,36 s:56,46 e:62,58 w:66,64 p:52,72 k:52,100 f:30,100',b:'h:92,62 s:82,66 e:88,82 w:92,96 p:62,82 k:52,100 f:30,100',props:[{t:'pad',at:'f'}],dur:3};
+POSES.punch={a:'h:56,20 s:56,30 e:62,40 w:66,30 e2:58,42 w2:62,32 p:55,60 k:60,80 f:62,100 k2:48,80 f2:44,100',b:'h:58,20 s:58,30 e:74,30 w:90,28 e2:58,42 w2:62,32 p:55,60 k:60,80 f:62,100 k2:48,80 f2:44,100',dur:.9};
+POSES.kickback={a:'h:72,30 s:66,38 e:76,46 w:84,42 p:54,62 k:55,80 f:55,100 k2:53,80 f2:52,100',b:'h:72,30 s:66,38 e:76,46 w:84,42 p:54,62 k:55,80 f:55,100 k2:38,72 f2:24,80'};
+
+Object.assign(EX,{
+  // ---- Bodyweight ----
+  wall_pushup:{name:'Wall Push-Ups',e:'🧱',m:['Chest','Arms'],steps:['Stand an arm\'s length from a wall and put your hands on it at shoulder height.','Keep your body straight and bend your elbows to bring your chest to the wall.','Push back until your arms are straight.'],tip:'Step your feet further back to make it harder.'},
+  diamond_pushup:{name:'Diamond Push-Ups',e:'💎',m:['Triceps','Chest'],steps:['Get into a push-up position with your hands close together under your chest.','Touch thumbs and pointer fingers to make a diamond shape.','Lower your chest to your hands, then push back up.'],tip:'Too hard? Do them on your knees.'},
+  wide_pushup:{name:'Wide Push-Ups',e:'🦅',m:['Chest','Shoulders'],steps:['Get into a push-up position with your hands wider than usual.','Keep your body in a straight line.','Lower your chest towards the floor, then push up.'],tip:'Don\'t go so wide that your shoulders hurt.'},
+  pike_pushup:{name:'Pike Push-Ups',e:'🔺',m:['Shoulders','Triceps'],steps:['Start in a push-up position, then walk your feet in so your hips go up high, like an upside-down V.','Bend your elbows to lower the top of your head towards the floor.','Push back up to the V.'],tip:'Go slowly and keep your head between your hands.'},
+  jump_squat:{name:'Jump Squats',e:'🦘',m:['Legs','Heart'],steps:['Stand with feet shoulder-width apart.','Squat down, then jump up as high as you can.','Land softly with bent knees and go straight into the next squat.'],tip:'Land quietly, like a cat. No jumping? Do fast squats instead.'},
+  split_squat:{name:'Split Squats',e:'🦵',m:['Legs','Glutes'],per:'each leg',steps:['Stand with one foot a big step in front of the other.','Bend both knees and lower your back knee towards the floor.','Push through your front foot to stand up. Do all reps, then switch.'],tip:'Keep your front heel down and your chest up.'},
+  walking_lunge:{name:'Walking Lunges',e:'🚶',m:['Legs','Glutes'],per:'each leg',steps:['Stand tall with hands on your hips.','Take a big step forward and lower your back knee towards the floor.','Push up and bring the back foot forward into the next step.'],tip:'Short on space? Do them on the spot.'},
+  curtsy_lunge:{name:'Curtsy Lunges',e:'👑',m:['Glutes','Legs'],per:'each leg',steps:['Stand with feet hip-width apart.','Step one foot behind and across the other, like a curtsy, and bend both knees.','Push back up to standing and switch sides.'],tip:'Keep your front knee over your toes.'},
+  donkey_kick:{name:'Donkey Kicks',e:'🐴',m:['Glutes'],per:'each leg',steps:['Get on your hands and knees.','Keep your knee bent and lift one foot up towards the ceiling.','Squeeze your bottom at the top, then lower slowly.'],tip:'Don\'t arch your lower back. Only your leg moves.'},
+  fire_hydrant:{name:'Fire Hydrants',e:'🚒',m:['Glutes'],per:'each leg',steps:['Get on your hands and knees.','Keep your knee bent and lift one leg out to the side.','Lower it slowly. Do all reps, then switch.'],tip:'Keep your hips level, like a table.'},
+  bear_crawl:{name:'Bear Crawl',e:'🐻',m:['Whole body','Core'],time:true,steps:['Get on hands and feet with your knees just off the floor.','Crawl forward by moving the opposite hand and foot together.','Keep your back flat and your knees low.'],tip:'No space? Crawl a few steps forward, then backward.'},
+  plank_jack:{name:'Plank Jacks',e:'✳️',m:['Core','Heart'],time:true,steps:['Start in a plank on straight arms.','Jump your feet out wide, then back together.','Keep your hips steady and your tummy tight.'],tip:'Step the feet out one at a time to make it easier.'},
+  reverse_crunch:{name:'Reverse Crunches',e:'🔃',m:['Abs'],steps:['Lie on your back with knees bent and feet off the floor.','Use your tummy to curl your knees towards your chest and lift your hips a little.','Lower slowly without letting your feet touch.'],tip:'Move slowly. No swinging.'},
+  bicycle_crunch:{name:'Bicycle Crunches',e:'🚲',m:['Abs','Obliques'],per:'each side',steps:['Lie on your back, hands by your ears, knees up.','Bring one elbow towards the opposite knee while you straighten the other leg.','Switch sides like you are riding a bike.'],tip:'Slow is better than fast. Don\'t pull on your neck.'},
+  hollow_hold:{name:'Hollow Hold',e:'🍌',m:['Core'],time:true,steps:['Lie on your back and press your lower back into the floor.','Lift your shoulders and legs a little off the floor, arms by your ears.','Hold the banana shape and breathe.'],tip:'Bend your knees to make it easier.'},
+  skater_jump:{name:'Skater Jumps',e:'⛸️',m:['Legs','Heart'],per:'each side',steps:['Stand on one leg.','Jump sideways and land softly on the other leg.','Swing your arms and keep going side to side.'],tip:'Step instead of jumping to make it easier.'},
+  inchworm:{name:'Inchworms',e:'🐛',m:['Whole body','Hamstrings'],steps:['Stand tall, then bend forward and put your hands on the floor.','Walk your hands out to a push-up position.','Walk your hands back to your feet and stand up.'],tip:'Bend your knees as much as you need.'},
+  jump_rope:{name:'Jump Rope',e:'🪢',m:['Heart','Calves'],time:true,steps:['Hold the handles with your elbows close to your sides.','Turn the rope with your wrists and do small jumps.','Stay on the balls of your feet.'],tip:'No rope? Pretend! Same moves without it.'},
+  butt_kicks:{name:'Butt Kicks',e:'🏃',m:['Legs','Heart'],time:true,steps:['Jog on the spot.','Kick your heels up towards your bottom.','Pump your arms and stay light on your feet.'],tip:'Slow it down to a march if you need a break.'},
+  shadow_boxing:{name:'Shadow Boxing',e:'🥊',m:['Heart','Shoulders'],time:true,steps:['Stand with one foot in front, fists up by your chin.','Throw quick punches straight in front of you, left and right.','Bring each fist back to your chin. Keep moving your feet.'],tip:'Never lock your elbows. Punch the air, not too hard.'},
+  inverted_row:{name:'Inverted Rows',e:'🛶',m:['Back','Biceps'],steps:['Lie under a low, sturdy bar (or a Smith machine bar at waist height) and grab it.','Keep your body straight, heels on the floor.','Pull your chest up to the bar, then lower slowly.'],tip:'Bend your knees to make it easier. Only use a bar that cannot move.'},
+  nordic_curl:{name:'Nordic Curls (assisted)',e:'🧎',m:['Hamstrings'],steps:['Kneel on a soft mat. Hook your heels under a sturdy couch, or have an adult hold them.','Keep your body straight and lean forward as slowly as you can.','Catch yourself with your hands, then push back up.'],tip:'Very hard! Only go as far as you can control.'},
+  // ---- Backpack (home) ----
+  backpack_press:{name:'Backpack Overhead Press',e:'🎒',m:['Shoulders','Triceps'],weight:true,steps:['Hold a backpack with books in front of your shoulders.','Press it straight up over your head.','Lower it slowly back to your shoulders.'],tip:'Squeeze your tummy so your back doesn\'t arch.'},
+  backpack_squat:{name:'Backpack Squats',e:'🎒',m:['Legs','Glutes'],weight:true,steps:['Hug a backpack with books to your chest.','Sit back and down like sitting on a chair.','Push through your heels to stand up.'],tip:'Keep your chest up and knees over your toes.'},
+  backpack_rdl:{name:'Backpack Deadlifts',e:'🎒',m:['Hamstrings','Glutes','Back'],weight:true,steps:['Hold a backpack in front of your legs.','Push your hips back with a flat back, sliding the bag down to your knees.','Squeeze your bottom to stand up tall.'],tip:'Your back stays flat like a table the whole time.'},
+  // ---- Dumbbells ----
+  db_shrug:{name:'Dumbbell Shrugs',e:'🤷',m:['Upper back','Forearms'],weight:true,start:'20 lbs each',steps:['Stand holding dumbbells by your sides.','Lift your shoulders straight up towards your ears.','Hold for a second, then lower slowly.'],tip:'Up and down only. Don\'t roll your shoulders.'},
+  db_fly:{name:'Dumbbell Fly',e:'🦋',m:['Chest'],weight:true,start:'10 lbs each',steps:['Lie on a bench holding dumbbells above your chest, palms facing each other.','With a small bend in your elbows, open your arms out wide like a big hug.','Bring them back together over your chest.'],tip:'Go light and stop when you feel a stretch.'},
+  db_pullover:{name:'Dumbbell Pullover',e:'🔄',m:['Chest','Back'],weight:true,start:'15 lbs',steps:['Lie on a bench and hold one dumbbell with both hands above your chest.','Keep your arms nearly straight and lower it slowly behind your head.','Pull it back over your chest.'],tip:'Only go as far back as feels comfortable.'},
+  front_raise:{name:'Front Raises',e:'🙆',m:['Shoulders'],weight:true,start:'8 lbs each',steps:['Stand holding dumbbells in front of your thighs.','Lift them straight in front of you to shoulder height.','Lower slowly.'],tip:'No swinging. Go lighter than you think.'},
+  reverse_fly:{name:'Bent-Over Reverse Fly',e:'🕊️',m:['Rear shoulders','Upper back'],weight:true,start:'8 lbs each',steps:['Hold light dumbbells and bend forward at your hips with a flat back.','Lift your arms out to the sides like wings.','Squeeze your shoulder blades, then lower slowly.'],tip:'Keep a small bend in your elbows.'},
+  db_step_up:{name:'Dumbbell Step-Ups',e:'📦',m:['Legs','Glutes'],weight:true,per:'each leg',start:'15 lbs each',steps:['Hold a dumbbell in each hand and stand in front of a sturdy step or bench.','Step up with one foot and push through that heel to stand on top.','Step down slowly and repeat.'],tip:'Use a low step first. Push with the top leg, not the bottom one.'},
+  db_thruster:{name:'Dumbbell Thrusters',e:'🚀',m:['Whole body','Shoulders','Legs'],weight:true,start:'12 lbs each',steps:['Hold dumbbells at your shoulders.','Squat down, then stand up fast.','Use that push to press the dumbbells overhead. Lower to your shoulders.'],tip:'One smooth move: squat, stand, press.'},
+  db_overhead_ext:{name:'Overhead Tricep Extension',e:'🙋',m:['Triceps'],weight:true,start:'15 lbs',steps:['Hold one dumbbell with both hands above your head.','Bend only your elbows to lower it behind your head.','Straighten your arms to lift it back up.'],tip:'Keep your elbows pointing up and close to your head.'},
+  concentration_curl:{name:'Concentration Curls',e:'🎯',m:['Biceps'],weight:true,per:'each arm',start:'12 lbs',steps:['Sit on a bench and rest your elbow on the inside of your thigh.','Curl the dumbbell up towards your shoulder.','Lower slowly until your arm is straight.'],tip:'Only your forearm moves.'},
+  renegade_row:{name:'Renegade Rows',e:'⚔️',m:['Back','Core'],weight:true,per:'each arm',start:'15 lbs each',steps:['Get in a push-up position holding two dumbbells on the floor.','Pull one dumbbell up to your hip while you keep your hips still.','Put it down and switch arms.'],tip:'Spread your feet wide to stay steady. Use hex dumbbells that can\'t roll.'},
+  db_floor_press:{name:'Dumbbell Floor Press',e:'🏋️',m:['Chest','Triceps'],weight:true,start:'20 lbs each',steps:['Lie on the floor with knees bent, dumbbells above your chest.','Lower until your upper arms touch the floor.','Press back up.'],tip:'Great when you have no bench. The floor protects your shoulders.'},
+  // ---- Cable / functional trainer ----
+  cable_fly:{name:'Cable Fly',e:'🦋',m:['Chest'],weight:true,need:['cable','machines'],start:'15 lbs each',steps:['Set both pulleys at shoulder height and hold a handle in each hand.','Step forward with a small bend in your elbows.','Bring your hands together in front of your chest, then open slowly.'],tip:'Think "hug a big tree".'},
+  cable_curl:{name:'Cable Bicep Curls',e:'💪',m:['Biceps'],weight:true,need:['cable','machines'],start:'20 lbs',steps:['Attach a bar or rope to a low pulley.','Stand tall and curl it up to your shoulders.','Lower slowly until your arms are straight.'],tip:'Elbows stay by your sides.'},
+  cable_lateral_raise:{name:'Cable Lateral Raise',e:'🛫',m:['Shoulders'],weight:true,per:'each arm',need:['cable','machines'],start:'5 lbs',steps:['Stand side-on to a low pulley and hold the handle with the far hand.','Lift your arm out to the side to shoulder height.','Lower slowly.'],tip:'Go light. Lead with your elbow.'},
+  cable_kickback:{name:'Cable Glute Kickback',e:'🍑',m:['Glutes'],weight:true,per:'each leg',need:['cable','machines'],start:'10 lbs',steps:['Put an ankle strap on a low pulley and hold the machine.','Keep your leg nearly straight and push it back behind you.','Squeeze your bottom, then return slowly.'],tip:'Don\'t arch your back to kick higher.'},
+  cable_crunch:{name:'Cable Crunch',e:'🙇',m:['Abs'],weight:true,need:['cable','machines'],start:'30 lbs',steps:['Kneel facing a high pulley, holding a rope by your head.','Curl down, bringing your elbows towards your knees.','Come back up slowly.'],tip:'Your hips stay still. Only your tummy curls.'},
+  pallof_press:{name:'Pallof Press',e:'🧭',m:['Core','Obliques'],weight:true,per:'each side',need:['cable','machines'],start:'15 lbs',steps:['Stand side-on to a pulley at chest height, holding the handle at your chest.','Press it straight out in front and don\'t let it twist you.','Bring it back to your chest.'],tip:'Step further away to make it harder.'},
+  woodchop:{name:'Cable Woodchop',e:'🪓',m:['Obliques','Core'],weight:true,per:'each side',need:['cable','machines'],start:'15 lbs',steps:['Set a pulley high and hold the handle with both hands.','Pull it down and across your body to the opposite hip, turning your shoulders.','Return slowly.'],tip:'Turn from your middle and pivot your back foot.'},
+  straight_arm_pulldown:{name:'Straight-Arm Pulldown',e:'⬇️',m:['Back'],weight:true,need:['cable','machines'],start:'25 lbs',steps:['Hold a bar or rope on a high pulley with straight arms.','Lean forward a little and pull it down to your thighs.','Let it rise slowly.'],tip:'Keep your arms straight. Feel it under your armpits.'},
+  overhead_cable_ext:{name:'Overhead Cable Tricep Extension',e:'🙋',m:['Triceps'],weight:true,need:['cable','machines'],start:'20 lbs',steps:['Hold a rope on a low pulley and turn away from the machine, rope behind your head.','Straighten your arms forwards and up.','Bend your elbows slowly to come back.'],tip:'Elbows point forward and stay still.'},
+  cable_pull_through:{name:'Cable Pull-Through',e:'🔗',m:['Glutes','Hamstrings'],weight:true,need:['cable','machines'],start:'30 lbs',steps:['Stand facing away from a low pulley, rope between your legs.','Push your hips back with a flat back.','Squeeze your bottom to stand tall.'],tip:'It\'s a hip hinge, not a squat.'},
+  // ---- Machines ----
+  leg_curl:{name:'Leg Curl (machine)',e:'🦵',m:['Hamstrings'],weight:true,need:['machines'],start:'40 lbs',steps:['Lie face down on the machine with the pad just above your heels.','Curl your heels towards your bottom.','Lower slowly.'],tip:'Keep your hips pressed into the pad.'},
+  chest_press_machine:{name:'Chest Press (machine)',e:'🏢',m:['Chest','Triceps'],weight:true,need:['machines'],start:'40 lbs',steps:['Sit with your back flat on the pad, handles at chest height.','Push the handles forward until your arms are straight.','Bring them back slowly.'],tip:'A great safe way to learn pressing.'},
+  shoulder_press_machine:{name:'Shoulder Press (machine)',e:'🏢',m:['Shoulders','Triceps'],weight:true,need:['machines'],start:'30 lbs',steps:['Sit tall with the handles at shoulder height.','Press them up until your arms are straight.','Lower slowly.'],tip:'Keep your back on the pad.'},
+  assisted_pullup:{name:'Assisted Pull-Ups',e:'🤝',m:['Back','Biceps'],need:['machines','pullbar'],steps:['Use the assisted pull-up machine, or loop a strong band over a bar and put your knee in it.','Pull until your chin is over the bar.','Lower all the way down slowly.'],tip:'Use less help over time until you can do a real pull-up.'},
+  // ---- Barbell & EZ bar ----
+  good_morning:{name:'Good Morning (Barbell)',e:'🌅',m:['Hamstrings','Lower back','Glutes'],weight:true,bar:true,need:['barbell'],start:'45 lbs',steps:['Rest a light bar on your upper back, feet hip-width.','With soft knees and a flat back, push your hips back and lean forward.','Squeeze your bottom to stand back up.'],tip:'Go light. Stop when you feel a stretch in your hamstrings.'},
+  barbell_lunge:{name:'Barbell Reverse Lunge',e:'🦵',m:['Legs','Glutes'],weight:true,bar:true,per:'each leg',need:['barbell'],start:'65 lbs',steps:['Rest the bar on your upper back.','Step one foot back and lower your back knee towards the floor.','Push through your front foot to stand up.'],tip:'Use a rack with safety bars. Go slowly.'},
+  barbell_shrug:{name:'Barbell Shrugs',e:'🤷',m:['Upper back','Forearms'],weight:true,bar:true,need:['barbell'],start:'95 lbs',steps:['Hold the bar in front of your thighs.','Lift your shoulders straight up towards your ears.','Hold for a second and lower.'],tip:'Use straps if your grip gives out first.'},
+  ez_curl:{name:'EZ-Bar Bicep Curls',e:'〰️',m:['Biceps','Forearms'],weight:true,need:['ez','barbell'],start:'30 lbs',steps:['Hold the EZ bar on the angled grips, arms straight.','Curl it up to your shoulders.','Lower slowly.'],tip:'The angled grip is easier on your wrists.'},
+  ez_skull_crusher:{name:'EZ-Bar Skull Crushers',e:'💀',m:['Triceps'],weight:true,need:['ez','barbell'],start:'30 lbs',steps:['Lie on a bench holding the EZ bar above your chest.','Bend only your elbows to lower it towards your forehead.','Straighten your arms to lift it back up.'],tip:'Go slowly and have a spotter.'},
+});
+// Equipment versions are added by gear.js from `need`; bar lifts are Expert-only like the others.
+Object.assign(FIG,{
+  wall_pushup:['wallpush'],diamond_pushup:['pushup'],wide_pushup:['pushup'],pike_pushup:['pike'],jump_squat:['squat'],split_squat:['lunge'],
+  walking_lunge:['lunge'],curtsy_lunge:['lunge'],donkey_kick:['birddog'],fire_hydrant:['birddog'],bear_crawl:['climber'],plank_jack:['plank'],
+  reverse_crunch:['deadbug'],bicycle_crunch:['twist'],hollow_hold:['flutter'],skater_jump:['sidelunge'],inchworm:['burpee'],jump_rope:['march'],
+  butt_kicks:['march'],shadow_boxing:['punch'],inverted_row:['invrow'],nordic_curl:['nordic'],
+  backpack_press:['ohp',{t:'bag',at:'w'}],backpack_squat:['goblet',{t:'bag',at:'w'}],backpack_rdl:['hinge',{t:'bag',at:'w'}],
+  db_shrug:['shrug',{t:'db',at:'w'}],db_fly:['bench',{t:'db',at:'w'}],db_pullover:['pullover',{t:'db',at:'w'}],front_raise:['frontraise',{t:'db',at:'w'}],
+  reverse_fly:['row',{t:'db',at:'w'}],db_step_up:['stepup',{t:'db',at:'w'}],db_thruster:['pushpress',{t:'db',at:'w'}],db_overhead_ext:['ohext',{t:'db',at:'w'}],
+  concentration_curl:['curl',{t:'db',at:'w'}],renegade_row:['shouldertap',{t:'db',at:'w'}],db_floor_press:['floorpress',{t:'db',at:'w'}],
+  cable_fly:['cablefly',{t:'cable',from:[8,30]}],cable_curl:['curl',{t:'cable',from:[62,100]}],cable_lateral_raise:['frontraise',{t:'cable',from:[30,100]}],
+  cable_kickback:['kickback'],cable_crunch:['cablecrunch'],pallof_press:['pallof'],woodchop:['chop'],straight_arm_pulldown:['straightpull'],
+  overhead_cable_ext:['ohext',{t:'cable',from:[10,100]}],cable_pull_through:['hinge',{t:'cable',from:[0,100]}],
+  leg_curl:['legcurl'],chest_press_machine:['seatpress'],shoulder_press_machine:['dbpress'],assisted_pullup:['pullup'],
+  good_morning:['hinge',{t:'plate',at:'s'}],barbell_lunge:['lunge',{t:'plate',at:'s'}],barbell_shrug:['shrug',{t:'plate',at:'w'}],
+  ez_curl:['curl',{t:'plate',at:'w',r:7}],ez_skull_crusher:['skull',{t:'plate',at:'w',r:7}],
+});
+Object.assign(ALT,{
+  wall_pushup:['knee_pushup'],diamond_pushup:['knee_pushup','chair_dip'],wide_pushup:['knee_pushup'],pike_pushup:['shoulder_tap','knee_pushup'],
+  jump_squat:['squat'],split_squat:['reverse_lunge','squat'],walking_lunge:['reverse_lunge'],curtsy_lunge:['reverse_lunge'],donkey_kick:['glute_bridge'],
+  fire_hydrant:['glute_bridge'],bear_crawl:['plank'],plank_jack:['plank'],reverse_crunch:['dead_bug'],bicycle_crunch:['crunch','dead_bug'],
+  hollow_hold:['dead_bug'],skater_jump:['side_lunge'],inchworm:['plank'],jump_rope:['jumping_jacks'],butt_kicks:['high_knees'],shadow_boxing:['jumping_jacks'],
+  inverted_row:['backpack_row'],nordic_curl:['single_leg_bridge','glute_bridge'],backpack_press:['pike_pushup','shoulder_tap'],backpack_squat:['squat'],
+  backpack_rdl:['glute_bridge'],db_shrug:['farmer_carry'],db_fly:['db_bench','pushup'],db_pullover:['db_row'],front_raise:['lateral_raise'],
+  reverse_fly:['face_pull','superman'],db_step_up:['step_up'],db_thruster:['goblet_squat','db_press'],db_overhead_ext:['skull_crusher','chair_dip'],
+  concentration_curl:['db_curl'],renegade_row:['db_row','plank'],db_floor_press:['db_bench','pushup'],
+  cable_fly:['db_fly','pushup'],cable_curl:['db_curl'],cable_lateral_raise:['lateral_raise'],cable_kickback:['donkey_kick'],cable_crunch:['crunch'],
+  pallof_press:['side_plank'],woodchop:['russian_twist'],straight_arm_pulldown:['db_pullover','lat_pulldown'],overhead_cable_ext:['db_overhead_ext'],
+  cable_pull_through:['db_rdl','glute_bridge'],leg_curl:['single_leg_bridge','db_rdl'],chest_press_machine:['db_bench','pushup'],
+  shoulder_press_machine:['db_press'],assisted_pullup:['lat_pulldown','inverted_row'],good_morning:['db_rdl'],barbell_lunge:['db_lunge'],
+  barbell_shrug:['db_shrug'],ez_curl:['db_curl'],ez_skull_crusher:['skull_crusher'],
+});

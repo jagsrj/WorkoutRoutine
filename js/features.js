@@ -164,7 +164,7 @@ function exCard(id,target,editable){
 const e1rm=(w,r)=>w>0&&r>0?(r===1?w:w*(1+Math.min(r,12)/30)):0;
 function bestOf(sets,unit){
   let w=0,er=0,reps=0,wr=0;
-  (sets||[]).forEach(s=>{const kg=toUnit(Number(s.weight)||0,unit),r=Number(s.reps)||0;if(kg>w||(kg===w&&r>wr)){w=kg;wr=r}er=Math.max(er,e1rm(kg,r));reps=Math.max(reps,r)});
+  workSets(sets).forEach(s=>{const kg=toUnit(Number(s.weight)||0,unit),r=Number(s.reps)||0;if(kg>w||(kg===w&&r>wr)){w=kg;wr=r}er=Math.max(er,e1rm(kg,r));reps=Math.max(reps,r)});
   return {w,wr,er,reps};
 }
 function recordsTable(j=getJournal()){
@@ -198,17 +198,29 @@ function muscleStats(){
   workoutDates(j).forEach(d=>{const thisWeek=parseIso(d)>=ws;
     j[d].forEach(e=>{const ex=EX[exByName(e.exercise)];if(!ex||e.kind==='activity')return;
       const keys=[...new Set(ex.m.flatMap(m=>MUSCLE_KEYS[m]||[]))];
-      const vol=(e.sets||[]).reduce((t,x)=>t+(Number(x.reps)||0)*toUnit(Number(x.weight)||0,e.unit),0);
+      const ws=workSets(e.sets),vol=ws.reduce((t,x)=>t+(Number(x.reps)||0)*toUnit(Number(x.weight)||0,e.unit),0);
       const b=bestOf(e.sets,e.unit);
       keys.forEach(k=>{
-        if(thisWeek){sets[k]=(sets[k]||0)+(e.sets||[]).length;load[k]=(load[k]||0)+vol}
+        if(thisWeek){sets[k]=(sets[k]||0)+ws.length;load[k]=(load[k]||0)+vol}
         if(b.er>0&&(!best[k]||b.er>best[k].er))best[k]={er:b.er,w:b.w,wr:b.wr,ex:e.exercise,d};
       })})});
   return {sets,load,best};
 }
 function weekMuscles(){return muscleStats().sets}
+const mmSeg=()=>`<div class="seg">${[['sets','Sets'],['load',`${profile.unit} lifted`],['best','Strength'],['ready','Ready?']].map(o=>`<button class="${o[0]===muscleMode?'on':''}" data-mm="${o[0]}">${o[1]}</button>`).join('')}</div>`;
+// "Ready?" tab: which muscles are rested enough to train hard again.
+function readyCard(){
+  const R=muscleReady(),rows=readyRows();
+  const tip=k=>`${MUSCLE_NAMES[k]}: ${readyText(R[k]).slice(2)}`;
+  return `<div class="card stack" id="mmcard"><h2 class="h3">💪 Muscle power</h2>${mmSeg()}
+    ${bodyMap(k=>1-R[k],{cls:'mmap',tip,label:'Body map of tired muscles'})}
+    ${rows.length?`<div class="stack" style="gap:8px">${rows.map(([k,r])=>{const h=r<READY?hoursUntilReady(k):0;return `<div><div class="row between small"><b>${MUSCLE_NAMES[k]}</b><span>${readyText(r)}${h?` <span class="muted">· ready in ~${h<24?h+' h':plural(Math.round(h/24),'day')}</span>`:''}</span></div><div class="famBar"><i style="width:${Math.round((1-r)*100)}%"></i></div></div>`}).join('')}</div>`
+      :`<p class="small muted">All muscles are rested and ready. 💚</p>`}
+    <p class="small muted">Darker = more tired. Big muscles like legs and back need about 2–3 days after a hard workout; arms, calves and core recover faster. Hard sets and "Too hard" ratings count more.</p></div>`;
+}
 function muscleMap(){
   const st=muscleStats(),m=muscleMode;
+  if(m==='ready')return readyCard();
   const val=k=>m==='sets'?(st.sets[k]||0):m==='load'?Math.round(st.load[k]||0):Math.round((st.best[k]||{}).er||0);
   const max=Math.max(1,...Object.keys(MUSCLE_NAMES).map(val));
   const unit=profile.unit,fmt=n=>n.toLocaleString();
@@ -218,7 +230,7 @@ function muscleMap(){
     :m==='load'?`Weight × reps for every set this week. Each muscle counts the full weight of the exercises that use it (so a bench press adds to chest, shoulders and triceps).`
     :'Each muscle\'s strongest lift ever, as an estimated 1-rep max: the most it could lift once. A score to watch grow, not a weight to try!';
   return `<div class="card stack" id="mmcard"><h2 class="h3">💪 Muscle power</h2>
-    <div class="seg">${[['sets','Sets'],['load',`${unit} lifted`],['best','Strength']].map(o=>`<button class="${o[0]===m?'on':''}" data-mm="${o[0]}">${o[1]}</button>`).join('')}</div>
+    ${mmSeg()}
     ${bodyMap(k=>{const n=val(k);return n?n/max:0},{cls:'mmap',tip,label:'Body map of muscles worked'})}
     ${rows.length?`<div class="stack" style="gap:8px">${rows.map(([k,n])=>`<div><div class="row between small"><b>${MUSCLE_NAMES[k]}</b><span>${m==='sets'?plural(n,'set'):fmt(n)+' '+unit}${m==='best'?` <span class="muted">· ${esc(st.best[k].ex)}</span>`:''}</span></div><div class="famBar"><i style="width:${n/max*100}%"></i></div></div>`).join('')}</div>`
       :`<p class="small muted">${m==='sets'?'Finish a workout and the muscles you worked light up here.':m==='load'?`No weights lifted this week yet. Bodyweight moves count in Sets. Weighted exercises show here in ${unit}.`:'Lift with weights (dumbbells, machines or a barbell) to see each muscle\'s strength score.'}</p>`}

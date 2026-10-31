@@ -5,7 +5,7 @@
 // js/errors.js stays separate and loads first, so it can still report a broken app.js.
 const fs = require('fs'), path = require('path');
 const root = path.join(__dirname, '..');
-const ORDER = ['data', 'store', 'screens', 'sync', 'coach', 'photos', 'features', 'gear', 'extras', 'smart', 'habits', 'more', 'me'];
+const ORDER = ['data', 'store', 'screens', 'sync', 'coach', 'photos', 'features', 'gear', 'extras', 'smart', 'recovery', 'habits', 'more', 'me'];
 let out = '/* KinFit app bundle. GENERATED FILE: do not edit. Edit js/*.js and run `node scripts/build.js`. */\n';
 for (const n of ORDER) {
   const src = fs.readFileSync(path.join(root, 'js', n + '.js'), 'utf8').replace(/\s+$/, '');

@@ -2,12 +2,12 @@
 
 /* ---------- Workout builder ---------- */
 // Equipment each exercise needs (beyond a wall, chair, step or backpack).
-const NEEDS_BAR_OR_RACK=new Set(['pullup','dips','knee_raise','leg_raise','chin_up','weighted_pullup']);
+const NEEDS_BAR_OR_RACK=new Set(['pullup','inverted_row','dips','knee_raise','leg_raise','chin_up','weighted_pullup']);
 const MACHINES=new Set(['lat_pulldown','leg_extension','cable_row','tricep_pushdown','leg_press','face_pull']);
-const homeOk=id=>id.startsWith('backpack_')||(!EX[id].weight&&!NEEDS_BAR_OR_RACK.has(id)&&id!=='ab_wheel');
+const homeOk=id=>!EX[id].need&&(id.startsWith('backpack_')||!EX[id].weight&&!NEEDS_BAR_OR_RACK.has(id)&&id!=='ab_wheel');
 function equipOk(id,equip){
   if(equip==='none')return homeOk(id);
-  if(equip==='dumbbells')return homeOk(id)||(EX[id].weight&&!EX[id].bar&&!MACHINES.has(id));
+  if(equip==='dumbbells')return homeOk(id)||(EX[id].weight&&!EX[id].bar&&!EX[id].need&&!MACHINES.has(id));
   return true;
 }
 const levelOk=id=>profile.level==='expert'||!EX[id].bar;
@@ -18,7 +18,9 @@ function buildPool(equip){return Object.keys(EX).filter(id=>!id.startsWith('_')&
 function buildWorkout({mins=15,focus='full',equip,sport}={}){
   equip=equip||(profile.level==='beginner'?'none':profile.level==='intermediate'?'dumbbells':'gym');
   const count=Math.max(3,Math.min(8,Math.round(mins/3.5))),sets=mins<=10?2:3,beg=profile.level==='beginner';
-  const pool=buildPool(equip);let picks=[];
+  let pool=buildPool(equip);let picks=[];
+  // Prefer muscles that are rested, if that still leaves plenty to choose from.
+  try{const R=muscleReady(),fresh=pool.filter(id=>planMuscles([[id]]).every(k=>(R[k]??1)>=TIRED));if(fresh.length>=count*2)pool=fresh}catch(e){}
   if(sport){const S=SPORTS.find(s=>s.id===sport);if(S)picks=shuffle(S.items.map(x=>x[0]).filter(id=>pool.includes(id)))}
   if(picks.length<count){
     const groups=FOCUS[focus]&&FOCUS[focus].m?[FOCUS[focus].m]:[['Legs','Glutes'],['Chest','Shoulders'],['Back'],['Core'],['Heart'],['Arms']];
