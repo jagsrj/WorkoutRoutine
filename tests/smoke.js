@@ -220,6 +220,17 @@ const check = (ok, what) => { console.log(`${ok ? '✅' : '❌'} ${what}`); if (
       setJournal(save); profile.unit = unit; return r;
     });
     Object.entries(prg).forEach(([k, v]) => check(v, 'Unit: ' + k));
+    // Today's hero only says "done" after today's planned workout, not after an activity
+    const hero = await page.evaluate(() => {
+      const save = getJournal(), t = isoLocal(), k = SCHEDULE[new Date().getDay()].k, r = {};
+      if (!(k in WORKOUTS)) { r.skipRestDay = true; return r; }
+      setJournal({ [t]: [{ id: 5, kind: 'activity', act: 'Dog walk', exercise: '🐕 Dog walk', minutes: 30, sets: [], u: 1 }] }); go('today');
+      let h = document.querySelector('.hero').textContent; r.activityNotDone = !h.includes('DONE FOR TODAY') && h.includes('Start workout') && h.includes('already been active');
+      setJournal({ [t]: [{ id: 6, exercise: 'Plank', sets: [{ reps: 30, weight: 0 }], workout: k, level: profile.level, u: 1 }] }); go('today');
+      h = document.querySelector('.hero').textContent; r.planDone = h.includes('DONE FOR TODAY') && h.includes('Do it again');
+      setJournal(save); go('today'); return r;
+    });
+    Object.entries(hero).forEach(([k, v]) => check(v, 'Unit: ' + k));
     // Food diary & scanner (the AI reply is faked)
     await page.route('**/api/food', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify({ food: true, dish: 'Chicken rice bowl', confidence: 'medium', items: [{ name: 'Chicken', portion: '120 g', calories: 198, protein: 37, carbs: 0, fiber: 0 }, { name: 'Rice', portion: '1 cup', calories: 205, protein: 4, carbs: 45, fiber: 0.6 }], total: { calories: 403, protein: 41, carbs: 45, fiber: 0.6 } }) }));
     await page.evaluate(() => { profile.food = []; profile.body = []; delete profile.stats; delete profile.kid; delete profile.kcalGoal; saveProfile(); go('today'); });

@@ -844,7 +844,11 @@ function renderToday(v){
     return `<div class="day ${d===dow?'today':''} ${doneDates.has(isoLocal(dt))?'done':''}"><b>${DAYS[d]}</b>${dt.getDate()}<span class="e">${e}</span></div>`}).join('');
   const active=store.get(pKey('jams_active'),null);
   const isWork=sched.k in WORKOUTS;
-  const doneToday=doneDates.has(isoLocal());
+  // "Done" only once today's planned workout itself is logged. Activities (walks, sports) or a different
+  // workout don't count: they show as a small note instead. (Old entries have no workout key.)
+  const todayLog=(getJournal()[isoLocal()]||[]).filter(e=>e.kind!=='activity');
+  const doneToday=todayLog.some(e=>e.workout===sched.k||(!e.workout&&e.level));
+  const otherToday=!doneToday&&(getJournal()[isoLocal()]||[]).length>0;
   let heroHtml;
   if(active&&active.level===profile.level){
     const W=WORKOUTS[active.key]||{name:active.title,e:active.emoji};
@@ -855,6 +859,7 @@ function renderToday(v){
     heroHtml=`<div class="card hero stack">
       <p class="muted" style="font-weight:700">${doneToday?'✅ DONE FOR TODAY. NICE!':"TODAY'S WORKOUT"}</p>
       <div class="row"><span class="big-emoji">${W.e}</span><div><h2>${W.name}</h2><p class="muted">${W.sub} · ${plan.length} exercises · ~${mins} min</p></div></div>
+      ${otherToday?`<p class="small" style="font-weight:700;opacity:.9">✅ Nice, you've already been active today!</p>`:''}
       <button class="btn" data-start="${sched.k}">${doneToday?'Do it again':'Start workout ▶'}</button></div>`;
   }else{
     heroHtml=`<div class="card hero stack"><div class="row"><span class="big-emoji">${sched.e}</span><div><h2>${sched.label}</h2><p class="muted">${sched.note}</p></div></div>
@@ -1589,12 +1594,12 @@ function compareSheet(list){
   draw();
 }
 async function renderPhotoNudge(){
-  const box=$('#photoNudge');if(!box||!profile.photos)return;
-  const list=await photosFor();if(!$('#photoNudge'))return;
+  if(!$('#photoNudge')||!profile.photos)return;
+  const list=await photosFor(),box=$('#photoNudge');if(!box)return; // the screen may have been redrawn while loading
   const last=list[list.length-1],n=last?daysSince(last.date):null;
   if(last&&n<28)return;
   box.innerHTML=`<button class="card row" id="nudge" style="width:100%;text-align:left"><span class="big-emoji">📸</span><div style="flex:1"><b>${last?'Time for a progress photo?':'Take your first progress photo'}</b><p class="muted small">${last?`Your last one was ${ageText(n)}.`:'Then compare in a few weeks.'}</p></div><span class="muted">›</span></button>`;
-  $('#nudge').onclick=()=>{go('progress');setTimeout(()=>{const el=$('#photos');if(el)el.scrollIntoView({behavior:'smooth'})},250)};
+  box.querySelector('#nudge').onclick=()=>{go('progress');setTimeout(()=>{const el=$('#photos');if(el)el.scrollIntoView({behavior:'smooth'})},250)};
 }
 function photosCard(){
   return `<div class="card stack"><h2 class="h3">📸 Body tracking</h2>
