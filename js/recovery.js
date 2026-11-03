@@ -7,7 +7,7 @@ const RECOVER_H={quads:72,hams:72,glutes:72,lowerback:72,upperback:60,chest:60,s
 const TIRED_AT=10;   // about 10 hard sets on a muscle right now = fully tired
 const READY=.7,TIRED=.4;
 // Sports and activities: which muscles they work, per 10 minutes, in "sets".
-const ACT_LOAD={Run:{quads:.6,hams:.6,calves:.8,glutes:.4},Walk:{calves:.2},Bike:{quads:.6,glutes:.3},Swim:{upperback:.5,shoulders:.5},
+const ACT_LOAD={Run:{quads:.6,hams:.6,calves:.8,glutes:.4},Walk:{calves:.2},'Dog walk':{calves:.1},Bike:{quads:.6,glutes:.3},Swim:{upperback:.5,shoulders:.5},
   Soccer:{quads:.6,hams:.6,calves:.6},Basketball:{quads:.6,calves:.7},Cricket:{shoulders:.3,quads:.3},Tennis:{shoulders:.4,quads:.4,calves:.4},
   Pickleball:{quads:.3,calves:.3},Dance:{quads:.3,calves:.4},'Martial arts':{quads:.4,abs:.3},Intervals:{quads:.4,abs:.2}};
 
