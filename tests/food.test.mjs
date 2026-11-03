@@ -8,9 +8,9 @@ const req = (body, origin = 'https://kinfit.pages.dev') => new Request('https://
   method: 'POST', headers: { 'content-type': 'application/json', origin, 'cf-connecting-ip': '10.1.0.' + (++ip % 250) }, body: JSON.stringify(body) });
 const IMG = 'data:image/jpeg;base64,' + 'A'.repeat(400);
 const GOOD = JSON.stringify({ food: true, dish: 'Chicken rice bowl', confidence: 'medium', items: [
-  { name: 'Grilled chicken', portion: '120 g', protein_g: 37, carbs_g: 0, fiber_g: 0 },
-  { name: 'White rice', portion: '1 cup', protein_g: 4.3, carbs_g: 45, fiber_g: 0.6 },
-  { name: 'Broccoli', portion: '1/2 cup', protein_g: 1.3, carbs_g: 3, fiber_g: 1.2 }] });
+  { name: 'Grilled chicken', portion: '120 g', calories_kcal: 198, protein_g: 37, carbs_g: 0, fiber_g: 0 },
+  { name: 'White rice', portion: '1 cup', calories_kcal: 205, protein_g: 4.3, carbs_g: 45, fiber_g: 0.6 },
+  { name: 'Broccoli', portion: '1/2 cup', calories_kcal: 15, protein_g: 1.3, carbs_g: 3, fiber_g: 1.2 }] });
 // Fake Workers AI: records calls, answers like the vision model / Llama Guard.
 function ai({ reply = GOOD, guard = 'safe', fail = [] } = {}) {
   const calls = [];
@@ -27,7 +27,7 @@ const tests = {
   async 'photo: returns items and totals'() {
     const AI = ai(), { status, d } = await call({ image: IMG }, { AI });
     assert.equal(status, 200); assert.equal(d.dish, 'Chicken rice bowl'); assert.equal(d.items.length, 3);
-    assert.deepEqual(d.total, { protein: 42.6, carbs: 48, fiber: 1.8 });
+    assert.deepEqual(d.total, { calories: 418, protein: 42.6, carbs: 48, fiber: 1.8 });
     const msg = AI.calls[0].input.messages[1].content;
     assert.ok(msg.some(c => c.type === 'image_url' && c.image_url.url === IMG), 'image is sent to the model');
     assert.ok(!AI.calls.some(c => c.model === GUARD_MODEL), 'no guard call without typed text');
@@ -57,10 +57,10 @@ const tests = {
     assert.equal(last.status, 429);
   },
   'parse: clamps numbers, strips markup, ignores extra text'() {
-    const p = parseFood('Sure! {"food":true,"dish":"<b>Pizza</b>","items":[{"name":"Slice","protein_g":"12","carbs_g":9999,"fiber_g":-3}],"calories":800}');
+    const p = parseFood('Sure! {"food":true,"dish":"<b>Pizza</b>","items":[{"name":"Slice","calories_kcal":99999,"protein_g":"12","carbs_g":9999,"fiber_g":-3}],"extra":800}');
     assert.equal(p.dish, 'b Pizza /b'); // markup characters removed
-    assert.deepEqual(p.items[0], { name: 'Slice', portion: '', protein: 12, carbs: 300, fiber: 0 });
-    assert.ok(!('calories' in p)); assert.equal(p.confidence, 'low');
+    assert.deepEqual(p.items[0], { name: 'Slice', portion: '', calories: 3000, protein: 12, carbs: 300, fiber: 0 });
+    assert.ok(!('extra' in p)); assert.equal(p.confidence, 'low');
     assert.equal(parseFood('no json here'), null);
   },
 };

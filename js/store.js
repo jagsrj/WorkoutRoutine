@@ -37,7 +37,8 @@ function sanitizeProfile(p){
   if(p.cricket===true)o.cricket=true;
   if(p.foodOn===true)o.foodOn=true;
   if(p.foodOff===true)o.foodOff=true;
-  o.food=(Array.isArray(p.food)?p.food:[]).slice(-300).filter(f=>f&&ISO_RE.test(String(f.d))).map(f=>({id:cleanText(f.id,30)||newPid(),d:f.d,n:cleanText(f.n,50)||'Meal',p:cleanNum(f.p,1000),c:cleanNum(f.c,1000),f:cleanNum(f.f,1000),u:cleanNum(f.u,1e14)}));
+  o.food=(Array.isArray(p.food)?p.food:[]).slice(-600).filter(f=>f&&ISO_RE.test(String(f.d))).map(f=>({id:cleanText(f.id,30)||newPid(),d:f.d,m:['b','l','d','s'].includes(f.m)?f.m:'s',n:cleanText(f.n,50)||'Meal',k:Math.round(cleanNum(f.k,10000)),p:cleanNum(f.p,1000),c:cleanNum(f.c,1000),f:cleanNum(f.f,1000),u:cleanNum(f.u,1e14)}));
+  {const g=Math.round(Number(p.kcalGoal));if(g>=1200&&g<=5000)o.kcalGoal=g}
   const bn=cleanText(p.buddyName,16);if(bn)o.buddyName=bn;
   if(Number.isInteger(p.buddySeen)&&p.buddySeen>=0&&p.buddySeen<10)o.buddySeen=p.buddySeen;
   o.habits=(Array.isArray(p.habits)?p.habits:[]).filter(h=>h&&/^[a-z0-9_]{1,30}$/.test(String(h.id))).slice(0,8)
@@ -184,7 +185,7 @@ function render(){
   if(route!=='workout')hideTimer();
   const v=$('#view');
   if(onb) return renderOnboard(v);
-  ({today:renderToday,workout:renderWorkout,library:renderLibrary,progress:renderProgress,me:renderMe,ask:renderAsk,report:renderReport,trail:renderTrail,parent:renderParent}[route]||renderToday)(v);
+  ({today:renderToday,workout:renderWorkout,library:renderLibrary,progress:renderProgress,me:renderMe,ask:renderAsk,report:renderReport,trail:renderTrail,parent:renderParent,food:renderFood}[route]||renderToday)(v);
 }
 const logo=()=>`<div class="logo"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="var(--lvl-text)"/><path d="M14 27h6v10h-6zM44 27h6v10h-6zM20 23h5v18h-5zM39 23h5v18h-5zM25 30h14v4H25z" fill="#fff"/></svg>KINFIT</div>`;
 const topbar=(right='')=>`<div class="topbar">${logo()}${right}</div>`;

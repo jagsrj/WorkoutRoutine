@@ -220,25 +220,38 @@ const check = (ok, what) => { console.log(`${ok ? '✅' : '❌'} ${what}`); if (
       setJournal(save); profile.unit = unit; return r;
     });
     Object.entries(prg).forEach(([k, v]) => check(v, 'Unit: ' + k));
-    // Food scanner (the AI reply is faked)
-    await page.route('**/api/food', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify({ food: true, dish: 'Chicken rice bowl', confidence: 'medium', items: [{ name: 'Chicken', portion: '120 g', protein: 37, carbs: 0, fiber: 0 }, { name: 'Rice', portion: '1 cup', protein: 4, carbs: 45, fiber: 0.6 }], total: { protein: 41, carbs: 45, fiber: 0.6 } }) }));
-    await page.evaluate(() => { profile.food = []; saveProfile(); go('today'); });
+    // Food diary & scanner (the AI reply is faked)
+    await page.route('**/api/food', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify({ food: true, dish: 'Chicken rice bowl', confidence: 'medium', items: [{ name: 'Chicken', portion: '120 g', calories: 198, protein: 37, carbs: 0, fiber: 0 }, { name: 'Rice', portion: '1 cup', calories: 205, protein: 4, carbs: 45, fiber: 0.6 }], total: { calories: 403, protein: 41, carbs: 45, fiber: 0.6 } }) }));
+    await page.evaluate(() => { profile.food = []; delete profile.stats; delete profile.kid; delete profile.kcalGoal; saveProfile(); go('today'); });
     check(await page.isVisible('#foodcard'), 'Food card shows on Today');
     await page.click('#foodscan'); await page.fill('#fnote', 'chicken and rice bowl'); await page.click('#fgo'); await page.waitForTimeout(300);
-    check((await page.textContent('#fres')).includes('41'), 'Food breakdown shows protein, carbs and fiber');
+    check((await page.textContent('#fres')).includes('403') && (await page.textContent('#fres')).includes('41'), 'Breakdown shows calories, protein, carbs and fiber');
     await page.click('#fk [data-k="0.5"]');
-    check((await page.textContent('#fres')).includes('20.5'), 'Portion buttons rescale the breakdown');
-    await page.click('#fadd'); await page.waitForTimeout(200);
-    const fc = await page.textContent('#foodcard');
-    check(fc.includes('1 meal') && fc.includes('20.5'), 'Meal is added to Food today');
+    check((await page.textContent('#fres')).includes('20.5') && (await page.textContent('#fres')).includes('202'), 'Portion buttons rescale the breakdown');
+    await page.click('#fmeal [data-meal="l"]'); await page.click('#fadd'); await page.waitForTimeout(200);
+    check((await page.textContent('#foodcard')).includes('202'), 'Calories eaten show on Today');
+    await page.click('#fooddiary'); await page.waitForTimeout(150);
+    const lunch = await page.locator('.meal').filter({ hasText: 'Lunch' }).textContent();
+    check(lunch.includes('Chicken rice bowl') && lunch.includes('202 cal'), 'Food diary files the meal under Lunch');
+    await page.click('[data-fquick="b"]'); await page.fill('#qn', 'Banana'); await page.fill('#qk', '105'); await page.fill('#qc', '27'); await page.click('#qok'); await page.waitForTimeout(150);
+    check((await page.locator('.meal').filter({ hasText: 'Breakfast' }).textContent()).includes('Banana'), 'Quick add puts food in Breakfast');
+    await page.locator('[data-kgoal]').first().click(); await page.fill('#kg', '800'); await page.click('#kok'); await page.waitForTimeout(100);
+    check(await page.isVisible('#kok'), 'A calorie goal under 1,200 is refused');
+    await page.fill('#kg', '2000'); await page.click('#kok'); await page.waitForTimeout(150);
+    check((await page.textContent('#view')).includes('1,693'), 'Goal − Food = Remaining is shown');
+    await page.evaluate(() => { profile.kid = true; profile.foodOn = true; saveProfile(); go('food'); });
+    const kidDiary = await page.textContent('#view');
+    check(!/\d cal\b/.test(kidDiary) && !kidDiary.includes('Remaining') && !kidDiary.includes('Set goal') && kidDiary.includes("doesn't count calories"), 'Child profiles see no calories or goals');
+    await page.evaluate(() => { delete profile.kid; delete profile.foodOn; saveProfile(); });
     const foodU = await page.evaluate(() => {
       const r = {};
-      r.foodKept = sanitizeProfile({ id: 'pf', food: [{ id: 'f1', d: '2026-11-03', n: '<b>Toast</b>', p: 8, c: 30, f: 2 }] }).food[0].n === 'bToast/b';
+      const s = sanitizeProfile({ id: 'pf', kcalGoal: 900, food: [{ id: 'f1', d: '2026-11-03', m: 'x', n: '<b>Toast</b>', k: 99999, p: 8, c: 30, f: 2 }] });
+      r.foodKept = s.food[0].n === 'bToast/b' && s.food[0].m === 's' && s.food[0].k === 10000 && !('kcalGoal' in s);
       r.kidOffByDefault = foodOn({ kid: true }) === false && foodOn({ kid: true, foodOn: true }) === true && foodOn({}) === true && foodOn({ foodOff: true }) === false;
       return r;
     });
     Object.entries(foodU).forEach(([k, v]) => check(v, 'Unit: ' + k));
-    await page.evaluate(() => { profile.food = []; saveProfile(); });
+    await page.evaluate(() => { profile.food = []; delete profile.kcalGoal; saveProfile(); go('today'); });
     await page.unroute('**/api/food');
     await page.evaluate(() => { DB.list = DB.list.filter(p => p.id !== 'pkid1'); saveDB(); profile.cricket = false; saveProfile(); go('today'); });
     await page.evaluate(() => { profile.photos = false; profile.unit = 'lbs'; delete profile.stats; profile.body = []; saveProfile(); go('progress'); });
