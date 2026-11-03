@@ -17,7 +17,7 @@ const check = (ok, what) => { console.log(`${ok ? '✅' : '❌'} ${what}`); if (
   await new Promise(r => server.listen(PORT, r));
   const browser = await chromium.launch();
   const page = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
-  const errors = []; page.on('pageerror', e => errors.push(e.message));
+  const errors = []; page.on('pageerror', e => errors.push(e.message + ' @ ' + String(e.stack).split('\n').slice(1,3).join(' ')));
   try {
     await page.goto(`http://localhost:${PORT}/`);
     // Onboarding: name + quiz → level
@@ -222,7 +222,7 @@ const check = (ok, what) => { console.log(`${ok ? '✅' : '❌'} ${what}`); if (
     Object.entries(prg).forEach(([k, v]) => check(v, 'Unit: ' + k));
     // Food diary & scanner (the AI reply is faked)
     await page.route('**/api/food', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify({ food: true, dish: 'Chicken rice bowl', confidence: 'medium', items: [{ name: 'Chicken', portion: '120 g', calories: 198, protein: 37, carbs: 0, fiber: 0 }, { name: 'Rice', portion: '1 cup', calories: 205, protein: 4, carbs: 45, fiber: 0.6 }], total: { calories: 403, protein: 41, carbs: 45, fiber: 0.6 } }) }));
-    await page.evaluate(() => { profile.food = []; delete profile.stats; delete profile.kid; delete profile.kcalGoal; saveProfile(); go('today'); });
+    await page.evaluate(() => { profile.food = []; profile.body = []; delete profile.stats; delete profile.kid; delete profile.kcalGoal; saveProfile(); go('today'); });
     check(await page.isVisible('#foodcard'), 'Food card shows on Today');
     await page.click('#foodscan'); await page.fill('#fnote', 'chicken and rice bowl'); await page.click('#fgo'); await page.waitForTimeout(300);
     check((await page.textContent('#fres')).includes('403') && (await page.textContent('#fres')).includes('41'), 'Breakdown shows calories, protein, carbs and fiber');
@@ -239,6 +239,20 @@ const check = (ok, what) => { console.log(`${ok ? '✅' : '❌'} ${what}`); if (
     check(await page.isVisible('#kok'), 'A calorie goal under 1,200 is refused');
     await page.fill('#kg', '2000'); await page.click('#kok'); await page.waitForTimeout(150);
     check((await page.textContent('#view')).includes('1,693'), 'Goal − Food = Remaining is shown');
+    const exU = await page.evaluate(() => {
+      const t = isoLocal(), save = getJournal(); profile.unit = 'kg'; profile.body = [{ id: 'bw', d: t, w: 70, unit: 'kg', waist: 0, lu: 'cm' }];
+      setJournal({ [t]: [{ id: 1, exercise: 'Goblet Squats', sets: [{ reps: 10, weight: 20 }, { reps: 10, weight: 20 }, { reps: 10, weight: 20 }], unit: 'kg', u: 1 }, { id: 2, kind: 'activity', act: 'Run', exercise: 'Run', minutes: 30, sets: [], u: 1 }] });
+      const r = { exKcal: exerciseKcal(t) === 326 };
+      setJournal({ [t]: [{ id: 3, kind: 'activity', act: 'Dog walk', exercise: '🐕 Dog walk', minutes: 60, sets: [], u: 1 }] }); const dog = exerciseKcal(t);
+      setJournal({ [t]: [{ id: 4, kind: 'activity', act: 'Walk', exercise: '🚶 Walk', minutes: 60, sets: [], u: 1 }] }); const walk = exerciseKcal(t);
+      r.dogWalkLess = dog === 140 && walk === 175 && ACTIVITIES.some(a => a[1] === 'Dog walk');
+      setJournal({ [t]: [{ id: 1, exercise: 'Goblet Squats', sets: [{ reps: 10, weight: 20 }, { reps: 10, weight: 20 }, { reps: 10, weight: 20 }], unit: 'kg', u: 1 }, { id: 2, kind: 'activity', act: 'Run', exercise: 'Run', minutes: 30, sets: [], u: 1 }] });
+      saveProfile(); go('food');
+      r.exShown = document.querySelector('#view').textContent.includes('Exercise') && document.querySelector('#view').textContent.includes('1,856');
+      profile.body = []; saveProfile(); go('food'); r.exNeedsWeight = document.querySelector('#view').textContent.includes('Add your weight');
+      setJournal(save); profile.unit = 'lbs'; saveProfile(); return r;
+    });
+    Object.entries(exU).forEach(([k, v]) => check(v, 'Unit: ' + k));
     await page.evaluate(() => { profile.kid = true; profile.foodOn = true; saveProfile(); go('food'); });
     const kidDiary = await page.textContent('#view');
     check(!/\d cal\b/.test(kidDiary) && !kidDiary.includes('Remaining') && !kidDiary.includes('Set goal') && kidDiary.includes("doesn't count calories"), 'Child profiles see no calories or goals');

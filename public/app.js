@@ -353,7 +353,7 @@ const SPORTS=[
   {id:'running',e:'🏃',name:'Running',sub:'Injury-proof legs and a steady core',items:[['reverse_lunge',3,8,10],['step_up',3,8,10],['single_leg_bridge',3,8,10],['calf_raise_bw',3,15,20],['side_plank',3,20,30],['dead_bug',3,8,10]]},
   {id:'basketball',e:'🏀',name:'Basketball',sub:'Jumping power and quick moves',items:[['jumping_jacks',3,20,30],['squat',3,12,15],['step_up',3,8,10],['lateral_shuffle',3,20,30],['calf_raise_bw',3,15,20],['burpee',3,6,10],['plank',3,20,40]]},
 ];
-const ACTIVITIES=[['🚶','Walk'],['🏃','Run'],['🚴','Bike'],['🏊','Swim'],['🏏','Cricket'],['⚽','Soccer'],['🏀','Basketball'],['🎾','Tennis'],['🏓','Pickleball'],['💃','Dance'],['🧘','Yoga'],['🥋','Martial arts'],['🧘','Stretch'],['⏱️','Intervals'],['⭐','Other']];
+const ACTIVITIES=[['🚶','Walk'],['🐕','Dog walk'],['🏃','Run'],['🚴','Bike'],['🏊','Swim'],['🏏','Cricket'],['⚽','Soccer'],['🏀','Basketball'],['🎾','Tennis'],['🏓','Pickleball'],['💃','Dance'],['🧘','Yoga'],['🥋','Martial arts'],['🧘','Stretch'],['⏱️','Intervals'],['⭐','Other']];
 const MUSCLE_KEYS={Chest:['chest'],'Upper Chest':['chest'],Shoulders:['shoulders'],'Rear shoulders':['shoulders','upperback'],Back:['upperback','lowerback'],'Upper back':['upperback'],'Lower back':['lowerback'],'Whole back side':['upperback','lowerback','glutes','hams'],
   Biceps:['biceps'],Triceps:['triceps'],Arms:['biceps','triceps'],Forearms:['forearms'],Grip:['forearms'],Core:['abs'],Abs:['abs'],Obliques:['abs'],'Hip flexors':['quads'],
   Legs:['quads','hams','calves'],Quads:['quads'],Hamstrings:['hams'],Glutes:['glutes'],Calves:['calves'],'Whole body':['quads','chest','upperback','abs'],Agility:['quads','calves'],Heart:[]};
@@ -553,6 +553,7 @@ function sanitizeProfile(p){
   if(p.foodOff===true)o.foodOff=true;
   o.food=(Array.isArray(p.food)?p.food:[]).slice(-600).filter(f=>f&&ISO_RE.test(String(f.d))).map(f=>({id:cleanText(f.id,30)||newPid(),d:f.d,m:['b','l','d','s'].includes(f.m)?f.m:'s',n:cleanText(f.n,50)||'Meal',k:Math.round(cleanNum(f.k,10000)),p:cleanNum(f.p,1000),c:cleanNum(f.c,1000),f:cleanNum(f.f,1000),u:cleanNum(f.u,1e14)}));
   {const g=Math.round(Number(p.kcalGoal));if(g>=1200&&g<=5000)o.kcalGoal=g}
+  if(p.exAdd==='off'||p.exAdd==='all')o.exAdd=p.exAdd;
   const bn=cleanText(p.buddyName,16);if(bn)o.buddyName=bn;
   if(Number.isInteger(p.buddySeen)&&p.buddySeen>=0&&p.buddySeen<10)o.buddySeen=p.buddySeen;
   o.habits=(Array.isArray(p.habits)?p.habits:[]).filter(h=>h&&/^[a-z0-9_]{1,30}$/.test(String(h.id))).slice(0,8)
@@ -2780,7 +2781,7 @@ const RECOVER_H={quads:72,hams:72,glutes:72,lowerback:72,upperback:60,chest:60,s
 const TIRED_AT=10;   // about 10 hard sets on a muscle right now = fully tired
 const READY=.7,TIRED=.4;
 // Sports and activities: which muscles they work, per 10 minutes, in "sets".
-const ACT_LOAD={Run:{quads:.6,hams:.6,calves:.8,glutes:.4},Walk:{calves:.2},Bike:{quads:.6,glutes:.3},Swim:{upperback:.5,shoulders:.5},
+const ACT_LOAD={Run:{quads:.6,hams:.6,calves:.8,glutes:.4},Walk:{calves:.2},'Dog walk':{calves:.1},Bike:{quads:.6,glutes:.3},Swim:{upperback:.5,shoulders:.5},
   Soccer:{quads:.6,hams:.6,calves:.6},Basketball:{quads:.6,calves:.7},Cricket:{shoulders:.3,quads:.3},Tennis:{shoulders:.4,quads:.4,calves:.4},
   Pickleball:{quads:.3,calves:.3},Dance:{quads:.3,calves:.4},'Martial arts':{quads:.4,abs:.3},Intervals:{quads:.4,abs:.2}};
 
@@ -3149,14 +3150,34 @@ const MACRO={p:['💪','Protein','helps muscles repair and grow','#7c3aed'],c:['
 const macroTiles=t=>`<div class="stats" style="grid-template-columns:repeat(3,1fr)">${Object.keys(MACRO).map(k=>`<div class="stat"><b style="color:${MACRO[k][3]}">${round1(t[k])}<small style="font-size:14px">g</small></b><span>${MACRO[k][0]} ${MACRO[k][1]}</span></div>`).join('')}</div>`;
 const kcalTxt=n=>`${Math.round(n).toLocaleString()} cal`;
 const entryLine=f=>`${showKcal()&&f.k?`<b>${kcalTxt(f.k)}</b> · `:''}P ${f.p} · C ${f.c} · F ${f.f} g`;
-// Goal − Food = Remaining, like MyFitnessPal.
-function kcalSummary(t){
+/* ---------- Workout calories ----------
+   Estimated as (MET − 1) × body weight (kg) × hours: only the calories above resting, which the goal
+   already covers. Dog walks count less than walks (slower, lots of stops). Strength work counts about 2 minutes per set at MET 3.5. Calorie-burn estimates are
+   rough (wrist trackers are off by 27–93% in studies), so by default only HALF is added back. */
+const ACT_MET={Walk:3.5,'Dog walk':3,Run:9.8,Bike:7.5,Swim:6,Cricket:4.8,Soccer:7,Basketball:6.5,Tennis:7.3,Pickleball:4.1,Dance:5,Yoga:2.5,'Martial arts':7,Stretch:2.3,Intervals:8,Other:4};
+const LIFT_MET=3.5;
+const EX_SHARE={off:[0,'Off'],half:[.5,'Half'],all:[1,'All']};
+const exShare=()=>(EX_SHARE[profile.exAdd]||EX_SHARE.half)[0];
+// Calories burned in workouts and activities on a day, or null if body weight is unknown.
+function exerciseKcal(d){
+  const lw=latestWeight();if(!lw)return null;
+  const kg=kgOf(lw.w,lw.unit);let k=0;
+  (getJournal()[d]||[]).forEach(e=>{
+    if(e.kind==='activity')k+=Math.max(0,(ACT_MET[e.act]||4)-1)*kg*(e.minutes||0)/60;
+    else k+=(LIFT_MET-1)*kg*workSets(e.sets).length*2/60});
+  return Math.round(k);
+}
+const hasExercise=d=>(getJournal()[d]||[]).length>0;
+// Goal − Food + Exercise = Remaining, like MyFitnessPal.
+function kcalSummary(t,d=isoLocal()){
   if(!showKcal())return '';
-  const g=profile.kcalGoal;
-  if(!g)return `<div class="kcalrow"><div><b>${t.k.toLocaleString()}</b><span>calories eaten</span></div><button class="link small" data-kgoal>🎯 Set a daily goal</button></div>`;
-  const left=g-t.k;
-  return `<div class="kcalrow"><div><b>${g.toLocaleString()}</b><span>Goal</span></div><i>−</i><div><b>${t.k.toLocaleString()}</b><span>Food</span></div><i>=</i><div><b style="color:${left<0?'var(--warn)':'var(--ok)'}">${left.toLocaleString()}</b><span>Remaining</span></div></div>
-    <div class="famBar" style="height:10px"><i style="width:${Math.min(100,t.k/g*100)}%;${left<0?'background:var(--warn)':''}"></i></div>`;
+  const g=profile.kcalGoal,burn=exerciseKcal(d),add=burn?Math.round(burn*exShare()):0;
+  const hint=burn===null&&hasExercise(d)&&exShare()?`<p class="small muted">🏃 Add your weight in Body stats to count workout calories.</p>`:'';
+  if(!g)return `<div class="kcalrow"><div><b>${t.k.toLocaleString()}</b><span>calories eaten</span></div>${burn?`<div><b>${burn.toLocaleString()}</b><span>burned 🏃</span></div>`:''}<button class="link small" data-kgoal>🎯 Set a daily goal</button></div>${hint}`;
+  const left=g-t.k+add,cap=g+add;
+  return `<div class="kcalrow"><div><b>${g.toLocaleString()}</b><span>Goal</span></div><i>−</i><div><b>${t.k.toLocaleString()}</b><span>Food</span></div>${add?`<i>+</i><div><b>${add.toLocaleString()}</b><span>Exercise</span></div>`:''}<i>=</i><div><b style="color:${left<0?'var(--warn)':'var(--ok)'}">${left.toLocaleString()}</b><span>Remaining</span></div></div>
+    <div class="famBar" style="height:10px"><i style="width:${Math.min(100,t.k/cap*100)}%;${left<0?'background:var(--warn)':''}"></i></div>
+    ${add&&exShare()<1?`<p class="small muted">🏃 About ${burn.toLocaleString()} burned in workouts; half is added back because burn estimates run high.</p>`:''}${hint}`;
 }
 
 // Shrink a photo to max 768px JPEG and return it as a data: URL (about 60–150 KB).
@@ -3199,7 +3220,7 @@ function renderFood(v){
   v.innerHTML=`<div class="topbar"><button class="link" id="fback">← Today</button>${showKcal()?`<button class="link small" data-kgoal>🎯 ${profile.kcalGoal?'Goal '+profile.kcalGoal.toLocaleString():'Set goal'}</button>`:''}</div>
   <div class="stack-lg">
     <div class="row between"><button class="btn sm ghost" id="fprev" aria-label="Previous day">‹</button><h1 style="font-size:22px">📒 ${isToday?'Today':niceDate(foodDay)}</h1><button class="btn sm ghost" id="fnext" aria-label="Next day" ${isToday?'disabled':''}>›</button></div>
-    ${showKcal()||L.length?`<div class="card stack">${kcalSummary(t)}${macroTiles(t)}</div>`:''}
+    ${showKcal()||L.length?`<div class="card stack">${kcalSummary(t,foodDay)}${macroTiles(t)}</div>`:''}
     ${Object.entries(MEALS).map(([m,[e,name]])=>{const M=L.filter(f=>(f.m||'s')===m),s=foodSum(M);
       return `<div class="card stack meal"><div class="row between"><h2 class="h3">${e} ${name}</h2>${M.length&&showKcal()?`<b>${kcalTxt(s.k)}</b>`:''}</div>
         ${M.map(f=>`<div class="row between fentry"><div style="flex:1"><b>${esc(f.n)}</b><p class="small muted">${entryLine(f)}</p></div><button class="xbtn" data-fdel="${f.id}" aria-label="Delete ${esc(f.n)}">🗑️</button></div>`).join('')}
@@ -3220,13 +3241,16 @@ function goalSheet(){
   if(!showKcal())return;
   sheet(`<h2>🎯 Daily calorie goal</h2><p class="small muted">Optional. Pick a number that suits you, or ask a doctor or dietitian. Most adults need somewhere around 1,800–2,800 a day, more if you're very active.</p>
     <input class="num" id="kg" type="number" inputmode="numeric" min="${KCAL_MIN_GOAL}" max="${KCAL_MAX_GOAL}" step="50" placeholder="e.g. 2200" value="${profile.kcalGoal||''}">
+    <p class="small muted" style="font-weight:700">ADD WORKOUT CALORIES BACK</p><div class="seg" id="exadd">${Object.entries(EX_SHARE).map(([k,[,l]])=>`<button class="${(profile.exAdd||'half')===k?'on':''}" data-ex="${k}">${l}${k==='half'?' ✓':''}</button>`).join('')}</div>
+    <p class="small muted">On workout days you can eat a bit more. Burn estimates often run high, so <b>Half</b> is the safer choice. Uses your weight from Body stats.</p>
     <button class="btn" id="kok">Save</button>${profile.kcalGoal?'<button class="btn secondary" id="koff">Remove goal</button>':''}<button class="btn ghost" id="cancel">Cancel</button>`,()=>{
     $('#cancel').onclick=closeLayer;
+    let ex=profile.exAdd||'half';document.querySelectorAll('#exadd [data-ex]').forEach(b=>b.onclick=()=>{ex=b.dataset.ex;document.querySelectorAll('#exadd button').forEach(x=>x.classList.toggle('on',x===b))});
     if($('#koff'))$('#koff').onclick=()=>{delete profile.kcalGoal;saveProfile();syncSoon();closeLayer();render()};
     $('#kok').onclick=()=>{const g=Math.round(parseFloat($('#kg').value));
       if(!(g>=KCAL_MIN_GOAL)){toast(`Pick ${KCAL_MIN_GOAL.toLocaleString()} or more. Going lower isn't safe without a doctor`);return}
       if(g>KCAL_MAX_GOAL){toast('Check your goal');return}
-      profile.kcalGoal=g;saveProfile();syncSoon();closeLayer();render()};
+      profile.kcalGoal=g;if(ex==='half')delete profile.exAdd;else profile.exAdd=ex;saveProfile();syncSoon();closeLayer();render()};
   });
 }
 function quickSheet(meal){

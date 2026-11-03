@@ -39,6 +39,7 @@ function sanitizeProfile(p){
   if(p.foodOff===true)o.foodOff=true;
   o.food=(Array.isArray(p.food)?p.food:[]).slice(-600).filter(f=>f&&ISO_RE.test(String(f.d))).map(f=>({id:cleanText(f.id,30)||newPid(),d:f.d,m:['b','l','d','s'].includes(f.m)?f.m:'s',n:cleanText(f.n,50)||'Meal',k:Math.round(cleanNum(f.k,10000)),p:cleanNum(f.p,1000),c:cleanNum(f.c,1000),f:cleanNum(f.f,1000),u:cleanNum(f.u,1e14)}));
   {const g=Math.round(Number(p.kcalGoal));if(g>=1200&&g<=5000)o.kcalGoal=g}
+  if(p.exAdd==='off'||p.exAdd==='all')o.exAdd=p.exAdd;
   const bn=cleanText(p.buddyName,16);if(bn)o.buddyName=bn;
   if(Number.isInteger(p.buddySeen)&&p.buddySeen>=0&&p.buddySeen<10)o.buddySeen=p.buddySeen;
   o.habits=(Array.isArray(p.habits)?p.habits:[]).filter(h=>h&&/^[a-z0-9_]{1,30}$/.test(String(h.id))).slice(0,8)
