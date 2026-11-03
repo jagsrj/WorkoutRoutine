@@ -28,12 +28,15 @@ function sanitizeProfile(p){
     unit:p.unit==='kg'?'kg':'lbs',rest:['auto','45','60','90','120'].includes(String(p.rest))?String(p.rest):'auto',
     warmups:cleanNum(p.warmups,1e5),questions:cleanNum(p.questions,1e6),updated:cleanNum(p.updated,1e14),fivesSeen:cleanNum(p.fivesSeen,1e14),
     badges:(Array.isArray(p.badges)?p.badges:[]).filter(b=>BADGES.some(x=>x.id===b)),photos:!!p.photos,toured:!!p.toured,
-    todayHide:(Array.isArray(p.todayHide)?p.todayHide:[]).filter(k=>['recovery','habits','phase','challenge','goal','family','badges','tip'].includes(k)),
+    todayHide:(Array.isArray(p.todayHide)?p.todayHide:[]).filter(k=>['recovery','habits','phase','challenge','goal','family','badges','tip','quest','buddy','dice'].includes(k)),
     chDone:(Array.isArray(p.chDone)?p.chDone:[]).slice(-60).map(x=>cleanText(x,30)).filter(x=>/^\d{4}-\d{2}-[a-z]+$/.test(x)),
     goals:(Array.isArray(p.goals)?p.goals:[]).slice(-20).filter(g=>g&&['lift','reps','workouts','minutes'].includes(g.type)&&ISO_RE.test(String(g.start))&&ISO_RE.test(String(g.by))).map(g=>({id:cleanText(g.id,30)||newPid(),type:g.type,ex:cleanText(g.ex,60),target:cleanNum(g.target,1e6),start:g.start,by:g.by,done:ISO_RE.test(String(g.done))?g.done:null}))};
   if(ISO_RE.test(String(p.planStart)))o.planStart=p.planStart;
   if(p.coachAI===false)o.coachAI=false;
   if(p.kid===true)o.kid=true;
+  if(p.cricket===true)o.cricket=true;
+  const bn=cleanText(p.buddyName,16);if(bn)o.buddyName=bn;
+  if(Number.isInteger(p.buddySeen)&&p.buddySeen>=0&&p.buddySeen<10)o.buddySeen=p.buddySeen;
   o.habits=(Array.isArray(p.habits)?p.habits:[]).filter(h=>h&&/^[a-z0-9_]{1,30}$/.test(String(h.id))).slice(0,8)
     .map(h=>({id:String(h.id),e:cleanEmoji(h.e,'⭐'),n:cleanText(h.n,24)||'Habit',t:Math.max(1,Math.min(20,Math.round(cleanNum(h.t,20))||1)),...(h.unit?{unit:cleanText(h.unit,12)}:{})}));
   o.hlog=cleanHabitLog(p.hlog);
@@ -178,7 +181,7 @@ function render(){
   if(route!=='workout')hideTimer();
   const v=$('#view');
   if(onb) return renderOnboard(v);
-  ({today:renderToday,workout:renderWorkout,library:renderLibrary,progress:renderProgress,me:renderMe,ask:renderAsk,report:renderReport}[route]||renderToday)(v);
+  ({today:renderToday,workout:renderWorkout,library:renderLibrary,progress:renderProgress,me:renderMe,ask:renderAsk,report:renderReport,trail:renderTrail,parent:renderParent}[route]||renderToday)(v);
 }
 const logo=()=>`<div class="logo"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="var(--lvl-text)"/><path d="M14 27h6v10h-6zM44 27h6v10h-6zM20 23h5v18h-5zM39 23h5v18h-5zM25 30h14v4H25z" fill="#fff"/></svg>KINFIT</div>`;
 const topbar=(right='')=>`<div class="topbar">${logo()}${right}</div>`;

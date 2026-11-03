@@ -342,6 +342,24 @@ a.btn{text-decoration:none}
 .wrow .wv{font-weight:800;font-size:14px;color:var(--lvl-text);white-space:nowrap}
 .mini{display:block;height:6px;background:var(--line);border-radius:6px;overflow:hidden}
 .mini i{display:block;height:100%;background:var(--lvl-text);border-radius:6px}
+.qbar{display:flex;height:16px;background:var(--line);border-radius:10px;overflow:hidden}.qbar i{display:block;height:100%}
+.qwho{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px}.qwho i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.buddy{padding:14px;gap:14px}.buddy-e{font-size:46px;line-height:1;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.ladder{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.ladder div{text-align:center;border:1px solid var(--line);border-radius:14px;padding:8px 2px;opacity:.55}.ladder div.on{opacity:1;border-color:var(--lvl-text)}
+.ladder span{display:block;font-size:28px}.ladder b{display:block;font-size:12px}.ladder small{font-size:11px;color:var(--muted)}
+.dice{font-size:56px;text-align:center}.dice.spin{animation:roll .7s ease-out}
+@keyframes roll{0%{transform:rotate(0) scale(.4)}70%{transform:rotate(600deg) scale(1.15)}100%{transform:rotate(720deg) scale(1)}}
+.trail{display:flex;flex-direction:column}
+.tstop{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 12px;color:var(--text);opacity:.6;width:100%}
+.tstop.on{opacity:1}.tstop.here{border:2px solid var(--lvl-text)}
+.tdot{font-size:28px;width:40px;text-align:center}
+.tseg{position:relative;height:40px;width:6px;margin-left:31px;background:var(--line);border-radius:3px}.tseg i{position:absolute;left:0;top:0;width:100%;background:var(--lvl-text);border-radius:3px}
+.tme{position:absolute;left:14px;transform:translateY(-50%);font-size:20px}
+.postcard{text-align:center;border:3px dashed var(--lvl-text);border-radius:18px;padding:18px;background:var(--lvl-soft)}.pc-e{font-size:72px}
+.balls{letter-spacing:2px;font-weight:900;color:var(--lvl-text)}
+.pwarn{background:var(--bg);border-left:4px solid var(--warn);border-radius:8px;padding:8px 10px}
+@media (prefers-reduced-motion:reduce){.buddy-e,.dice.spin{animation:none}}
 </style>
 </head>
 <body data-level="beginner">

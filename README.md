@@ -58,6 +58,13 @@ Redeploy after adding bindings. Coach allows 20 AI questions per hour per person
 - **Activities:** log walks, runs, sports and more; they count toward streaks.
 - **Body measurements:** weight and waist (part of opt-in body tracking).
 - **Body stats & BMI** (Progress, with body tracking on): weight, height, age, current BMI with its range, and a target BMI that shows the matching weight. Targets below 18.5 aren't accepted, and under-18s see their BMI without adult ranges or a target (kids are measured on growth charts instead).
+- **Family quest** (`js/fun.js`): with 2+ people, one shared weekly goal (reps, active days, minutes or sets) that everyone fills together, in a colour-per-person bar.
+- **Grow-a-buddy:** a pet that grows with every active day (🥚 → 🐣 → 🐥 → 🐦 → 🦜 → 🦅 → 🐉), never shrinks after a break, and can be named.
+- **Workout dice:** a surprise 10-minute workout from your equipment, skipping tired muscles. Start it, re-roll or save it.
+- **Adventure trail:** every active day moves you 10 km from Waterloo to St. John's, with a postcard and fun fact at each stop.
+- **Strength in real things:** total weight lifted shown as polar bears, cars, school buses… (or CN Tower stair climbs for bodyweight reps), on Progress, the workout-done screen, the monthly report and the share card.
+- **Cricket mode** (Me → Settings): each workout day is an innings, reps score runs, with 50s, 100s, overs and a monthly season card.
+- **Family dashboard** (Me → Parent controls, behind the parent PIN): everyone's week at a glance, with gentle warnings for too many days in a row, very tired muscles, "too hard" ratings, kids on the barbell plan, or long breaks.
 - **Voice coach:** reads exercises, rest times and countdowns aloud.
 - **Coach knows your history:** AI answers use your recent training log.
 - **Family challenge:** a weekly leaderboard and high-fives between people.

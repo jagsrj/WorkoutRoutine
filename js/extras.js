@@ -61,7 +61,7 @@ function shareProgress(){
   const j=getJournal(),ds=workoutDates(j),ws=weekStart(new Date()),wk=ds.filter(d=>parseIso(d)>=ws).length,rec=recordsTable(j);
   const best=Object.entries(rec).filter(([n,r])=>r.w).sort((a,b)=>b[1].w-a[1].w).slice(0,2).map(([n,r])=>`🏋️ ${n}: ${round1(r.w)} ${profile.unit}`);
   shareImage({big:'🔥',title:`${profile.name||'My'}${profile.name?"'s":''} progress`,sub:`${lvl().emoji} ${lvl().name} level`,stats:[[ds.length,'workouts'],[weekStreak(),'week streak'],[earnedBadges().length,'badges']],
-    lines:[`📅 ${wk} active ${wk===1?'day':'days'} this week`,...best],text:'My progress on KinFit 🔥'});
+    lines:[`📅 ${wk} active ${wk===1?'day':'days'} this week`,...best,...(()=>{const t=totals(),r=realThing(t.kg,t.reps);return r&&t.kg>=4?[`💪 Lifted ${r}`]:[]})()],text:'My progress on KinFit 🔥'});
 }
 
 /* ---------- Stretching & mobility ---------- */
@@ -162,6 +162,7 @@ function renderReport(v){
     <div class="card stack"><h2 class="h3">🏆 Records set this month</h2>${prs.length?prs.map(([n,r])=>`<div class="row between"><span>${esc(n)}</span><b>${r.w?round1(r.w)+' '+profile.unit+' × '+r.wr:r.reps+' reps'}</b></div>`).join(''):'<p class="muted small">No new records this month. Keep pushing!</p>'}</div>
     ${acts.length?`<div class="card stack"><h2 class="h3">🏃 Activities</h2>${Object.entries(acts.reduce((m,e)=>(m[e.exercise]=(m[e.exercise]||0)+(e.minutes||0),m),{})).map(([n,m])=>`<div class="row between"><span>${esc(n)}</span><b>${m} min</b></div>`).join('')}</div>`:''}
     ${B.length>1?`<div class="card stack"><h2 class="h3">⚖️ Body weight</h2><p>${round1(toUnit(B[0].w,B[0].unit))} → <b>${round1(toUnit(B[B.length-1].w,B[B.length-1].unit))} ${profile.unit}</b></p></div>`:''}
+    ${(()=>{const t=totals(profile,isoLocal(first),isoLocal(last)),r=realLine(t.kg,t.reps,'This month');return r?`<div class="card stack"><h2 class="h3">🐻‍❄️ Strength in real things</h2><p>${r}</p></div>`:''})()}
     <div class="card stack"><h2 class="h3">🏅 Badges so far</h2><p>${BADGES.filter(b=>earnedBadges().includes(b.id)).map(b=>b.e+' '+b.n).join(' · ')||'None yet'}</p></div>
     <p class="small muted center">Made with KinFit · ${location.host}</p>
     <button class="btn noprint" id="rprint">🖨️ Print or save as PDF</button>
@@ -213,7 +214,7 @@ async function restoreHistorySheet(){
 }
 
 /* ---------- Today: one compact "This week" card, and optional rows ---------- */
-const TODAY_ROWS={recovery:'😴 Muscle recovery tips',habits:'🌱 Daily habits',phase:'📅 6-month plan',challenge:'🏆 Monthly challenge',goal:'🎯 Goals',family:'👨‍👩‍👧 Family challenge',badges:'🏅 Badges',tip:'💡 Tip of the day'};
+const TODAY_ROWS={recovery:'😴 Muscle recovery tips',habits:'🌱 Daily habits',phase:'📅 6-month plan',challenge:'🏆 Monthly challenge',goal:'🎯 Goals',family:'👨‍👩‍👧 Family challenge',badges:'🏅 Badges',tip:'💡 Tip of the day',quest:'🤝 Family quest',buddy:'🐣 Grow-a-buddy',dice:'🎲 Workout dice'};
 const todayHidden=k=>(profile.todayHide||[]).includes(k);
 function weekRow(icon,title,value,pct,go='progress'){
   return `<button class="wrow" data-go="${go}"><span class="wi" aria-hidden="true">${icon}</span><span class="wt"><b>${title}</b>${pct!=null?`<span class="mini" aria-hidden="true"><i style="width:${Math.max(0,Math.min(100,pct))}%"></i></span>`:''}</span><span class="wv">${value}</span></button>`;
