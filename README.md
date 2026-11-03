@@ -57,6 +57,7 @@ Redeploy after adding bindings. Coach allows 20 AI questions per hour per person
 - **"How did that feel?"** effort rating that shapes the next workout's advice.
 - **Activities:** log walks, runs, sports and more; they count toward streaks.
 - **Body measurements:** weight and waist (part of opt-in body tracking).
+- **Body stats & BMI** (Progress, with body tracking on): weight, height, age, current BMI with its range, and a target BMI that shows the matching weight. Targets below 18.5 aren't accepted, and under-18s see their BMI without adult ranges or a target (kids are measured on growth charts instead).
 - **Voice coach:** reads exercises, rest times and countdowns aloud.
 - **Coach knows your history:** AI answers use your recent training log.
 - **Family challenge:** a weekly leaderboard and high-fives between people.

@@ -21,6 +21,7 @@ function cleanHabitLog(l){
     const c={};Object.entries(day.c).slice(0,20).forEach(([k,v])=>{if(/^[a-z0-9_]{1,30}$/.test(k))c[k]=Math.round(cleanNum(v,20))});o[d]={u:cleanNum(day.u,1e14),c}});
   return o;
 }
+const BMI_MIN_GOAL=18.5; // a target BMI below the healthy range is never accepted
 function sanitizeProfile(p){
   if(!p||typeof p!=='object'||!/^p[a-z0-9]{1,40}$/.test(String(p.id||'')))return null;
   const o={id:p.id,name:cleanText(p.name,24),avatar:AVATARS.includes(p.avatar)?p.avatar:'🙂',level:['beginner','intermediate','expert'].includes(p.level)?p.level:'beginner',
@@ -45,6 +46,12 @@ function sanitizeProfile(p){
   o.routines=(Array.isArray(p.routines)?p.routines:[]).slice(0,50).filter(r=>r&&/^r[a-z0-9]{1,40}$/.test(String(r.id))).map(r=>({id:r.id,name:cleanText(r.name,30)||'My workout',e:cleanEmoji(r.e,'💪'),
     items:(Array.isArray(r.items)?r.items:[]).slice(0,30).filter(x=>Array.isArray(x)&&ID_RE.test(String(x[0]))).map(x=>[String(x[0]),Math.max(1,Math.min(10,cleanNum(x[1])||3)),Math.max(1,cleanNum(x[2],999)||8),Math.max(1,cleanNum(x[3],999)||12)])}));
   o.body=(Array.isArray(p.body)?p.body:[]).slice(-500).filter(b=>b&&ISO_RE.test(b.d)).map(b=>({id:cleanText(b.id,30)||newPid(),d:b.d,w:cleanNum(b.w,1500),unit:b.unit==='kg'?'kg':'lbs',waist:cleanNum(b.waist,500),lu:b.lu==='cm'?'cm':'in'}));
+  // Body stats: height in cm, age as entered on ageOn (so it can grow by itself), and an adult target BMI.
+  const st=p.stats&&typeof p.stats==='object'?p.stats:{},so={},sh=Number(st.h),sa=Number(st.age),sg=Number(st.goal);
+  if(sh>=50&&sh<=250)so.h=Math.round(sh*10)/10;
+  if(sa>=5&&sa<=110&&ISO_RE.test(String(st.ageOn))){so.age=Math.round(sa);so.ageOn=st.ageOn}
+  if(sg>=BMI_MIN_GOAL&&sg<=40)so.goal=Math.round(sg*10)/10;
+  if(Object.keys(so).length)o.stats=so;
   o.fives=(Array.isArray(p.fives)?p.fives:[]).slice(-20).filter(f=>f&&typeof f==='object').map(f=>({from:cleanText(f.from,24)||'Someone',av:AVATARS.includes(f.av)?f.av:'🙂',at:cleanNum(f.at,1e14)}));
   return o;
 }
