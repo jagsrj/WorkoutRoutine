@@ -15,6 +15,7 @@ jobs:
       - run: node scripts/build.js --check
       - run: node tests/chat-guard.test.mjs
       - run: node tests/api-scale.test.mjs
+      - run: node tests/food.test.mjs
       - run: npm install --no-save playwright@1
       - run: npx playwright install --with-deps chromium
       - run: node tests/smoke.js

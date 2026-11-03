@@ -137,6 +137,7 @@ function renderToday(v){
     ${backupCard()||installCard()}
     ${streakCard()}
     ${buddyCard()}
+    ${foodCard()}
     ${questCard()}
     ${habitsCard()}
     ${weekCard(strip,earned)}
@@ -147,7 +148,7 @@ function renderToday(v){
     ${todayHidden('tip')?'':tipOfDay()}
   </div>`;
   v.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>startWorkout(b.dataset.start));
-  if($('#dice'))$('#dice').onclick=diceSheet;if($('#buddy'))$('#buddy').onclick=buddySheet;
+  bindFood(v);if($('#dice'))$('#dice').onclick=diceSheet;if($('#buddy'))$('#buddy').onclick=buddySheet;
   v.querySelectorAll('button[data-go]:not(.streakpill)').forEach(b=>b.onclick=()=>go(b.dataset.go));
   if($('#warmonly'))$('#warmonly').onclick=()=>runWarmup();
   renderPhotoNudge();

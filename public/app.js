@@ -542,13 +542,16 @@ function sanitizeProfile(p){
     unit:p.unit==='kg'?'kg':'lbs',rest:['auto','45','60','90','120'].includes(String(p.rest))?String(p.rest):'auto',
     warmups:cleanNum(p.warmups,1e5),questions:cleanNum(p.questions,1e6),updated:cleanNum(p.updated,1e14),fivesSeen:cleanNum(p.fivesSeen,1e14),
     badges:(Array.isArray(p.badges)?p.badges:[]).filter(b=>BADGES.some(x=>x.id===b)),photos:!!p.photos,toured:!!p.toured,
-    todayHide:(Array.isArray(p.todayHide)?p.todayHide:[]).filter(k=>['recovery','habits','phase','challenge','goal','family','badges','tip','quest','buddy','dice'].includes(k)),
+    todayHide:(Array.isArray(p.todayHide)?p.todayHide:[]).filter(k=>['recovery','habits','phase','challenge','goal','family','badges','tip','quest','buddy','dice','food'].includes(k)),
     chDone:(Array.isArray(p.chDone)?p.chDone:[]).slice(-60).map(x=>cleanText(x,30)).filter(x=>/^\d{4}-\d{2}-[a-z]+$/.test(x)),
     goals:(Array.isArray(p.goals)?p.goals:[]).slice(-20).filter(g=>g&&['lift','reps','workouts','minutes'].includes(g.type)&&ISO_RE.test(String(g.start))&&ISO_RE.test(String(g.by))).map(g=>({id:cleanText(g.id,30)||newPid(),type:g.type,ex:cleanText(g.ex,60),target:cleanNum(g.target,1e6),start:g.start,by:g.by,done:ISO_RE.test(String(g.done))?g.done:null}))};
   if(ISO_RE.test(String(p.planStart)))o.planStart=p.planStart;
   if(p.coachAI===false)o.coachAI=false;
   if(p.kid===true)o.kid=true;
   if(p.cricket===true)o.cricket=true;
+  if(p.foodOn===true)o.foodOn=true;
+  if(p.foodOff===true)o.foodOff=true;
+  o.food=(Array.isArray(p.food)?p.food:[]).slice(-300).filter(f=>f&&ISO_RE.test(String(f.d))).map(f=>({id:cleanText(f.id,30)||newPid(),d:f.d,n:cleanText(f.n,50)||'Meal',p:cleanNum(f.p,1000),c:cleanNum(f.c,1000),f:cleanNum(f.f,1000),u:cleanNum(f.u,1e14)}));
   const bn=cleanText(p.buddyName,16);if(bn)o.buddyName=bn;
   if(Number.isInteger(p.buddySeen)&&p.buddySeen>=0&&p.buddySeen<10)o.buddySeen=p.buddySeen;
   o.habits=(Array.isArray(p.habits)?p.habits:[]).filter(h=>h&&/^[a-z0-9_]{1,30}$/.test(String(h.id))).slice(0,8)
@@ -867,6 +870,7 @@ function renderToday(v){
     ${backupCard()||installCard()}
     ${streakCard()}
     ${buddyCard()}
+    ${foodCard()}
     ${questCard()}
     ${habitsCard()}
     ${weekCard(strip,earned)}
@@ -877,7 +881,7 @@ function renderToday(v){
     ${todayHidden('tip')?'':tipOfDay()}
   </div>`;
   v.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>startWorkout(b.dataset.start));
-  if($('#dice'))$('#dice').onclick=diceSheet;if($('#buddy'))$('#buddy').onclick=buddySheet;
+  bindFood(v);if($('#dice'))$('#dice').onclick=diceSheet;if($('#buddy'))$('#buddy').onclick=buddySheet;
   v.querySelectorAll('button[data-go]:not(.streakpill)').forEach(b=>b.onclick=()=>go(b.dataset.go));
   if($('#warmonly'))$('#warmonly').onclick=()=>runWarmup();
   renderPhotoNudge();
@@ -2078,6 +2082,7 @@ function parentCard(){
     <p class="small muted">${pinIsSet()?'Parent lock is <b>on</b>. A PIN is needed to change levels, remove people, change sync, body tracking or Coach settings, or erase data.':'Set a 4-digit PIN so kids can\'t change levels, remove people or erase data.'}</p>
     <div class="row between"><span><b>Coach AI answers</b><br><span class="small muted">Off = Coach only uses its built-in answers</span></span><div class="seg" style="width:120px"><button class="${profile.coachAI===false?'on':''}" data-cai="0">Off</button><button class="${profile.coachAI===false?'':'on'}" data-cai="1">On</button></div></div>
     <div class="row between"><span><b>Child profile</b><br><span class="small muted">Coach uses simpler, kid-safe answers for ${esc(profile.name||'this person')}</span></span><div class="seg" style="width:120px"><button class="${profile.kid?'':'on'}" data-kidp="0">Off</button><button class="${profile.kid?'on':''}" data-kidp="1">On</button></div></div>
+    <div class="row between"><span><b>Food scanner</b><br><span class="small muted">${profile.kid?'Off by default for child profiles':'Shows protein, carbs and fiber for meals'}</span></span><div class="seg" style="width:120px"><button class="${foodOn()?'':'on'}" data-fon="0">Off</button><button class="${foodOn()?'on':''}" data-fon="1">On</button></div></div>
     <button class="btn secondary" id="pdash">👀 Family dashboard</button>
     <button class="btn secondary" id="pinset">${pinIsSet()?'Change PIN':'Set a parent PIN'}</button>
     ${pinIsSet()?'<button class="link" id="pinoff" style="padding:0;color:var(--muted)">Turn off parent lock</button>':''}</div>`;
@@ -2481,7 +2486,7 @@ async function restoreHistorySheet(){
 }
 
 /* ---------- Today: one compact "This week" card, and optional rows ---------- */
-const TODAY_ROWS={recovery:'😴 Muscle recovery tips',habits:'🌱 Daily habits',phase:'📅 6-month plan',challenge:'🏆 Monthly challenge',goal:'🎯 Goals',family:'👨‍👩‍👧 Family challenge',badges:'🏅 Badges',tip:'💡 Tip of the day',quest:'🤝 Family quest',buddy:'🐣 Grow-a-buddy',dice:'🎲 Workout dice'};
+const TODAY_ROWS={recovery:'😴 Muscle recovery tips',habits:'🌱 Daily habits',phase:'📅 6-month plan',challenge:'🏆 Monthly challenge',goal:'🎯 Goals',family:'👨‍👩‍👧 Family challenge',badges:'🏅 Badges',tip:'💡 Tip of the day',quest:'🤝 Family quest',buddy:'🐣 Grow-a-buddy',dice:'🎲 Workout dice',food:'🍽️ Food today'};
 const todayHidden=k=>(profile.todayHide||[]).includes(k);
 function weekRow(icon,title,value,pct,go='progress'){
   return `<button class="wrow" data-go="${go}"><span class="wi" aria-hidden="true">${icon}</span><span class="wt"><b>${title}</b>${pct!=null?`<span class="mini" aria-hidden="true"><i style="width:${Math.max(0,Math.min(100,pct))}%"></i></span>`:''}</span><span class="wv">${value}</span></button>`;
@@ -3122,6 +3127,100 @@ addEventListener('online',()=>{showNet();if(syncCfg.code)syncNow(true)});
 addEventListener('offline',showNet);
 showNet();
 
+/* ===== js/food.js ===== */
+/* KinFit · Food scanner: snap a meal (or describe it) and get an estimate of its protein, carbs and fiber.
+   The photo is shrunk on the phone and sent to /api/food, which asks a Workers AI vision model.
+   Photos are never stored. Results can be added to a simple "food today" list (kept for 30 days).
+   No calories, targets or good/bad labels: KinFit is used by kids too. Child profiles only see the
+   scanner if a parent turns it on (Me → Parent controls). */
+
+const FOOD_KEEP_DAYS=30;
+const foodOn=(p=profile)=>p.kid?p.foodOn===true:p.foodOff!==true; // kids: off unless a parent turns it on
+const foodToday=()=>(profile.food||[]).filter(f=>f.d===isoLocal());
+const foodSum=list=>['p','c','f'].reduce((o,k)=>(o[k]=round1(list.reduce((a,x)=>a+(x[k]||0),0)),o),{});
+const MACRO={p:['💪','Protein','helps muscles repair and grow','#7c3aed'],c:['⚡','Carbs','your body\'s main fuel for workouts','#ea580c'],f:['🥦','Fiber','keeps your tummy happy and you full longer','#16a34a']};
+const macroTiles=t=>`<div class="stats" style="grid-template-columns:repeat(3,1fr)">${Object.keys(MACRO).map(k=>`<div class="stat"><b style="color:${MACRO[k][3]}">${round1(t[k])}<small style="font-size:14px">g</small></b><span>${MACRO[k][0]} ${MACRO[k][1]}</span></div>`).join('')}</div>`;
+
+// Shrink a photo to max 768px JPEG and return it as a data: URL (about 60–150 KB).
+async function foodImage(file){
+  const url=URL.createObjectURL(file);
+  try{
+    const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url});
+    const k=Math.min(1,768/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement('canvas');
+    c.width=Math.round(img.naturalWidth*k);c.height=Math.round(img.naturalHeight*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    return c.toDataURL('image/jpeg',.8);
+  }finally{URL.revokeObjectURL(url)}
+}
+
+function foodCard(){
+  if(!foodOn()||todayHidden('food'))return '';
+  const L=foodToday(),t=foodSum(L);
+  return `<div class="card stack" id="foodcard"><div class="row between"><h2 class="h3">🍽️ Food today</h2>${L.length?`<span class="small muted" style="font-weight:700">${plural(L.length,'meal')}</span>`:''}</div>
+    ${L.length?`${macroTiles(t)}<details class="how"><summary>Meals</summary>${L.map(f=>`<div class="row between" style="padding:6px 0"><span>${esc(f.n)}</span><span class="small muted">P ${f.p} · C ${f.c} · F ${f.f} g<button class="xbtn" data-fdel="${f.id}" aria-label="Delete">🗑️</button></span></div>`).join('')}</details>`
+      :`<p class="small muted">Snap a photo of your meal to see its protein, carbs and fiber.</p>`}
+    <button class="btn secondary" id="foodscan">📷 Scan food</button></div>`;
+}
+function bindFood(v){
+  if($('#foodscan'))$('#foodscan').onclick=()=>foodSheet();
+  v.querySelectorAll('[data-fdel]').forEach(b=>b.onclick=()=>{const before=(profile.food||[]).slice();profile.food=before.filter(x=>x.id!==b.dataset.fdel);saveProfile();render();
+    undoable('Meal deleted',()=>{profile.food=before;saveProfile();render()},()=>syncSoon())});
+}
+
+function foodSheet(){
+  let img='';
+  sheet(`<h2>🍽️ Scan food</h2><p class="small muted">Take a photo of your plate from above, with all the food in view. You can also just describe it.</p>
+    <div class="row" style="gap:8px"><label class="btn secondary" style="flex:1;cursor:pointer">📷 Take photo<input type="file" id="fcam" accept="image/*" capture="environment" hidden></label>
+      <label class="btn secondary" style="flex:1;cursor:pointer">🖼️ Choose photo<input type="file" id="fpick" accept="image/*" hidden></label></div>
+    <div id="fprev"></div>
+    <label class="small muted" style="font-weight:700">DETAILS (OPTIONAL)</label>
+    <input class="txt" id="fnote" maxlength="200" placeholder="e.g. big bowl, brown rice, 2 eggs">
+    <button class="btn" id="fgo">🔍 Get breakdown</button><button class="btn ghost" id="cancel">Cancel</button>
+    <p class="small muted">🔒 The photo is only used to work out the breakdown. It isn't saved anywhere.</p>`,()=>{
+    $('#cancel').onclick=closeLayer;
+    const pick=async e=>{const f=e.target.files[0];if(!f)return;try{img=await foodImage(f);$('#fprev').innerHTML=`<img src="${img}" alt="Your meal" class="fprev">`}catch(err){toast("Couldn't open that photo")}};
+    $('#fcam').onchange=pick;$('#fpick').onchange=pick;
+    $('#fgo').onclick=async()=>{const note=$('#fnote').value.trim();
+      if(!img&&note.length<3){toast('Add a photo or describe your meal');return}
+      const b=$('#fgo');b.disabled=true;b.textContent='Looking at your meal… 🔍';
+      try{
+        const r=await fetch('api/food',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({image:img||undefined,note:note||undefined})});
+        const d=await r.json().catch(()=>({}));
+        if(d.error==='crisis'){foodCrisis();return}
+        if(!r.ok||d.error)throw new Error(d.error||'failed');
+        if(!d.food){toast("Hmm, I couldn't spot any food in that photo 🤔");b.disabled=false;b.textContent='🔍 Get breakdown';return}
+        foodResult(d,img);
+      }catch(e){b.disabled=false;b.textContent='🔍 Get breakdown';
+        toast(e.message==='rate_limited'?'Lots of scans right now. Try again in a little while':e.message==='not_configured'?'The food scanner isn\'t switched on for this website yet':e.message==='unsafe'?'I can only help with food and meals':e.message==='bad_image'?'That photo didn\'t work. Try another one':'Couldn\'t check that meal. Check your internet and try again')}
+    };
+  });
+}
+function foodCrisis(){
+  sheet(`<h2>💛 You're not alone</h2><p>What you're feeling matters. Please talk to a trusted adult (a parent, teacher or coach) right now.</p>
+    <p>In Canada or the US you can call or text <b>988</b> any time. Kids and teens in Canada can call Kids Help Phone at <b>1-800-668-6868</b> or text <b>686868</b>.</p>
+    <button class="btn" id="ok">OK</button>`,()=>$('#ok').onclick=closeLayer);
+}
+function foodResult(d,img){
+  let k=1;
+  const draw=()=>{const t={p:d.total.protein*k,c:d.total.carbs*k,f:d.total.fiber*k};
+    $('#fres').innerHTML=`${macroTiles(t)}
+      <div class="stack" style="gap:6px">${d.items.map(x=>`<div class="row between small"><span><b>${esc(x.name)}</b>${x.portion?` <span class="muted">· ${esc(x.portion)}${k!==1?' × '+k:''}</span>`:''}</span><span class="muted">P ${round1(x.protein*k)} · C ${round1(x.carbs*k)} · F ${round1(x.fiber*k)} g</span></div>`).join('')}</div>`};
+  sheet(`<h2>🍽️ ${esc(d.dish)}</h2>
+    ${img?`<img src="${img}" alt="Your meal" class="fprev">`:''}
+    <p class="small muted"><span class="chip">${{low:'🤔 Rough guess',medium:'👍 Good guess',high:'🎯 Confident'}[d.confidence]}</span> Estimated from ${img?'the photo':'your description'}. Portions can be off, so adjust if needed.</p>
+    <p class="small muted" style="font-weight:700">HOW MUCH DID YOU EAT?</p>
+    <div class="seg" id="fk">${[[.5,'½'],[1,'All of it'],[1.5,'1½×'],[2,'2×']].map(([v,l])=>`<button class="${v===1?'on':''}" data-k="${v}">${l}</button>`).join('')}</div>
+    <div id="fres" class="stack"></div>
+    <details class="how"><summary>What do these do?</summary>${Object.values(MACRO).map(m=>`<p class="small">${m[0]} <b>${m[1]}</b> ${m[2]}.</p>`).join('')}</details>
+    <button class="btn" id="fadd">＋ Add to food today</button><button class="btn secondary" id="fagain">📷 Scan another</button><button class="btn ghost" id="cancel">Close</button>`,()=>{
+    draw();
+    $('#cancel').onclick=closeLayer;$('#fagain').onclick=()=>foodSheet();
+    document.querySelectorAll('#fk [data-k]').forEach(b=>b.onclick=()=>{k=+b.dataset.k;document.querySelectorAll('#fk button').forEach(x=>x.classList.toggle('on',x===b));draw()});
+    $('#fadd').onclick=()=>{const cut=isoLocal(new Date(Date.now()-FOOD_KEEP_DAYS*864e5));
+      profile.food=[...(profile.food||[]).filter(f=>f.d>=cut),{id:newId('f'),d:isoLocal(),n:(d.dish+(k!==1?` (${k===.5?'½':k+'×'})`:'')).slice(0,50),p:round1(d.total.protein*k),c:round1(d.total.carbs*k),f:round1(d.total.fiber*k),u:Date.now()}].slice(-300);
+      saveProfile();syncSoon();closeLayer();toast('🍽️ Added to food today');render()};
+  });
+}
+
 /* ===== js/fun.js ===== */
 /* KinFit · Fun extras: family quest, grow-a-buddy, workout dice, adventure trail,
    "strength in real things", cricket mode and the parent dashboard. */
@@ -3428,6 +3527,7 @@ function renderMe(v){
   bindReminders(v);
   v.querySelectorAll('[data-crk]').forEach(b=>b.onclick=()=>{profile.cricket=b.dataset.crk==='1';saveProfile();syncSoon();toast(profile.cricket?'🏏 Cricket mode on! See Progress':'Cricket mode off');renderMe(v)});
   if($('#pdash'))$('#pdash').onclick=openParent;
+  v.querySelectorAll('[data-fon]').forEach(b=>b.onclick=()=>{const on=b.dataset.fon==='1';if(on===foodOn())return;requirePin(()=>{if(profile.kid){if(on)profile.foodOn=true;else delete profile.foodOn}else{if(on)delete profile.foodOff;else profile.foodOff=true}saveProfile();toast(on?'🍽️ Food scanner on':'Food scanner off');renderMe(v)},'A parent PIN is needed to change the food scanner.')});
   v.querySelectorAll('[data-kidp]').forEach(b=>b.onclick=()=>{const on=b.dataset.kidp==='1';if(on===!!profile.kid)return;requirePin(()=>{if(on)profile.kid=true;else delete profile.kid;saveProfile();toast(on?'🧒 Child profile on':'Child profile off');renderMe(v)},'A parent PIN is needed to change this.')});
   $('#pinset').onclick=()=>requirePin(()=>pinSheet(()=>renderMe(v)),'Enter the current PIN to change it.');
   if($('#pinoff'))$('#pinoff').onclick=()=>requirePin(()=>{store.del('jams_pin');unlockedUntil=0;toast('Parent lock is off');renderMe(v)},'Enter the PIN to turn off the parent lock.');
