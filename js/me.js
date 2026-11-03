@@ -85,6 +85,7 @@ function renderMe(v){
   bindReminders(v);
   v.querySelectorAll('[data-crk]').forEach(b=>b.onclick=()=>{profile.cricket=b.dataset.crk==='1';saveProfile();syncSoon();toast(profile.cricket?'🏏 Cricket mode on! See Progress':'Cricket mode off');renderMe(v)});
   if($('#pdash'))$('#pdash').onclick=openParent;
+  v.querySelectorAll('[data-fon]').forEach(b=>b.onclick=()=>{const on=b.dataset.fon==='1';if(on===foodOn())return;requirePin(()=>{if(profile.kid){if(on)profile.foodOn=true;else delete profile.foodOn}else{if(on)delete profile.foodOff;else profile.foodOff=true}saveProfile();toast(on?'🍽️ Food scanner on':'Food scanner off');renderMe(v)},'A parent PIN is needed to change the food scanner.')});
   v.querySelectorAll('[data-kidp]').forEach(b=>b.onclick=()=>{const on=b.dataset.kidp==='1';if(on===!!profile.kid)return;requirePin(()=>{if(on)profile.kid=true;else delete profile.kid;saveProfile();toast(on?'🧒 Child profile on':'Child profile off');renderMe(v)},'A parent PIN is needed to change this.')});
   $('#pinset').onclick=()=>requirePin(()=>pinSheet(()=>renderMe(v)),'Enter the current PIN to change it.');
   if($('#pinoff'))$('#pinoff').onclick=()=>requirePin(()=>{store.del('jams_pin');unlockedUntil=0;toast('Parent lock is off');renderMe(v)},'Enter the PIN to turn off the parent lock.');

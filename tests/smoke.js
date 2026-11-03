@@ -220,6 +220,26 @@ const check = (ok, what) => { console.log(`${ok ? '✅' : '❌'} ${what}`); if (
       setJournal(save); profile.unit = unit; return r;
     });
     Object.entries(prg).forEach(([k, v]) => check(v, 'Unit: ' + k));
+    // Food scanner (the AI reply is faked)
+    await page.route('**/api/food', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify({ food: true, dish: 'Chicken rice bowl', confidence: 'medium', items: [{ name: 'Chicken', portion: '120 g', protein: 37, carbs: 0, fiber: 0 }, { name: 'Rice', portion: '1 cup', protein: 4, carbs: 45, fiber: 0.6 }], total: { protein: 41, carbs: 45, fiber: 0.6 } }) }));
+    await page.evaluate(() => { profile.food = []; saveProfile(); go('today'); });
+    check(await page.isVisible('#foodcard'), 'Food card shows on Today');
+    await page.click('#foodscan'); await page.fill('#fnote', 'chicken and rice bowl'); await page.click('#fgo'); await page.waitForTimeout(300);
+    check((await page.textContent('#fres')).includes('41'), 'Food breakdown shows protein, carbs and fiber');
+    await page.click('#fk [data-k="0.5"]');
+    check((await page.textContent('#fres')).includes('20.5'), 'Portion buttons rescale the breakdown');
+    await page.click('#fadd'); await page.waitForTimeout(200);
+    const fc = await page.textContent('#foodcard');
+    check(fc.includes('1 meal') && fc.includes('20.5'), 'Meal is added to Food today');
+    const foodU = await page.evaluate(() => {
+      const r = {};
+      r.foodKept = sanitizeProfile({ id: 'pf', food: [{ id: 'f1', d: '2026-11-03', n: '<b>Toast</b>', p: 8, c: 30, f: 2 }] }).food[0].n === 'bToast/b';
+      r.kidOffByDefault = foodOn({ kid: true }) === false && foodOn({ kid: true, foodOn: true }) === true && foodOn({}) === true && foodOn({ foodOff: true }) === false;
+      return r;
+    });
+    Object.entries(foodU).forEach(([k, v]) => check(v, 'Unit: ' + k));
+    await page.evaluate(() => { profile.food = []; saveProfile(); });
+    await page.unroute('**/api/food');
     await page.evaluate(() => { DB.list = DB.list.filter(p => p.id !== 'pkid1'); saveDB(); profile.cricket = false; saveProfile(); go('today'); });
     await page.evaluate(() => { profile.photos = false; profile.unit = 'lbs'; delete profile.stats; profile.body = []; saveProfile(); go('progress'); });
     // Security: booby-trapped saved data must never run as code
