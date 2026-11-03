@@ -58,6 +58,9 @@ Redeploy after adding bindings. Coach allows 20 AI questions per hour per person
 - **Activities:** log walks, runs, sports and more; they count toward streaks.
 - **Body measurements:** weight and waist (part of opt-in body tracking).
 - **Body stats & BMI** (Progress, with body tracking on): weight, height, age, current BMI with its range, and a target BMI that shows the matching weight. Targets below 18.5 aren't accepted, and under-18s see their BMI without adult ranges or a target (kids are measured on growth charts instead).
+- **Plateau alerts** (`js/progression.js`): if an exercise's best estimated 1-rep max (or best reps) hasn't gone up in 3 sessions, Progress → Plateau check and the workout screen suggest a lighter week (~10% less), a harder version or a swap.
+- **Sets per muscle:** hard sets per muscle over the last 7 days against a sweet spot for your level (Beginner 6–15, Intermediate 10–20, Expert 10–22), marked Needs more / Growing / Too much.
+- **Suggested weight:** each weighted exercise is pre-filled with a weight worked out from your recent sessions for today's rep range (never more than one small step up), with the reason shown.
 - **Family quest** (`js/fun.js`): with 2+ people, one shared weekly goal (reps, active days, minutes or sets) that everyone fills together, in a colour-per-person bar.
 - **Grow-a-buddy:** a pet that grows with every active day (🥚 → 🐣 → 🐥 → 🐦 → 🦜 → 🦅 → 🐉), never shrinks after a break, and can be named.
 - **Workout dice:** a surprise 10-minute workout from your equipment, skipping tired muscles. Start it, re-roll or save it.

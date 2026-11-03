@@ -196,6 +196,30 @@ const check = (ok, what) => { console.log(`${ok ? '✅' : '❌'} ${what}`); if (
     await page.evaluate(() => go('me')); await page.click('#pdash'); await page.waitForTimeout(150);
     const dash = await page.textContent('#view');
     check(dash.includes('Family dashboard') && dash.includes('Kiddo') && dash.includes('too hard'), 'Parent dashboard shows each person with warnings');
+    // Smarter progression: plateau, weekly sets per muscle, suggested weights
+    const prg = await page.evaluate(() => {
+      const r = {}, ago = n => { const d = new Date(); d.setDate(d.getDate() - n); return isoLocal(d); };
+      const save = getJournal(), unit = profile.unit; profile.unit = 'lbs';
+      const j = {}, row = (d, w, reps) => (j[d] = j[d] || []).push({ id: 'g' + d + w, exercise: 'Goblet Squats', sets: [{ reps, weight: w }, { reps, weight: w }, { reps, weight: w }], unit: 'lbs', u: 1 });
+      row(ago(20), 40, 10); row(ago(14), 45, 10); row(ago(10), 45, 9); row(ago(6), 45, 10); row(ago(2), 45, 9);
+      (j[ago(1)] = j[ago(1)] || []).push({ id: 'cp', exercise: 'Dumbbell Bench Press', sets: [{ reps: 10, weight: 30 }, { reps: 10, weight: 30 }], unit: 'lbs', u: 1 });
+      setJournal(j);
+      const pl = plateauOf('Goblet Squats'); r.plateauFound = !!pl && pl.deload === 40;
+      r.noPlateauFewSessions = plateauOf('Dumbbell Bench Press') === null;
+      r.suggestPlateau = suggestWeight('goblet_squat', ['goblet_squat', 3, 8, 12]).w === 40;
+      const sb = suggestWeight('db_bench', ['db_bench', 3, 8, 12]); r.suggestFromHistory = sb && sb.w === 30;
+      setJournal({ [ago(1)]: [{ id: 'cq', exercise: 'Dumbbell Bench Press', sets: [{ reps: 12, weight: 30 }, { reps: 12, weight: 30 }, { reps: 12, weight: 30 }], unit: 'lbs', u: 1 }] });
+      r.suggestUpAfterTop = suggestWeight('db_bench', ['db_bench', 3, 8, 12]).w === 35;
+      r.firstTimeStart = suggestWeight('goblet_squat', ['goblet_squat', 3, 8, 12]).w === 20;
+      setJournal(j);
+      const ws = weeklySets(); r.weeklySets = ws.quads === 6 && ws.chest === 2 && ws.triceps === 1;
+      r.statusRanges = setStatus(4, [6, 15]).t === 'Needs more' && setStatus(10, [6, 15]).t.startsWith('Growing') && setStatus(30, [6, 15]).t === 'Too much';
+      go('progress');
+      r.cardsShow = !!document.querySelector('#wscard') && document.body.textContent.includes('Plateau check') && document.body.textContent.includes('Goblet Squats');
+      r.hintShows = progressHint(['goblet_squat', 3, 8, 12], EX.goblet_squat).includes('No progress') && progressHint(['db_bench', 3, 8, 12], EX.db_bench).includes('Suggested: 30 lbs');
+      setJournal(save); profile.unit = unit; return r;
+    });
+    Object.entries(prg).forEach(([k, v]) => check(v, 'Unit: ' + k));
     await page.evaluate(() => { DB.list = DB.list.filter(p => p.id !== 'pkid1'); saveDB(); profile.cricket = false; saveProfile(); go('today'); });
     await page.evaluate(() => { profile.photos = false; profile.unit = 'lbs'; delete profile.stats; profile.body = []; saveProfile(); go('progress'); });
     // Security: booby-trapped saved data must never run as code
