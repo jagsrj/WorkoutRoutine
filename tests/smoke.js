@@ -240,6 +240,23 @@ const check = (ok, what) => { console.log(`${ok ? '✅' : '❌'} ${what}`); if (
     }
     check(!wide.length, 'Every screen fits a 320px-wide phone' + (wide.length ? ': ' + wide.join(', ') : ''));
     await page.setViewportSize({ width: 390, height: 844 }); await page.evaluate(() => go('today'));
+    // A workout left unfinished yesterday doesn't take over today, and its sets can be saved to yesterday
+    const st = await page.evaluate(() => {
+      const r = {}, save = getJournal(), y = (() => { const d = new Date(); d.setDate(d.getDate() - 1); return isoLocal(d); })();
+      const plan = PLANS[profile.level].ua;
+      store.set(pKey('jams_active'), { key: 'ua', level: profile.level, plan, date: y, started: Date.now() - 864e5, items: plan.map((p, i) => ({ id: p[0], sets: [{ reps: 10, weight: EX[p[0]].weight ? 20 : '', done: i === 0 }, { reps: '', weight: '', done: false }] })) });
+      go('today');
+      const k = SCHEDULE[new Date().getDay()].k;
+      r.staleCard = !!document.querySelector('.stale') && document.querySelector('.stale').textContent.includes('Upper Body A');
+      r.heroIsToday = !(k in WORKOUTS) || document.querySelector('.hero').textContent.includes(WORKOUTS[k].name);
+      r.saveYesterday = !!document.querySelector('#stsave'); r.save = save; return r;
+    });
+    check(st.staleCard && st.heroIsToday && st.saveYesterday, 'Unfinished workout from yesterday gets its own card; Today shows today\'s workout');
+    await page.click('#stsave'); await page.waitForTimeout(300);
+    const savedY = await page.evaluate(() => { const d = new Date(); d.setDate(d.getDate() - 1); const e = (getJournal()[isoLocal(d)] || []).find(x => x.workout === 'ua'); return !!e && !store.get(pKey('jams_active'), null) && !document.querySelector('#layer').textContent.includes('1440'); });
+    check(savedY, 'Saving puts the sets under yesterday and clears the unfinished workout');
+    if (await page.isVisible('#done')) await page.click('#done');
+    await page.evaluate(s => { setJournal(s); go('today'); }, st.save);
     // Food diary & scanner (the AI reply is faked)
     await page.route('**/api/food', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify({ food: true, dish: 'Chicken rice bowl', confidence: 'medium', items: [{ name: 'Chicken', portion: '120 g', calories: 198, protein: 37, carbs: 0, fiber: 0 }, { name: 'Rice', portion: '1 cup', calories: 205, protein: 4, carbs: 45, fiber: 0.6 }], total: { calories: 403, protein: 41, carbs: 45, fiber: 0.6 } }) }));
     await page.evaluate(() => { profile.food = []; profile.body = []; delete profile.stats; delete profile.kid; delete profile.kcalGoal; saveProfile(); go('today'); });
