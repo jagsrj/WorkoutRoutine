@@ -136,14 +136,18 @@ function renderToday(v){
     ${isWork&&!doneToday&&!(active&&active.level===profile.level)?recoveryCard(sched.k):''}
     ${backupCard()||installCard()}
     ${streakCard()}
+    ${buddyCard()}
+    ${questCard()}
     ${habitsCard()}
     ${weekCard(strip,earned)}
+    ${todayHidden('dice')?'':`<button class="card row" id="dice" style="width:100%;text-align:left;padding:14px"><span class="big-emoji">🎲</span><div style="flex:1"><b>Can't decide? Roll the dice</b><p class="muted small">A surprise 10-minute workout</p></div><span class="muted">›</span></button>`}
     <button class="card row" id="logact" style="width:100%;text-align:left;padding:14px"><span class="big-emoji">🏃</span><div style="flex:1"><b>Log a sport or activity</b><p class="muted small">Walks, runs, cricket, soccer… they all count!</p></div><span class="muted" style="font-size:22px" aria-hidden="true">＋</span></button>
     <details class="card fold"><summary><b>${isWork?'Missed a day? Do a different workout':'Want to train anyway?'}</b></summary><div class="stack" style="margin-top:12px">${others}${(profile.routines||[]).map(r=>`<button class="card row" data-start="r:${r.id}" style="width:100%;text-align:left;padding:14px"><span class="ex-emoji">${r.e}</span><div style="flex:1"><b>${esc(r.name)}</b><p class="muted small">⭐ My workout · ${plural(r.items.length,'exercise')}</p></div><span class="muted">›</span></button>`).join('')}<button class="link" id="morew">Build your own or train for a sport ›</button></div></details>
     <div id="photoNudge"></div>
     ${todayHidden('tip')?'':tipOfDay()}
   </div>`;
   v.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>startWorkout(b.dataset.start));
+  if($('#dice'))$('#dice').onclick=diceSheet;if($('#buddy'))$('#buddy').onclick=buddySheet;
   v.querySelectorAll('button[data-go]:not(.streakpill)').forEach(b=>b.onclick=()=>go(b.dataset.go));
   if($('#warmonly'))$('#warmonly').onclick=()=>runWarmup();
   renderPhotoNudge();
@@ -393,6 +397,7 @@ function celebrate(sets,mins,vol,badges,prs=[]){
     <div class="stats"><div class="stat"><b>${sets}</b><span>sets</span></div><div class="stat"><b>${mins}</b><span>${mins===1?'minute':'minutes'}</span></div><div class="stat"><b>${weekStreak()}</b><span>week streak 🔥</span></div></div>
     ${prs.length?`<div class="card stack" style="text-align:left"><h2 class="h3">🏆 New personal ${prs.length>1?'records':'record'}!</h2>${prs.map(p=>`<p>⭐ ${esc(p)}</p>`).join('')}</div>`:''}
     ${badgeRow(badges)}
+    ${celebrateExtras(vol)}
     ${backupNudge()}
     ${vol>0?`<p class="muted">You moved <b>${Math.round(vol).toLocaleString()} ${profile.unit}</b> in total! 💪</p>`:'<p class="muted">Every rep makes you stronger. See you next time!</p>'}
     <div class="row" style="gap:8px"><button class="btn secondary" id="cshare" style="flex:1">📤 Share</button><button class="btn secondary" id="ccool" style="flex:1">🧘 Cool-down</button></div>
@@ -453,6 +458,9 @@ function renderProgress(v){
       ${names.length?`<select class="sel" id="exsel" aria-label="Exercise to chart">${names.map(n=>`<option ${n===chartEx?'selected':''}>${esc(n)}</option>`).join('')}</select><div id="chart"></div>`:`<div class="empty"><div class="big-emoji">🌱</div><p class="muted">Finish your first workout to see your progress chart here.</p></div>`}
     </div>
     ${recordsCard()}
+    ${trailCard()}
+    ${realCard()}
+    ${cricketCard()}
     ${bodyCard()}
     <div id="photos"></div>
     <div class="stack"><h2 class="h3">History</h2>${historyHtml(j,dates)}</div>
@@ -466,6 +474,7 @@ function renderProgress(v){
   if($('#logact'))$('#logact').onclick=()=>activitySheet();
   if($('#badd'))$('#badd').onclick=bodySheet;
   if($('#bstats'))$('#bstats').onclick=statsSheet;
+  if($('#opentrail'))$('#opentrail').onclick=()=>go('trail');
   v.querySelectorAll('[data-bdel]').forEach(b=>b.onclick=()=>{const before=(profile.body||[]).slice();profile.body=before.filter(x=>x.id!==b.dataset.bdel);saveProfile();renderProgress(v);
     undoable('Measurement deleted',()=>{profile.body=before;saveProfile();renderProgress(v)},()=>syncSoon())});
   v.querySelectorAll('[data-b]').forEach(b=>b.onclick=()=>{const B=BADGES.find(x=>x.id===b.dataset.b);toast(`${earned.has(B.id)?B.e+' Earned: ':'🔒 To unlock: '}${B.d}`)});

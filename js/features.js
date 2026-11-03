@@ -25,6 +25,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-say]');if(
 /* ---------- Plans: level plan, my workouts, sport plans ---------- */
 function startCustom(kind,id){
   setEditing=null;
+  const cur0=store.get(pKey('jams_active'),null);if(cur0&&cur0.key===kind+':'+id){go('workout',cur0.key);return} // e.g. a dice workout
   const src=kind==='r'?(profile.routines||[]).find(r=>r.id===id):SPORTS.find(s=>s.id===id);if(!src)return;
   const plan=src.items.filter(p=>EX[p[0]]).map(p=>[p[0],+p[1]||3,+p[2]||8,+p[3]||+p[2]||12]);
   if(!plan.length){toast('This workout has no exercises yet');return}
@@ -477,6 +478,7 @@ function parentCard(){
     <p class="small muted">${pinIsSet()?'Parent lock is <b>on</b>. A PIN is needed to change levels, remove people, change sync, body tracking or Coach settings, or erase data.':'Set a 4-digit PIN so kids can\'t change levels, remove people or erase data.'}</p>
     <div class="row between"><span><b>Coach AI answers</b><br><span class="small muted">Off = Coach only uses its built-in answers</span></span><div class="seg" style="width:120px"><button class="${profile.coachAI===false?'on':''}" data-cai="0">Off</button><button class="${profile.coachAI===false?'':'on'}" data-cai="1">On</button></div></div>
     <div class="row between"><span><b>Child profile</b><br><span class="small muted">Coach uses simpler, kid-safe answers for ${esc(profile.name||'this person')}</span></span><div class="seg" style="width:120px"><button class="${profile.kid?'':'on'}" data-kidp="0">Off</button><button class="${profile.kid?'on':''}" data-kidp="1">On</button></div></div>
+    <button class="btn secondary" id="pdash">👀 Family dashboard</button>
     <button class="btn secondary" id="pinset">${pinIsSet()?'Change PIN':'Set a parent PIN'}</button>
     ${pinIsSet()?'<button class="link" id="pinoff" style="padding:0;color:var(--muted)">Turn off parent lock</button>':''}</div>`;
 }

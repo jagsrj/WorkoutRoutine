@@ -24,6 +24,8 @@ function renderMe(v){
       <p class="small muted">Auto = ${lvl().rest}s for ${lvl().name}.</p>
       <p class="small muted" style="font-weight:700">VOICE COACH</p><div class="seg">${[['0','🔇 Off'],['1','🔊 On']].map(x=>`<button class="${(voiceOn?'1':'0')===x[0]?'on':''}" data-voice="${x[0]}">${x[1]}</button>`).join('')}</div>
       <p class="small muted">Reads out exercises, rest time and countdowns during workouts.</p>
+      <p class="small muted" style="font-weight:700">🏏 CRICKET MODE</p><div class="seg">${[['0','Off'],['1','On']].map(x=>`<button class="${(profile.cricket?'1':'0')===x[0]?'on':''}" data-crk="${x[0]}">${x[1]}</button>`).join('')}</div>
+      <p class="small muted">Each workout day becomes an innings: reps score runs, with 50s, 100s and a season in Progress.</p>
     </div>
 
     ${displayCard()}
@@ -81,6 +83,8 @@ function renderMe(v){
     if(on){try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}toast('📸 Photos on! Find them in Progress')}else toast('Body tracking hidden. Your photos stay saved on this phone');renderMe(v)},'A parent PIN is needed to change body tracking.')});
   v.querySelectorAll('[data-voice]').forEach(b=>b.onclick=()=>{voiceOn=b.dataset.voice==='1';store.set('jams_voice',voiceOn);if(voiceOn)say('Voice coach on');renderMe(v)});
   bindReminders(v);
+  v.querySelectorAll('[data-crk]').forEach(b=>b.onclick=()=>{profile.cricket=b.dataset.crk==='1';saveProfile();syncSoon();toast(profile.cricket?'🏏 Cricket mode on! See Progress':'Cricket mode off');renderMe(v)});
+  if($('#pdash'))$('#pdash').onclick=openParent;
   v.querySelectorAll('[data-kidp]').forEach(b=>b.onclick=()=>{const on=b.dataset.kidp==='1';if(on===!!profile.kid)return;requirePin(()=>{if(on)profile.kid=true;else delete profile.kid;saveProfile();toast(on?'🧒 Child profile on':'Child profile off');renderMe(v)},'A parent PIN is needed to change this.')});
   $('#pinset').onclick=()=>requirePin(()=>pinSheet(()=>renderMe(v)),'Enter the current PIN to change it.');
   if($('#pinoff'))$('#pinoff').onclick=()=>requirePin(()=>{store.del('jams_pin');unlockedUntil=0;toast('Parent lock is off');renderMe(v)},'Enter the PIN to turn off the parent lock.');
