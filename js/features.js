@@ -32,7 +32,7 @@ function startCustom(kind,id){
   const key=kind+':'+id,cur=store.get(pKey('jams_active'),null);
   if(cur&&cur.key===key){go('workout',key);return}
   const start=()=>{
-    const a={key,level:profile.level,title:src.name,emoji:src.e,plan,date:isoLocal(),started:Date.now(),items:plan.map(p=>({id:p[0],sets:freshSets(p[0],p[1])}))};
+    const a={key,level:profile.level,title:src.name,emoji:src.e,plan,date:isoLocal(),started:Date.now(),items:plan.map(p=>({id:p[0],sets:freshSets(p[0],p[1],p)}))};
     store.set(pKey('jams_active'),a);go('workout',key);say(`Let's go! ${src.name}. First up: ${EX[plan[0][0]].name}.`);
   };
   if(cur)confirmBox('Start a new workout?','You have another workout in progress. Starting this one will cancel it.','Start new',start);else start();

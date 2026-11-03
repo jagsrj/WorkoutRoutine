@@ -94,7 +94,7 @@ function diceSheet(){
 }
 function startDice(w){
   const plan=w.items.map(p=>p.slice()),key='d:'+w.id,cur=store.get(pKey('jams_active'),null);
-  const start=()=>{store.set(pKey('jams_active'),{key,level:profile.level,title:w.name,emoji:'🎲',plan,date:isoLocal(),started:Date.now(),items:plan.map(p=>({id:p[0],sets:freshSets(p[0],p[1])}))});
+  const start=()=>{store.set(pKey('jams_active'),{key,level:profile.level,title:w.name,emoji:'🎲',plan,date:isoLocal(),started:Date.now(),items:plan.map(p=>({id:p[0],sets:freshSets(p[0],p[1],p)}))});
     go('workout',key);say(`Let's go! First up: ${EX[plan[0][0]].name}.`)};
   if(cur)confirmBox('Start a new workout?','You have another workout in progress. Starting this one will cancel it.','Start new',start);else start();
 }

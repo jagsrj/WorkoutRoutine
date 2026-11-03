@@ -209,18 +209,24 @@ function startWorkout(key){
   if(!(a&&a.key===key&&a.level===profile.level)){
     if(!profile.planStart){profile.planStart=planStart()||isoLocal();saveProfile()}
     const plan=phasePlan(PLANS[profile.level][key]);
-    a={key,level:profile.level,plan,date:isoLocal(),started:Date.now(),items:plan.map(p=>({id:p[0],sets:freshSets(p[0],p[1])}))};
+    a={key,level:profile.level,plan,date:isoLocal(),started:Date.now(),items:plan.map(p=>({id:p[0],sets:freshSets(p[0],p[1],p)}))};
     store.set(pKey('jams_active'),a);say(`Let's go! ${WORKOUTS[key].name}. First up: ${EX[plan[0][0]].name}.`);
   }
   go('workout',key);
 }
-function freshSets(id,n){
+function freshSets(id,n,p){
   const ex=EX[id],last=lastSession(ex.name);
   let w='';if(ex.weight&&last){const mx=Math.max(0,...workSets(last.sets).map(s=>s.weight||0));if(mx>0)w=round1(toUnit(mx,last.unit))}
+  const sg=last?suggestWeight(id,p):null;if(sg)w=sg.w; // first time: the starting weight is only shown as a hint
   return Array.from({length:n},()=>({reps:'',weight:w,done:false}));
 }
 function progressHint(p,ex){
   const last=lastSession(ex.name);if(!last||!last.sets.length)return '';
+  const pl=plateauOf(ex.name),sg=suggestWeight(exByName(ex.name),p),sgl=sg?`<br>🎯 <b>Suggested: ${sg.w} ${profile.unit}</b>, from ${sg.why}.`:'';
+  if(pl)return `<div class="hint">📉 No progress in your last ${PLATEAU_N} sessions. ${plateauFix(pl)}${sg&&!sg.plateau?sgl:''}</div>`;
+  return progressHintBase(p,ex,last).replace(/<\/div>$/,sgl+'</div>');
+}
+function progressHintBase(p,ex,last){
   const main=last.sets.filter(s=>!s.t||s.t==='f');if(!main.length)return '';
   const hitTop=main.length>=p[1]&&main.every(s=>s.reps>=p[3]);
   if(!hitTop)return `<div class="hint">📋 Last time: ${main.map(s=>s.reps+(ex.weight&&s.weight?' × '+round1(toUnit(s.weight,last.unit)):'')).join(', ')}. Try to beat it!</div>`;
@@ -276,7 +282,7 @@ function renderWorkout(v){
       <div class="row" style="margin-top:12px"><div class="progress" style="flex:1"><i style="width:${total?done/total*100:0}%"></i></div><b class="small">${done}/${total} sets</b></div></div>
     ${a.warm?`<div class="card small" style="background:var(--lvl-soft);border:0">✅ <b>Warmed up!</b> Now tap <b>✓</b> after each set.</div>`
       :`<div class="card stack" style="background:var(--lvl-soft);border:0"><p>🔥 <b>Warm up first!</b> 5 easy minutes so your body is ready.</p><button class="btn sm" id="warm" style="width:100%">Start guided warm-up 🤸</button><button class="link" id="skipwarm" style="padding:0">I already warmed up</button></div>`}
-    ${a.items.map((it,i)=>{const p=it.p||plan[i],ex=EX[it.id],orig=it.orig||it.id,canSwap=(ALT[orig]||[]).length&&!it.sets.some(s=>s.done);
+    ${a.items.map((it,i)=>{const p=(it.p&&it.p.length===3?[it.id,...it.p]:it.p)||plan[i],ex=EX[it.id],orig=it.orig||it.id,canSwap=(ALT[orig]||[]).length&&!it.sets.some(s=>s.done);
       const cols=`${ex.weight?'wt':'nowt'}${ex.time?' timed':''}`;return `
     ${SS[i]&&SS[i].pos===0?`<p class="sshead">🔗 Superset ${SS[i].g}: do one set of each, then rest</p>`:''}
     <div class="card ex${SS[i]?' ss':''}" id="ex${i}">
@@ -356,8 +362,8 @@ function renderWorkout(v){
       $('#cancel').onclick=closeLayer;
       document.querySelectorAll('[data-to]').forEach(x=>x.onclick=()=>{
         const to=x.dataset.to,base=plan[i];it.id=to;it.orig=to===orig?undefined:orig;
-        it.p=to===orig||EX[to].time===EX[orig].time?undefined:[base[1],EX[to].time?20:8,EX[to].time?40:12];
-        it.sets=freshSets(to,base[1]);save();closeLayer();rerender();toast(`🔄 Swapped to ${EX[to].name}`)});
+        it.p=to===orig||EX[to].time===EX[orig].time?undefined:[to,base[1],EX[to].time?20:8,EX[to].time?40:12]; // same shape as a plan item
+        it.sets=freshSets(to,base[1],it.p||base);save();closeLayer();rerender();toast(`🔄 Swapped to ${EX[to].name}`)});
     });
   });
   $('#back').onclick=()=>go('today');
@@ -453,6 +459,8 @@ function renderProgress(v){
       <div class="badges">${BADGES.map(b=>`<button class="badge-i ${earned.has(b.id)?'on':''}" data-b="${b.id}"><span>${earned.has(b.id)?b.e:'🔒'}</span><b>${b.n}</b></button>`).join('')}</div>
       <p class="small muted">Tap a badge to see how to earn it.</p></div>
     ${muscleMap()}
+    ${weeklySetsCard()}
+    ${plateauCard()}
     <div class="card stack"><h2 class="h3">Last 12 weeks</h2><div style="display:grid;grid-template-columns:repeat(12,1fr);gap:3px">${heat}</div><p class="small muted">Each square is a day. Coloured = you worked out. Aim for 3–4 a week!</p></div>
     <div class="card stack"><h2 class="h3">How am I improving?</h2>
       ${names.length?`<select class="sel" id="exsel" aria-label="Exercise to chart">${names.map(n=>`<option ${n===chartEx?'selected':''}>${esc(n)}</option>`).join('')}</select><div id="chart"></div>`:`<div class="empty"><div class="big-emoji">🌱</div><p class="muted">Finish your first workout to see your progress chart here.</p></div>`}
