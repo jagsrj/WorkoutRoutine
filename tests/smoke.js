@@ -220,6 +220,26 @@ const check = (ok, what) => { console.log(`${ok ? '✅' : '❌'} ${what}`); if (
       setJournal(save); profile.unit = unit; return r;
     });
     Object.entries(prg).forEach(([k, v]) => check(v, 'Unit: ' + k));
+    // Today's hero only says "done" after today's planned workout, not after an activity
+    const hero = await page.evaluate(() => {
+      const save = getJournal(), t = isoLocal(), k = SCHEDULE[new Date().getDay()].k, r = {};
+      if (!(k in WORKOUTS)) { r.skipRestDay = true; return r; }
+      setJournal({ [t]: [{ id: 5, kind: 'activity', act: 'Dog walk', exercise: '🐕 Dog walk', minutes: 30, sets: [], u: 1 }] }); go('today');
+      let h = document.querySelector('.hero').textContent; r.activityNotDone = !h.includes('DONE FOR TODAY') && h.includes('Start workout') && h.includes('already been active');
+      setJournal({ [t]: [{ id: 6, exercise: 'Plank', sets: [{ reps: 30, weight: 0 }], workout: k, level: profile.level, u: 1 }] }); go('today');
+      h = document.querySelector('.hero').textContent; r.planDone = h.includes('DONE FOR TODAY') && h.includes('Do it again');
+      setJournal(save); go('today'); return r;
+    });
+    Object.entries(hero).forEach(([k, v]) => check(v, 'Unit: ' + k));
+    // No screen may be wider than a small iPhone (it makes the page slide sideways and the tab bar look misaligned)
+    await page.setViewportSize({ width: 320, height: 700 });
+    const wide = [];
+    for (const r of ['today', 'library', 'progress', 'me', 'ask', 'food', 'trail', 'parent', 'report']) {
+      await page.evaluate(r => go(r), r); await page.waitForTimeout(120);
+      if (await page.evaluate(() => { const W = document.documentElement.clientWidth; return [...document.querySelectorAll('#view *')].some(e => { const x = e.getBoundingClientRect(); return x.width && x.right > W + 1 && getComputedStyle(e).position !== 'fixed' && !e.closest('[style*="overflow"],.chips,.seg'); }); })) wide.push(r); // the page clips sideways overflow, so measure elements
+    }
+    check(!wide.length, 'Every screen fits a 320px-wide phone' + (wide.length ? ': ' + wide.join(', ') : ''));
+    await page.setViewportSize({ width: 390, height: 844 }); await page.evaluate(() => go('today'));
     // Food diary & scanner (the AI reply is faked)
     await page.route('**/api/food', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify({ food: true, dish: 'Chicken rice bowl', confidence: 'medium', items: [{ name: 'Chicken', portion: '120 g', calories: 198, protein: 37, carbs: 0, fiber: 0 }, { name: 'Rice', portion: '1 cup', calories: 205, protein: 4, carbs: 45, fiber: 0.6 }], total: { calories: 403, protein: 41, carbs: 45, fiber: 0.6 } }) }));
     await page.evaluate(() => { profile.food = []; profile.body = []; delete profile.stats; delete profile.kid; delete profile.kcalGoal; saveProfile(); go('today'); });

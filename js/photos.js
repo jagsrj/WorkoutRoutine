@@ -105,12 +105,12 @@ function compareSheet(list){
   draw();
 }
 async function renderPhotoNudge(){
-  const box=$('#photoNudge');if(!box||!profile.photos)return;
-  const list=await photosFor();if(!$('#photoNudge'))return;
+  if(!$('#photoNudge')||!profile.photos)return;
+  const list=await photosFor(),box=$('#photoNudge');if(!box)return; // the screen may have been redrawn while loading
   const last=list[list.length-1],n=last?daysSince(last.date):null;
   if(last&&n<28)return;
   box.innerHTML=`<button class="card row" id="nudge" style="width:100%;text-align:left"><span class="big-emoji">📸</span><div style="flex:1"><b>${last?'Time for a progress photo?':'Take your first progress photo'}</b><p class="muted small">${last?`Your last one was ${ageText(n)}.`:'Then compare in a few weeks.'}</p></div><span class="muted">›</span></button>`;
-  $('#nudge').onclick=()=>{go('progress');setTimeout(()=>{const el=$('#photos');if(el)el.scrollIntoView({behavior:'smooth'})},250)};
+  box.querySelector('#nudge').onclick=()=>{go('progress');setTimeout(()=>{const el=$('#photos');if(el)el.scrollIntoView({behavior:'smooth'})},250)};
 }
 function photosCard(){
   return `<div class="card stack"><h2 class="h3">📸 Body tracking</h2>

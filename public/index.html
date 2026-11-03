@@ -33,6 +33,7 @@ body[data-level="intermediate"]{--lvl:#c2410c;--lvl-soft:#fdeee4;--lvl-text:#c24
 body[data-level="expert"]{--lvl:#6d28d9;--lvl-soft:#f0e9fe;--lvl-text:#6d28d9}
 @media (prefers-color-scheme:dark){html:not([data-theme=light]) body[data-level="beginner"]{--lvl-soft:#12301f}html:not([data-theme=light]) body[data-level="intermediate"]{--lvl-soft:#3a2214}html:not([data-theme=light]) body[data-level="expert"]{--lvl-soft:#2a1f47}}html[data-theme=dark] body[data-level="beginner"]{--lvl-soft:#12301f}html[data-theme=dark] body[data-level="intermediate"]{--lvl-soft:#3a2214}html[data-theme=dark] body[data-level="expert"]{--lvl-soft:#2a1f47}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{overflow-x:clip;overscroll-behavior:none}
 html,body{margin:0;background:var(--bg);color:var(--text);font:17px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
 button,input,select{font:inherit;color:inherit}
 /* Stop iPhone double-tap zoom when tapping + / − quickly, and the zoom-in on focus (inputs stay at 16px or bigger) */
@@ -66,7 +67,7 @@ p{margin:0}
 .logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:19px;letter-spacing:.02em}
 .logo svg{width:34px;height:34px}
 /* Tab bar */
-.tabbar{position:fixed;left:0;right:0;bottom:0;background:color-mix(in srgb,var(--card) 92%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:var(--safe-b);z-index:20}
+.tabbar{position:fixed;left:0;right:0;bottom:0;background:color-mix(in srgb,var(--card) 92%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:var(--safe-b);z-index:20;transform:translateZ(0);-webkit-transform:translateZ(0);will-change:transform}
 .tabbar .in{display:flex;max-width:560px;width:100%}
 .tab{flex:1;background:none;border:0;padding:9px 0 10px;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--muted);font-size:12.5px;font-weight:700}
 .tab .ic{font-size:23px;line-height:1;filter:grayscale(1);opacity:.65}
@@ -271,7 +272,7 @@ details.fold[open] summary::after{transform:rotate(180deg)}
 .actgrid button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px;border-radius:14px;border:2px solid var(--line);background:var(--card);font-size:12px;font-weight:700;color:var(--text)}
 .actgrid button span{font-size:24px}
 .actgrid button.sel{border-color:var(--lvl);background:var(--lvl-soft)}
-.daypick{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.daypick{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
 .daypick button{aspect-ratio:1;border-radius:50%;border:2px solid var(--line);background:var(--card);font-weight:800;color:var(--muted)}
 .daypick button.on{background:var(--lvl);border-color:var(--lvl);color:#fff}
 .mmap{width:100%;max-width:300px;margin:0 auto;display:block}
@@ -308,7 +309,7 @@ a.btn{text-decoration:none}
 .xbtn{min-width:40px;min-height:40px}
 .chips button{min-height:40px}
 .seg button{min-height:42px}
-.daypick button{min-height:44px}
+.daypick button{min-height:40px;min-width:0;aspect-ratio:auto;border-radius:12px;padding:0}
 .h3{font-size:18px;font-weight:700}
 .numbtn{display:flex;align-items:center;justify-content:center;width:100%;color:var(--text)}
 .numbtn .ph{color:var(--muted);font-weight:600}
