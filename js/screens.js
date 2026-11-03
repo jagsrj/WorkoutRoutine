@@ -107,7 +107,9 @@ function renderToday(v){
   const strip=[1,2,3,4,5,6,0].map((d,i)=>{const dt=new Date(ws);dt.setDate(ws.getDate()+i);const s=SCHEDULE[d];
     const e=s.k in WORKOUTS?WORKOUTS[s.k].e:s.e;
     return `<div class="day ${d===dow?'today':''} ${doneDates.has(isoLocal(dt))?'done':''}"><b>${DAYS[d]}</b>${dt.getDate()}<span class="e">${e}</span></div>`}).join('');
-  const active=store.get(pKey('jams_active'),null);
+  const saved=store.get(pKey('jams_active'),null);
+  // A workout started on an earlier day and never finished doesn't take over today: it gets its own card.
+  const stale=saved&&saved.date&&saved.date<isoLocal()?saved:null,active=stale?null:saved;
   const isWork=sched.k in WORKOUTS;
   // "Done" only once today's planned workout itself is logged. Activities (walks, sports) or a different
   // workout don't count: they show as a small note instead. (Old entries have no workout key.)
@@ -137,6 +139,7 @@ function renderToday(v){
   <div class="stack-lg">
     <div><h1>${hello()}${profile.name?', '+esc(profile.name):''}! ${esc(profile.avatar||'👋')}</h1><p class="muted" style="margin-top:4px">${now.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'})}</p></div>
     ${fivesCard()}
+    ${staleCard(stale)}
     ${heroHtml}
     ${isWork&&!doneToday&&!(active&&active.level===profile.level)?recoveryCard(sched.k):''}
     ${backupCard()||installCard()}
@@ -153,7 +156,7 @@ function renderToday(v){
     ${todayHidden('tip')?'':tipOfDay()}
   </div>`;
   v.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>startWorkout(b.dataset.start));
-  bindFood(v);if($('#dice'))$('#dice').onclick=diceSheet;if($('#buddy'))$('#buddy').onclick=buddySheet;
+  bindFood(v);bindStale(stale);if($('#dice'))$('#dice').onclick=diceSheet;if($('#buddy'))$('#buddy').onclick=buddySheet;
   v.querySelectorAll('button[data-go]:not(.streakpill)').forEach(b=>b.onclick=()=>go(b.dataset.go));
   if($('#warmonly'))$('#warmonly').onclick=()=>runWarmup();
   renderPhotoNudge();
@@ -208,10 +211,30 @@ function runWarmup(onDone){
 
 /* ---------- Workout ---------- */
 let setEditing=null; // "exercise,set" being edited after it was ticked; every other finished set stays locked
+/* ---------- Unfinished workout from an earlier day ---------- */
+const ticked=a=>a.items.reduce((n,it)=>n+it.sets.filter(s=>s.done).length,0);
+function staleCard(a){
+  if(!a)return '';
+  const W=WORKOUTS[a.key]||{name:a.title||'Workout',e:a.emoji||'💪'},n=ticked(a),tot=a.items.reduce((t,it)=>t+it.sets.length,0);
+  return `<div class="card stack stale"><p class="small muted" style="font-weight:700">⏸️ NOT FINISHED</p>
+    <div class="row"><span class="big-emoji">${esc(W.e)}</span><div style="flex:1"><b>${esc(W.name)}</b><p class="small muted">Started ${niceDate(a.date)} · ${n} of ${tot} sets ticked. It isn't in your history yet because <b>Finish workout</b> wasn't tapped.</p></div></div>
+    ${n?`<button class="btn sm" id="stsave" style="width:100%">✅ Save the ${plural(n,'set')} to ${parseIso(a.date).toLocaleDateString(undefined,{weekday:'long'})}</button>`:''}
+    <div class="row" style="gap:8px"><button class="btn sm secondary" id="stgo" style="flex:1">▶ Continue it</button><button class="btn sm ghost" id="stdel" style="flex:1">Discard</button></div></div>`;
+}
+function bindStale(a){
+  if(!a)return;
+  if($('#stsave'))$('#stsave').onclick=()=>finishWorkout(a); // saves under the day it was started (a.date)
+  $('#stgo').onclick=()=>go('workout',a.key);
+  $('#stdel').onclick=()=>confirmBox('Discard this workout?','The ticked sets will not be saved.','Discard',()=>{store.del(pKey('jams_active'));render()},true);
+}
 function startWorkout(key){
   setEditing=null;
   if(key.includes(':'))return startCustom(key[0],key.slice(2));
   let a=store.get(pKey('jams_active'),null);
+  if(a&&a.key!==key&&ticked(a)>0&&!startWorkout.ok){ // don't silently throw away ticked sets
+    const W=WORKOUTS[a.key]||{name:a.title||'workout'};
+    return confirmBox('Start a new workout?',`Your unfinished ${W.name} has ${plural(ticked(a),'ticked set')}. Starting this one discards it. To keep it, go back and tap Save on Today first.`,'Start new',()=>{startWorkout.ok=true;try{startWorkout(key)}finally{startWorkout.ok=false}});
+  }
   if(!(a&&a.key===key&&a.level===profile.level)){
     if(!profile.planStart){profile.planStart=planStart()||isoLocal();saveProfile()}
     const plan=phasePlan(PLANS[profile.level][key]);
@@ -393,8 +416,8 @@ function finishWorkout(a){
   });
   if(!sets){toast('Tap ✓ on at least one set first');return}
   setJournal(j);store.del(pKey('jams_active'));hideTimer();
-  const mins=Math.max(1,Math.round((Date.now()-a.started)/60000));
-  const nb=newBadges(),prs=findPRs(before,fresh),Wd=WORKOUTS[a.key]||{name:a.title,e:a.emoji};lastDone={title:Wd.name,e:Wd.e,sets,mins:Math.max(1,Math.round((Date.now()-a.started)/60000)),prs,badges:nb};
+  const mins=Math.max(1,Math.min(240,Math.round((Date.now()-a.started)/60000)));
+  const nb=newBadges(),prs=findPRs(before,fresh),Wd=WORKOUTS[a.key]||{name:a.title,e:a.emoji};lastDone={title:Wd.name,e:Wd.e,sets,mins:Math.max(1,Math.min(240,Math.round((Date.now()-a.started)/60000))),prs,badges:nb};
   celebrate(sets,mins,vol,nb,prs);
   syncSoon();
 }
