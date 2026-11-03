@@ -72,10 +72,11 @@ function foodCard(){
   const L=foodToday(),t=foodSum(L);
   return `<div class="card stack" id="foodcard"><div class="row between"><h2 class="h3">🍽️ Food today</h2>${L.length?`<span class="small muted" style="font-weight:700">${plural(L.length,'item')}</span>`:''}</div>
     ${L.length?`${kcalSummary(t)}${macroTiles(t)}`:`<p class="small muted">Log breakfast, lunch, dinner and snacks. Snap a photo to get the breakdown.</p>`}
-    <div class="row" style="gap:8px"><button class="btn sm" id="foodscan" style="flex:1">📷 Scan food</button><button class="btn sm secondary" id="fooddiary" style="flex:1">📒 Food diary</button></div></div>`;
+    <div class="row" style="gap:8px"><button class="btn sm" id="foodscan" style="flex:1">📷 Scan</button><button class="btn sm secondary" id="foodman" style="flex:1" aria-label="Add food manually">✏️ Manual</button><button class="btn sm secondary" id="fooddiary" style="flex:1">📒 Diary</button></div></div>`;
 }
 function bindFood(v){
   if($('#foodscan'))$('#foodscan').onclick=()=>foodSheet(mealNow());
+  if($('#foodman'))$('#foodman').onclick=()=>quickSheet(mealNow());
   if($('#fooddiary'))$('#fooddiary').onclick=()=>{foodDay=isoLocal();go('food')};
   v.querySelectorAll('[data-kgoal]').forEach(b=>b.onclick=goalSheet);
 }
@@ -91,8 +92,8 @@ function renderFood(v){
     ${showKcal()||L.length?`<div class="card stack">${kcalSummary(t,foodDay)}${macroTiles(t)}</div>`:''}
     ${Object.entries(MEALS).map(([m,[e,name]])=>{const M=L.filter(f=>(f.m||'s')===m),s=foodSum(M);
       return `<div class="card stack meal"><div class="row between"><h2 class="h3">${e} ${name}</h2>${M.length&&showKcal()?`<b>${kcalTxt(s.k)}</b>`:''}</div>
-        ${M.map(f=>`<div class="row between fentry"><div style="flex:1"><b>${esc(f.n)}</b><p class="small muted">${entryLine(f)}</p></div><button class="xbtn" data-fdel="${f.id}" aria-label="Delete ${esc(f.n)}">🗑️</button></div>`).join('')}
-        <div class="row" style="gap:8px"><button class="link" data-fadd="${m}">＋ Add food</button><button class="link" data-fquick="${m}" style="color:var(--muted)">Quick add</button></div></div>`}).join('')}
+        ${M.map(f=>`<div class="row between fentry"><button class="fedit" data-fedit="${f.id}" aria-label="Edit ${esc(f.n)}"><b>${esc(f.n)}</b><span class="small muted">${entryLine(f)} ✏️</span></button><button class="xbtn" data-fdel="${f.id}" aria-label="Delete ${esc(f.n)}">🗑️</button></div>`).join('')}
+        <div class="row" style="gap:8px"><button class="link" data-fadd="${m}">＋ Add food</button><button class="link" data-fquick="${m}">✏️ Add manually</button></div></div>`}).join('')}
     ${showKcal()?'':`<p class="small muted center">Growing bodies need plenty of fuel, so KinFit doesn't count calories for under-18s. Eat a variety of foods and listen to your hunger.</p>`}
   </div>`;
   $('#fback').onclick=()=>go('today');
@@ -100,6 +101,7 @@ function renderFood(v){
   $('#fnext').onclick=()=>{if(!isToday){foodDay=shift(1);renderFood(v)}};
   v.querySelectorAll('[data-kgoal]').forEach(b=>b.onclick=goalSheet);
   v.querySelectorAll('[data-fadd]').forEach(b=>b.onclick=()=>foodSheet(b.dataset.fadd));
+  v.querySelectorAll('[data-fedit]').forEach(b=>b.onclick=()=>{const x=(profile.food||[]).find(y=>y.id===b.dataset.fedit);if(x)quickSheet(x.m,null,x)});
   v.querySelectorAll('[data-fquick]').forEach(b=>b.onclick=()=>quickSheet(b.dataset.fquick));
   v.querySelectorAll('[data-fdel]').forEach(b=>b.onclick=()=>{const before=(profile.food||[]).slice();profile.food=before.filter(x=>x.id!==b.dataset.fdel);saveProfile();renderFood(v);
     undoable('Food deleted',()=>{profile.food=before;saveProfile();renderFood(v)},()=>syncSoon())});
@@ -121,20 +123,24 @@ function goalSheet(){
       profile.kcalGoal=g;if(ex==='half')delete profile.exAdd;else profile.exAdd=ex;saveProfile();syncSoon();closeLayer();render()};
   });
 }
-function quickSheet(meal){
-  let m=meal||mealNow();
-  const n=(id,l,ph)=>`<div style="flex:1"><label class="small muted" style="font-weight:700">${l}</label><input class="num" id="${id}" type="number" inputmode="decimal" min="0" step="0.1" placeholder="${ph}"></div>`;
-  sheet(`<h2>✏️ Quick add</h2>
-    <input class="txt" id="qn" maxlength="50" placeholder="What did you eat? e.g. Banana">
-    ${showKcal()?`<div class="row" style="gap:10px">${n('qk','CALORIES','0')}</div>`:''}
-    <div class="row" style="gap:10px">${n('qp','PROTEIN g','0')}${n('qc','CARBS g','0')}${n('qf','FIBER g','0')}</div>
+// Add food by typing the numbers, or fix an entry (edit = an existing diary entry; pre = values to start from).
+function quickSheet(meal,pre,edit){
+  const e=edit||pre||{};let m=e.m||meal||mealNow();
+  const n=(id,l,v)=>`<div style="flex:1"><label class="small muted" style="font-weight:700">${l}</label><input class="num" id="${id}" type="number" inputmode="decimal" min="0" step="any" placeholder="0" value="${v?v:''}"></div>`;
+  sheet(`<h2>${edit?'✏️ Edit food':'✏️ Add food manually'}</h2>
+    <input class="txt" id="qn" maxlength="50" placeholder="What did you eat? e.g. Banana" value="${esc(e.n||'')}">
+    ${showKcal()?`<div class="row" style="gap:10px">${n('qk','CALORIES',e.k)}</div><p class="small muted">Tip: the label on the pack shows calories per serving.</p>`:''}
+    <div class="row" style="gap:10px">${n('qp','PROTEIN g',e.p)}${n('qc','CARBS g',e.c)}${n('qf','FIBER g',e.f)}</div>
     ${mealSeg(m)}
-    <button class="btn" id="qok">Add</button><button class="btn ghost" id="cancel">Cancel</button>`,()=>{
+    <button class="btn" id="qok">${edit?'Save':'Add'}</button>${edit?'<button class="btn danger" id="qdel">Delete</button>':''}<button class="btn ghost" id="cancel">Cancel</button>`,()=>{
     bindMealSeg(x=>m=x);$('#cancel').onclick=closeLayer;
-    $('#qok').onclick=()=>{const v=id=>{const e=$('#'+id);return e?Math.max(0,parseFloat(e.value)||0):0},name=$('#qn').value.trim();
+    if(edit)$('#qdel').onclick=()=>{profile.food=(profile.food||[]).filter(x=>x.id!==edit.id);saveProfile();syncSoon();closeLayer();toast('Food deleted');render()};
+    $('#qok').onclick=()=>{const v=id=>{const x=$('#'+id);return x?Math.max(0,parseFloat(x.value)||0):(e[id.slice(1)]||0)},name=$('#qn').value.trim();
       if(!name){toast('Give it a name');return}
-      saveFood({d:route==='food'&&foodDay?foodDay:isoLocal(),m,n:name.slice(0,50),k:Math.min(5000,Math.round(v('qk'))),p:round1(v('qp')),c:round1(v('qc')),f:round1(v('qf'))});
-      closeLayer();toast(`Added to ${MEALS[m][1]}`);render()};
+      const vals={m,n:name.slice(0,50),k:Math.min(5000,Math.round(v('qk'))),p:round1(Math.min(1000,v('qp'))),c:round1(Math.min(1000,v('qc'))),f:round1(Math.min(1000,v('qf')))};
+      if(edit){profile.food=(profile.food||[]).map(x=>x.id===edit.id?Object.assign({},x,vals,{u:Date.now()}):x);saveProfile();syncSoon()}
+      else saveFood(Object.assign({d:route==='food'&&foodDay?foodDay:isoLocal()},vals));
+      closeLayer();toast(edit?'Saved ✅':`Added to ${MEALS[m][1]}`);render()};
   });
 }
 
@@ -147,7 +153,7 @@ function foodSheet(meal){
     <div id="fprev"></div>
     <label class="small muted" style="font-weight:700">DETAILS (OPTIONAL)</label>
     <input class="txt" id="fnote" maxlength="200" placeholder="e.g. big bowl, brown rice, 2 eggs">
-    <button class="btn" id="fgo">🔍 Get breakdown</button><button class="link" id="fq">✏️ Quick add instead</button><button class="btn ghost" id="cancel">Cancel</button>
+    <button class="btn" id="fgo">🔍 Get breakdown</button><button class="link" id="fq">✏️ Add manually instead</button><button class="btn ghost" id="cancel">Cancel</button>
     <p class="small muted">🔒 The photo is only used to work out the breakdown. It isn't saved anywhere.</p>`,()=>{
     $('#cancel').onclick=closeLayer;$('#fq').onclick=()=>quickSheet(m);
     const pick=async e=>{const f=e.target.files[0];if(!f)return;try{img=await foodImage(f);$('#fprev').innerHTML=`<img src="${img}" alt="Your meal" class="fprev">`}catch(err){toast("Couldn't open that photo")}};
@@ -185,9 +191,10 @@ function foodResult(d,img,meal){
     <div id="fres" class="stack"></div>
     ${mealSeg(m)}
     <details class="how"><summary>What do these do?</summary>${Object.values(MACRO).map(x=>`<p class="small">${x[0]} <b>${x[1]}</b> ${x[2]}.</p>`).join('')}</details>
-    <button class="btn" id="fadd">＋ Add to diary</button><button class="btn secondary" id="fagain">📷 Scan another</button><button class="btn ghost" id="cancel">Close</button>`,()=>{
+    <button class="btn" id="fadd">＋ Add to diary</button><button class="btn secondary" id="fedit">✏️ Change the numbers</button><button class="btn secondary" id="fagain">📷 Scan another</button><button class="btn ghost" id="cancel">Close</button>`,()=>{
     draw();bindMealSeg(x=>m=x);
     $('#cancel').onclick=closeLayer;$('#fagain').onclick=()=>foodSheet(m);
+    $('#fedit').onclick=()=>quickSheet(m,{m,n:(d.dish+(k!==1?` (${k===.5?'½':k+'×'})`:'')).slice(0,50),k:Math.round(cal*k),p:round1(T.protein*k),c:round1(T.carbs*k),f:round1(T.fiber*k)});
     document.querySelectorAll('#fk [data-k]').forEach(b=>b.onclick=()=>{k=+b.dataset.k;document.querySelectorAll('#fk button').forEach(x=>x.classList.toggle('on',x===b));draw()});
     $('#fadd').onclick=()=>{
       saveFood({d:route==='food'&&foodDay?foodDay:isoLocal(),m,n:(d.dish+(k!==1?` (${k===.5?'½':k+'×'})`:'')).slice(0,50),k:Math.round(cal*k),p:round1(T.protein*k),c:round1(T.carbs*k),f:round1(T.fiber*k)});
