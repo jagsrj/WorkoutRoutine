@@ -465,6 +465,7 @@ function renderProgress(v){
   $('#shareprog').onclick=shareProgress;
   if($('#logact'))$('#logact').onclick=()=>activitySheet();
   if($('#badd'))$('#badd').onclick=bodySheet;
+  if($('#bstats'))$('#bstats').onclick=statsSheet;
   v.querySelectorAll('[data-bdel]').forEach(b=>b.onclick=()=>{const before=(profile.body||[]).slice();profile.body=before.filter(x=>x.id!==b.dataset.bdel);saveProfile();renderProgress(v);
     undoable('Measurement deleted',()=>{profile.body=before;saveProfile();renderProgress(v)},()=>syncSoon())});
   v.querySelectorAll('[data-b]').forEach(b=>b.onclick=()=>{const B=BADGES.find(x=>x.id===b.dataset.b);toast(`${earned.has(B.id)?B.e+' Earned: ':'🔒 To unlock: '}${B.d}`)});

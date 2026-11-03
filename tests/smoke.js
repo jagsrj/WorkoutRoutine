@@ -55,7 +55,10 @@ const check = (ok, what) => { console.log(`${ok ? '✅' : '❌'} ${what}`); if (
     });
     Object.entries(u).forEach(([k, v]) => check(v, 'Unit: ' + k));
     // Start the Upper A workout from the folded list, tick a set, finish
-    await page.click('details.fold summary'); await page.click('details.fold [data-start="ua"]'); await page.waitForTimeout(300);
+    // On Mondays Upper A is today's main workout, so it isn't in the folded list
+    if (await page.locator('details.fold [data-start="ua"]').count()) { await page.click('details.fold summary'); await page.click('details.fold [data-start="ua"]'); }
+    else await page.click('[data-start="ua"]');
+    await page.waitForTimeout(300);
     check(await page.isVisible('#finish'), 'Workout screen opens');
     await page.click('[data-check="0,0"]'); await page.click('[data-check="0,1"]'); await page.click('[data-check="0,2"]');
     check(await page.isVisible('.effort'), 'Effort question appears after all sets');
@@ -129,6 +132,28 @@ const check = (ok, what) => { console.log(`${ok ? '✅' : '❌'} ${what}`); if (
     Object.entries(hs).forEach(([k, v]) => check(v, 'Unit: ' + k));
     await page.click('[data-go="progress"]'); await page.click('[data-mm="ready"]'); await page.waitForTimeout(150);
     check((await page.textContent('#mmcard')).includes('Ready'), 'Muscle "Ready?" tab shows');
+    // Body stats & BMI: enter weight, height, age and a target through the sheet
+    const bmiU = await page.evaluate(() => ({
+      bmiMath: Math.round(bmiOf(70, 175) * 10) / 10 === 22.9,
+      bands: bmiBand(17).n.startsWith('Below') && bmiBand(22).n === 'Healthy range' && bmiBand(27).n.startsWith('Above'),
+      statsKept: JSON.stringify(sanitizeProfile({ id: 'pq', stats: { h: 175, age: 40, ageOn: '2026-01-01', goal: 23 } }).stats) === '{"h":175,"age":40,"ageOn":"2026-01-01","goal":23}',
+      lowGoalDropped: !('goal' in (sanitizeProfile({ id: 'pq', stats: { h: 175, goal: 15 } }).stats || {})),
+    }));
+    Object.entries(bmiU).forEach(([k, v]) => check(v, 'Unit: ' + k));
+    await page.evaluate(() => { profile.photos = true; profile.unit = 'kg'; saveProfile(); go('progress'); });
+    await page.click('#bstats'); await page.fill('#sw', '70'); await page.fill('#shc', '175'); await page.fill('#sa', '40');
+    check((await page.textContent('#sprev')).includes('22.9'), 'BMI preview updates while typing');
+    await page.fill('#sg', '15'); await page.click('#ssave'); await page.waitForTimeout(150);
+    check(await page.isVisible('#ssave'), 'Target BMI below 18.5 is refused');
+    await page.fill('#sg', '22'); await page.click('#ssave'); await page.waitForTimeout(200);
+    const statsTxt = await page.textContent('#view');
+    check(statsTxt.includes('22.9') && statsTxt.includes('Healthy range') && statsTxt.includes('67.4 kg'), 'Body stats card shows BMI, range and target weight');
+    await page.click('#bstats'); await page.fill('#sa', '14'); await page.waitForTimeout(100);
+    check(!(await page.isVisible('#sg')), 'Target BMI is hidden for under-18s');
+    await page.click('#ssave'); await page.waitForTimeout(200);
+    const kidTxt = await page.textContent('#view');
+    check(!kidTxt.includes('Healthy range') && kidTxt.includes('growth charts'), 'Under-18s see BMI without adult ranges');
+    await page.evaluate(() => { profile.photos = false; profile.unit = 'lbs'; delete profile.stats; profile.body = []; saveProfile(); go('progress'); });
     // Security: booby-trapped saved data must never run as code
     const bad = '<img src=x onerror="window.__pwned=1">';
     await page.evaluate(b => {

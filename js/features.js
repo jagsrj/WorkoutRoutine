@@ -300,6 +300,68 @@ function activityCard(){
   return `<div class="card row"><span class="big-emoji">🏃</span><div style="flex:1"><b>${min} active minutes this week</b><p class="small muted">${n?plural(n,'activity')+' logged. Sports count too!':'Played a sport or went for a walk? Log it!'}</p></div><button class="btn sm secondary" id="logact">＋ Log</button></div>`;
 }
 
+/* ---------- Body stats: height, age, BMI and target BMI (part of body tracking) ----------
+   Height is kept in cm and weight entries in their own unit; everything is shown in the person's unit.
+   Adult BMI ranges don't apply under 18 (doctors use age-and-sex charts), so kids see the number with a note
+   and no category or target. A target below 18.5 (the bottom of the healthy range) is never accepted. */
+const bmiOf=(kg,cm)=>kg>0&&cm>0?kg/((cm/100)**2):null;
+const kgOf=(w,u)=>u==='kg'?w:w/2.2046;
+function latestWeight(){const B=(profile.body||[]).filter(b=>b.w).sort((a,b)=>a.d.localeCompare(b.d));return B.length?B[B.length-1]:null}
+function curAge(){const s=profile.stats||{};if(!s.age||!s.ageOn)return null;const a=parseIso(s.ageOn),n=new Date();
+  let y=n.getFullYear()-a.getFullYear();if(n.getMonth()<a.getMonth()||(n.getMonth()===a.getMonth()&&n.getDate()<a.getDate()))y--;return s.age+Math.max(0,y)}
+const bmiYoung=()=>isKid()||(curAge()!==null&&curAge()<18);
+function bmiBand(b){return b<18.5?{n:'Below the healthy range',c:'var(--warn)'}:b<25?{n:'Healthy range',c:'var(--ok)'}:b<30?{n:'Above the healthy range',c:'var(--warn)'}:{n:'Well above the healthy range',c:'var(--bad)'}}
+const fmtHeight=cm=>{if(!cm)return '–';if(profile.unit==='kg')return Math.round(cm)+' cm';const t=Math.round(cm/2.54);return `${Math.floor(t/12)}′${t%12}″`};
+// Weight for a BMI at the person's height, in their unit.
+const weightForBmi=(bmi,cm)=>round1(toUnit(bmi*(cm/100)**2,'kg'));
+function statsBlock(){
+  const s=profile.stats||{},lw=latestWeight(),age=curAge(),young=bmiYoung();
+  const bmi=lw&&s.h?round1(bmiOf(kgOf(lw.w,lw.unit),s.h)):null,band=bmi&&!young?bmiBand(bmi):null;
+  let goal='';
+  if(young)goal=`<p class="small muted">🧒 For anyone under 18, BMI is judged on growth charts for age, not adult ranges, so there's no target here. A doctor can explain what's healthy while you're growing.</p>`;
+  else if(s.goal&&s.h){const tw=weightForBmi(s.goal,s.h),diff=lw?round1(tw-toUnit(lw.w,lw.unit)):null;
+    goal=`<p class="small"><b>🎯 Target BMI ${s.goal}</b> ≈ ${tw} ${profile.unit} at your height${diff===null?'':Math.abs(diff)<0.5?' · You\'re there! 🎉':` · ${Math.abs(diff)} ${profile.unit} to ${diff<0?'lose':'gain'}`}</p>`}
+  return `<div class="stats" style="grid-template-columns:1fr 1fr">
+      <div class="stat"><b>${lw?round1(toUnit(lw.w,lw.unit)):'–'}</b><span>weight ${profile.unit}</span></div>
+      <div class="stat"><b>${fmtHeight(s.h)}</b><span>height</span></div>
+      <div class="stat"><b>${age===null?'–':age}</b><span>age</span></div>
+      <div class="stat"><b>${bmi===null?'–':bmi}</b><span>${bmi===null?(s.h?'BMI: add your weight':'BMI: add your height'):'current BMI'}</span>${band?`<span style="display:block;color:${band.c};font-weight:800;margin-top:2px">${band.n}</span>`:''}</div>
+      ${young?'':`<div class="stat" style="grid-column:1/-1"><b>${s.goal||'–'}</b><span>target BMI</span></div>`}
+    </div>${goal}
+    <button class="btn secondary" id="bstats">✏️ ${s.h||s.age||lw?'Edit my stats':'Add height, age & target'}</button>
+    <p class="small muted">BMI is a rough guide: it can't tell muscle from fat, so strong people often score "above". Strength, energy and how you feel matter more.</p>`;
+}
+function statsSheet(){
+  const s=profile.stats||{},lw=latestWeight(),cm=profile.unit==='kg',t=s.h?Math.round(s.h/2.54):0,lab='class="small muted" style="font-weight:700"';
+  sheet(`<h2>📏 My body stats</h2>
+    <div class="row" style="gap:10px"><div style="flex:1"><label ${lab}>WEIGHT (${profile.unit})</label><input class="num" id="sw" type="number" inputmode="decimal" step="0.1" min="0" value="${lw?round1(toUnit(lw.w,lw.unit)):''}"></div>
+      <div style="flex:1"><label ${lab}>AGE</label><input class="num" id="sa" type="number" inputmode="numeric" step="1" min="5" max="110" value="${curAge()??''}"></div></div>
+    <div><label ${lab}>HEIGHT (${cm?'cm':'feet · inches'})</label>${cm?`<input class="num" id="shc" type="number" inputmode="decimal" step="0.5" min="50" max="250" placeholder="cm" value="${s.h?Math.round(s.h):''}">`
+      :`<div class="row" style="gap:10px"><input class="num" id="shf" type="number" inputmode="numeric" min="1" max="8" placeholder="ft" value="${t?Math.floor(t/12):''}" style="flex:1"><input class="num" id="shi" type="number" inputmode="numeric" min="0" max="11" placeholder="in" value="${t?t%12:''}" style="flex:1"></div>`}</div>
+    <div id="sgwrap"><label ${lab}>TARGET BMI (ADULTS)</label><input class="num" id="sg" type="number" inputmode="decimal" step="0.1" min="${BMI_MIN_GOAL}" max="40" placeholder="e.g. 23" value="${s.goal||''}">
+      <p class="small muted">The healthy adult range is 18.5 to 24.9.</p></div>
+    <p class="small" id="sprev" style="font-weight:700"></p>
+    <button class="btn" id="ssave">Save</button><button class="btn ghost" id="cancel">Cancel</button>`,()=>{
+    $('#cancel').onclick=closeLayer;
+    const read=()=>{const n=id=>{const e=$('#'+id);return e?parseFloat(e.value):NaN};
+      const h=cm?n('shc'):((n('shf')||0)*12+(n('shi')||0))*2.54;return {w:n('sw'),age:n('sa'),h:h>0?h:NaN,goal:n('sg')}};
+    const young=a=>isKid()||(a>0&&a<18);
+    const prev=()=>{const r=read(),b=r.w>0&&r.h>=50?round1(bmiOf(kgOf(r.w,profile.unit),r.h)):null;
+      $('#sgwrap').style.display=young(r.age)?'none':'';
+      $('#sprev').textContent=b?`Your BMI: ${b}${young(r.age)?'':' · '+bmiBand(b).n}`:'Add weight and height to see your BMI.'};
+    $('#layer').querySelectorAll('input').forEach(i=>i.oninput=prev);prev();
+    $('#ssave').onclick=()=>{const r=read(),st={};
+      if(!isNaN(r.h)){if(r.h<50||r.h>250){toast('Check your height');return}st.h=round1(r.h)}
+      if(!isNaN(r.age)){if(r.age<5||r.age>110){toast('Check your age');return}st.age=Math.round(r.age);st.ageOn=isoLocal()}
+      if(!isNaN(r.goal)&&!young(r.age)){if(r.goal<BMI_MIN_GOAL){toast(`Pick a target of ${BMI_MIN_GOAL} or more. That's where the healthy range starts`);return}if(r.goal>40){toast('Check your target BMI');return}st.goal=round1(r.goal)}
+      profile.stats=st;
+      // A new weight is saved as today's measurement, so it also shows on the weight chart.
+      if(r.w>0&&(!lw||Math.abs(r.w-round1(toUnit(lw.w,lw.unit)))>=0.05)){const today=isoLocal(),B=(profile.body||[]).slice(),e=B.find(b=>b.d===today);
+        if(e){e.w=r.w;e.unit=profile.unit}else B.push({id:newId('b'),d:today,w:r.w,unit:profile.unit,waist:0,lu:cm?'cm':'in'});profile.body=B}
+      saveProfile();closeLayer();toast('Saved ✅');syncSoon();render()};
+  });
+}
+
 /* ---------- Body measurements (part of body tracking) ---------- */
 function bodyCard(){
   if(!profile.photos)return '';
@@ -307,7 +369,9 @@ function bodyCard(){
   const conv=(x,from,to)=>from===to?x:to==='cm'?x*2.54:x/2.54;
   const w=B.filter(b=>b.w).map(b=>({d:b.d,v:round1(toUnit(b.w,b.unit))})),wa=B.filter(b=>b.waist).map(b=>({d:b.d,v:round1(conv(b.waist,b.lu||'in',lu))}));
   const delta=a=>a.length>1?round1(a[a.length-1].v-a[0].v):null,dw=delta(w),dwa=delta(wa);
-  return `<div class="card stack"><div class="row between"><h2 class="h3">⚖️ Body measurements</h2><span class="small muted" style="font-weight:700">🔒 Private</span></div>
+  return `<div class="card stack"><div class="row between"><h2 class="h3">📏 Body stats & BMI</h2><span class="small muted" style="font-weight:700">🔒 Private</span></div>
+    ${statsBlock()}</div>
+  <div class="card stack"><div class="row between"><h2 class="h3">⚖️ Body measurements</h2><span class="small muted" style="font-weight:700">🔒 Private</span></div>
     ${B.length?`<div class="stats" style="grid-template-columns:1fr 1fr"><div class="stat"><b>${w.length?w[w.length-1].v:'–'}</b><span>${profile.unit}${dw!==null?` (${dw>0?'+':''}${dw})`:''}</span></div><div class="stat"><b>${wa.length?wa[wa.length-1].v:'–'}</b><span>waist ${lu}${dwa!==null?` (${dwa>0?'+':''}${dwa})`:''}</span></div></div>
       ${w.length>1?miniChart(w,'Body weight ('+profile.unit+')'):''}
       <details class="how"><summary>All entries</summary>${B.slice().reverse().map(b=>`<div class="row between" style="padding:6px 0"><span>${niceDate(b.d)}</span><span>${b.w?round1(toUnit(b.w,b.unit))+' '+profile.unit:''}${b.w&&b.waist?' · ':''}${b.waist?round1(conv(b.waist,b.lu||'in',lu))+' '+lu:''}<button class="xbtn" data-bdel="${b.id}" aria-label="Delete">🗑️</button></span></div>`).join('')}</details>`
